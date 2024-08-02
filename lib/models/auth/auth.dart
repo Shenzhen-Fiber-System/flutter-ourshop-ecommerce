@@ -1,0 +1,167 @@
+
+import '../../ui/pages/pages.dart';
+
+class Authentication extends Equatable {
+    final bool success;
+    final String message;
+    final Token data;
+
+    const Authentication({
+        required this.success,
+        required this.message,
+        required this.data,
+    });
+
+    factory Authentication.fromJson(Map<String, dynamic> json) => Authentication(
+        success: json["success"],
+        message: json["message"],
+        data: Token.fromJson(json["data"]),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "success": success,
+        "message": message,
+        "data": data.toJson(),
+    };
+    
+      @override
+      List<Object?> get props => [success, message, data];
+}
+
+class Token extends Equatable {
+    final String token;
+
+    const Token({
+        required this.token,
+    });
+
+    factory Token.fromJson(Map<String, dynamic> json) => Token(
+        token: json["token"],
+    );
+
+
+    get getTokenPayload{
+      final jwt = JWT.decode(token);
+      return jwt.payload;
+    }
+
+
+
+    Map<String, dynamic> toJson() => {
+        "token": token,
+    };
+    
+      @override
+      List<Object?> get props => [token];
+}
+
+class LoggedUser extends Equatable {
+    final String userCountryName;
+    final String sub;
+    final String companyId;
+    final String roles;
+    final String companyCountryName;
+    final String lastName;
+    final String language;
+    final String companyMainCategoryId;
+    final String companyCurrentBusinessCategoryId;
+    final String userPhoneNumber;
+    final String companyCountryId;
+    final String userId;
+    final String userCountryId;
+    final String companyName;
+    final String name;
+    final String userPhoneNumberCode;
+    final int exp;
+    final int iat;
+    final String email;
+
+    const LoggedUser({
+        required this.userCountryName,
+        required this.sub,
+        required this.companyId,
+        required this.roles,
+        required this.companyCountryName,
+        required this.lastName,
+        required this.language,
+        required this.companyMainCategoryId,
+        required this.companyCurrentBusinessCategoryId,
+        required this.userPhoneNumber,
+        required this.companyCountryId,
+        required this.userId,
+        required this.userCountryId,
+        required this.companyName,
+        required this.name,
+        required this.userPhoneNumberCode,
+        required this.exp,
+        required this.iat,
+        required this.email,
+    });
+
+    factory LoggedUser.fromJson(Map<String, dynamic> json) => LoggedUser(
+        userCountryName: json["user_country_name"],
+        sub: json["sub"],
+        companyId: json["company_id"],
+        roles: json["roles"],
+        companyCountryName: json["company_country_name"],
+        lastName: json["last_name"],
+        language: json["language"],
+        companyMainCategoryId: json["company_main_category_id"],
+        companyCurrentBusinessCategoryId: json["company_current_business_category_id"],
+        userPhoneNumber: json["user_phone_number"],
+        companyCountryId: json["company_country_id"],
+        userId: json["user_id"],
+        userCountryId: json["user_country_id"],
+        companyName: json["company_name"],
+        name: json["name"],
+        userPhoneNumberCode: json["user_phone_number_code"],
+        exp: json["exp"],
+        iat: json["iat"],
+        email: json["email"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "user_country_name": userCountryName,
+        "sub": sub,
+        "company_id": companyId,
+        "roles": roles,
+        "company_country_name": companyCountryName,
+        "last_name": lastName,
+        "language": language,
+        "company_main_category_id": companyMainCategoryId,
+        "company_current_business_category_id": companyCurrentBusinessCategoryId,
+        "user_phone_number": userPhoneNumber,
+        "company_country_id": companyCountryId,
+        "user_id": userId,
+        "user_country_id": userCountryId,
+        "company_name": companyName,
+        "name": name,
+        "user_phone_number_code": userPhoneNumberCode,
+        "exp": exp,
+        "iat": iat,
+        "email": email,
+    };
+    
+      @override
+      List<Object?> get props => [
+        userCountryName,
+        sub,
+        companyId,
+        roles,
+        companyCountryName,
+        lastName,
+        language,
+        companyMainCategoryId,
+        companyCurrentBusinessCategoryId,
+        userPhoneNumber,
+        companyCountryId,
+        userId,
+        userCountryId,
+        companyName,
+        name,
+        userPhoneNumberCode,
+        exp,
+        iat,
+        email,
+      ];
+}
