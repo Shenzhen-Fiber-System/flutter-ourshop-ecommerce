@@ -273,12 +273,13 @@ class _FormView extends StatelessWidget {
                       ),
                       validator: FormBuilderValidators.compose([
                         FormBuilderValidators.required(),
-                        FormBuilderValidators.minLength(8),
-                        FormBuilderValidators.hasSpecialChars(),
-                        FormBuilderValidators.hasUppercaseChars(),
-                        FormBuilderValidators.hasNumericChars(),
-                        FormBuilderValidators.equal(_formKey.currentState!.fields[translations.password.trim().toLowerCase()]?.value ?? '', errorText: translations.conform_password_error),
-                        
+                        (val) {
+                          final password = _formKey.currentState?.fields['password']?.value;
+                          if (val != password) {
+                            return translations.conform_password_error;
+                          }
+                          return null;
+                        },
                       ]),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                     );
