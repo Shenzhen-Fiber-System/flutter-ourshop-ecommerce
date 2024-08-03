@@ -52,8 +52,8 @@ class MyApp extends StatelessWidget {
         initialRoute: AppRoutes.initialPage,
         routes: AppRoutes.routes,
         onGenerateInitialRoutes: (initialRoute){
-          final String lastVisitedPage = locator<Preferences>().preferences['last_visited_page'];
-          if (lastVisitedPage.isEmpty) {
+          final String? lastVisitedPage = locator<Preferences>().preferences['last_visited_page'];
+          if ((lastVisitedPage != null &&lastVisitedPage.isEmpty) || lastVisitedPage == null) {
             return [
               MaterialPageRoute(
                 builder: (_) => const SplashPage()

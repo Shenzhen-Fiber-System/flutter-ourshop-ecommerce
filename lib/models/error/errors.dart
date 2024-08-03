@@ -22,12 +22,12 @@ class ErrorHandler extends DioException{
         ErrorToast(
           // title: AppLocalizations.of(_context!)!.user_exists,
           title: error.message,
-          description: AppLocalizations.of(_context!)!.user_exist_description,
+          // description: AppLocalizations.of(_context!)!.user_exist_description,
           style: ToastificationStyle.flatColored,
           foregroundColor: Colors.white,
           backgroundColor: Colors.red.shade500,
           icon: const Icon(Icons.error, color: Colors.white,),
-        ).showToast(_context);
+        ).showToast(_context!);
         break;
     //   case 401:
     //     ErrorToast(
@@ -76,12 +76,12 @@ class ErrorHandler extends DioException{
 }
 
 
-class RequestError {
-    bool success;
-    String message;
-    dynamic data;
+class RequestError extends Equatable {
+    final bool success;
+    final String message;
+    final dynamic data;
 
-    RequestError({
+    const RequestError({
         required this.success,
         required this.message,
         required this.data,
@@ -98,4 +98,8 @@ class RequestError {
         "message": message,
         "data": data,
     };
+    
+      @override
+      // TODO: implement props
+      List<Object?> get props => [success, message, data];
 }

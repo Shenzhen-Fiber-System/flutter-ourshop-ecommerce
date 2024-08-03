@@ -16,7 +16,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
   }
 
 
-  Future<void> loginUser(Map<String, dynamic> data) async {
+  Future<dynamic> loginUser(Map<String, dynamic> data) async {
     add(const AddIsLoadingEvent(true));
     final Auth auth = Auth(
       username: data['username'],
@@ -24,9 +24,9 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     final response =  await _userServices.login(auth);
     if(response is LoggedUser) {
       add(AddLoggedUserEvent(response));
-      add(const AddIsLoadingEvent(false));  
     }
     add(const AddIsLoadingEvent(false));
+    return response;
   }
 
 

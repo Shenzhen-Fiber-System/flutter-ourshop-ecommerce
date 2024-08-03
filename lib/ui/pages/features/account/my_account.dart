@@ -45,7 +45,7 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
     _scrollController = ScrollController();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 400),
     );
     _componentAnimationController = AnimationController(
       vsync: this,

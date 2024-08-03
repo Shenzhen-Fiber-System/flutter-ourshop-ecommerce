@@ -22,6 +22,8 @@ class _SignInPageState extends State<SignInPage> {
 
   final ValueNotifier<bool> showPassword = ValueNotifier<bool>(true);
 
+  late bool rememberMe;
+
 
   @override
   void initState() {
@@ -29,6 +31,7 @@ class _SignInPageState extends State<SignInPage> {
     locator<Preferences>().saveLastVisitedPage('sign_in_page');
     _userController = TextEditingController(text: locator<Preferences>().preferences['username'] ?? '');
     _passwordController = TextEditingController(text: locator<Preferences>().preferences['password'] ?? '');
+    rememberMe = bool.parse(locator<Preferences>().preferences['remember_me'] ?? 'false');
   }
 
   @override
@@ -110,11 +113,11 @@ class _SignInPageState extends State<SignInPage> {
                 child: Column(
                   children: [
                     FormBuilderTextField(
-                          autofocus: true,
+                          autofocus: rememberMe  ? false : true,
                           focusNode: _userFocusNode,
                           controller: _userController,
                           style: inputValueStyle,
-                          onEditingComplete: () => FocusScope.of(context).requestFocus(_passwordFocusNode),
+                          onEditingComplete: () => rememberMe ? null : FocusScope.of(context).requestFocus(_passwordFocusNode),
                           textInputAction: TextInputAction.next,
                           name: "username",
                           cursorColor: _cursorColor,
@@ -164,7 +167,7 @@ class _SignInPageState extends State<SignInPage> {
                                 shape: const RoundedRectangleBorder(
                                   side: BorderSide.none
                                 ),
-                                initialValue: bool.parse(locator<Preferences>().preferences['remember_me'] ?? 'false'),
+                                initialValue: rememberMe,
                                 onChanged: (value) {
                                   if(!value!){
                                     locator<Preferences>().removeData('remember_me');
@@ -193,18 +196,23 @@ class _SignInPageState extends State<SignInPage> {
                         const SizedBox(height: 10,),
                         SizedBox(
                           width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: (){
-                              if (_formKey.currentState!.saveAndValidate()) {
-                                if (_formKey.currentState!.value['remember_me']) {
-                                  locator<Preferences>().saveData('username', _formKey.currentState!.value['username']);
-                                  locator<Preferences>().saveData('password', _formKey.currentState!.value['password']);
-                                }
-                                context.read<UsersBloc>().loginUser(_formKey.currentState!.value).then((_)=> Navigator.pushNamed(context, '/home'));
-                              }
-                              
+                          child: BlocBuilder<UsersBloc, UsersState>(
+                            builder: (context, state) {
+                              return ElevatedButton(
+                                onPressed: state.isLoading ? null : (){
+                                  if (_formKey.currentState!.saveAndValidate()) {
+                                    if (_formKey.currentState!.value['remember_me']) {
+                                      locator<Preferences>().saveData('username', _formKey.currentState!.value['username']);
+                                      locator<Preferences>().saveData('password', _formKey.currentState!.value['password']);
+                                    }
+                                    context.read<UsersBloc>().loginUser(_formKey.currentState!.value)
+                                    .then((value) => value is RequestError ? null : Navigator.pushNamed(context, '/home'));
+                                  }
+                                  
+                                },
+                                child: state.isLoading ? const CircularProgressIndicator.adaptive() : Text(translations.sign_in_with(translations.email.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
+                              );
                             },
-                            child: Text(translations.sign_in_with(translations.email.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
                           ),
                         ),
                         const SizedBox(height: 5,),

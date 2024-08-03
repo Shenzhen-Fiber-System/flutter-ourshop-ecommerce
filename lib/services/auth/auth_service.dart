@@ -14,7 +14,9 @@ class AuthService{
       final LoggedUser loggedUser = LoggedUser.fromJson(auth.data.getTokenPayload);
       return loggedUser;
     } on DioException catch (e) {
+      log('AuthService -> : ${e.response?.data}');
       ErrorHandler(e);
+      return RequestError.fromJson(e.response?.data);
     }
   }
 
