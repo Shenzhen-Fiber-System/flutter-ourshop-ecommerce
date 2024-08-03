@@ -14,10 +14,17 @@ class Preferences{
     };
   }
 
-  Future<void> getpreferences(String key) async {
+  Future<void> getpreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    final value = prefs.getString(key) ?? '';
-    hasPreferences = value.isNotEmpty;
+    final keys = prefs.getKeys();
+    for (var key in keys) {  
+      preferences = {
+        ...preferences,
+        key: prefs.getString(key)
+      };
+    }
+    hasPreferences = preferences.isNotEmpty;
+
   }
 
   Future<void> removeData(String key) async {

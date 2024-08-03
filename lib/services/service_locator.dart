@@ -40,5 +40,5 @@ Future<void> initializeServiceLocator() async {
 }
 
 Future<void> validatePreferences () async {
-  await locator<Preferences>().getLastVisitedPage();
+  await locator<Preferences>().getpreferences();
 }

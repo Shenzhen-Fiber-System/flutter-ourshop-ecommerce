@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../../pages.dart';
 
 class SignInPage extends StatefulWidget {
@@ -11,6 +9,9 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
 
+  late TextEditingController _userController;
+  late TextEditingController _passwordController;
+
   final FocusNode _userFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
 
@@ -19,16 +20,23 @@ class _SignInPageState extends State<SignInPage> {
   final Color _cursorColor = AppTheme.palette[600]!;
   final double _space = 20;
 
+  final ValueNotifier<bool> showPassword = ValueNotifier<bool>(true);
+
 
   @override
   void initState() {
     super.initState();
     locator<Preferences>().saveLastVisitedPage('sign_in_page');
+    _userController = TextEditingController(text: locator<Preferences>().preferences['username'] ?? '');
+    _passwordController = TextEditingController(text: locator<Preferences>().preferences['password'] ?? '');
   }
 
   @override
   void dispose() {
     super.dispose();
+    _userController.dispose();
+    _passwordController.dispose();
+
     _userFocusNode.dispose();
     _passwordFocusNode.dispose();
 
@@ -104,6 +112,7 @@ class _SignInPageState extends State<SignInPage> {
                     FormBuilderTextField(
                           autofocus: true,
                           focusNode: _userFocusNode,
+                          controller: _userController,
                           style: inputValueStyle,
                           onEditingComplete: () => FocusScope.of(context).requestFocus(_passwordFocusNode),
                           textInputAction: TextInputAction.next,
@@ -119,22 +128,32 @@ class _SignInPageState extends State<SignInPage> {
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                         ),
                         SizedBox(height: _space,),
-                        FormBuilderTextField(
-                          focusNode: _passwordFocusNode,
-                          style: inputValueStyle,
-                          textInputAction: TextInputAction.done,
-                          name: "password",
-                          cursorColor: _cursorColor,
-                          decoration: InputDecoration(
-                            labelText: translations.password,
-                            hintText: translations.placeholder(translations.password.toLowerCase()),
-                            
-                          ),
-                          validator: FormBuilderValidators.compose([
-                            FormBuilderValidators.required(),
-                            FormBuilderValidators.minLength(6),
-                          ]),
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                        ValueListenableBuilder(
+                          valueListenable: showPassword,
+                          builder: (BuildContext context, value, _) {
+                            return FormBuilderTextField(
+                              focusNode: _passwordFocusNode,
+                              style: inputValueStyle,
+                              controller: _passwordController,
+                              textInputAction: TextInputAction.done,
+                              name: "password",
+                              cursorColor: _cursorColor,
+                              decoration: InputDecoration(
+                                labelText: translations.password,
+                                hintText: translations.placeholder(translations.password.toLowerCase()),
+                                suffixIcon: IconButton(
+                                  onPressed: () => showPassword.value = !showPassword.value,
+                                  icon: Icon(showPassword.value ? Icons.visibility : Icons.visibility_off),
+                                )
+                              ),
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.required(),
+                                FormBuilderValidators.minLength(6),
+                              ]),
+                              obscureText: value,
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                            );
+                          },
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -145,6 +164,15 @@ class _SignInPageState extends State<SignInPage> {
                                 shape: const RoundedRectangleBorder(
                                   side: BorderSide.none
                                 ),
+                                initialValue: bool.parse(locator<Preferences>().preferences['remember_me'] ?? 'false'),
+                                onChanged: (value) {
+                                  if(!value!){
+                                    locator<Preferences>().removeData('remember_me');
+                                    locator<Preferences>().removeData('username');
+                                    locator<Preferences>().removeData('password');
+                                  }
+                                  locator<Preferences>().saveData('remember_me', value.toString());
+                                },
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   focusedBorder: InputBorder.none,
@@ -168,9 +196,13 @@ class _SignInPageState extends State<SignInPage> {
                           child: ElevatedButton(
                             onPressed: (){
                               if (_formKey.currentState!.saveAndValidate()) {
-                                log('form:${_formKey.currentState!.value}');
+                                if (_formKey.currentState!.value['remember_me']) {
+                                  locator<Preferences>().saveData('username', _formKey.currentState!.value['username']);
+                                  locator<Preferences>().saveData('password', _formKey.currentState!.value['password']);
+                                }
                                 context.read<UsersBloc>().loginUser(_formKey.currentState!.value).then((_)=> Navigator.pushNamed(context, '/home'));
                               }
+                              
                             },
                             child: Text(translations.sign_in_with(translations.email.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
                           ),
