@@ -27,7 +27,6 @@ class ConnectivityListener extends StatelessWidget {
         builder: (BuildContext context, GeneralState state) {
           if (state.isInterentConnectionActive) {
             return child;
-
           }
           return Center(
             child: Text('No internet connection', style:theme.textTheme.headlineLarge ),

@@ -61,31 +61,31 @@ class MyApp extends StatelessWidget {
             ];
           }
           switch (lastVisitedPage) {
-                  case 'splash_page':          
-                  return [
-                    MaterialPageRoute(
-                      builder: (_) => const SplashPage()
-                    ),
-                  ];
-                  case 'choose_language_page':
-                  return [
-                    MaterialPageRoute(
-                      builder: (_) => const ChooseLanguagePage()
-                    ),
-                  ];
-                  case 'sign_in_page':
-                  return [
-                    MaterialPageRoute(
-                      builder: (_) => const SignInPage()
-                    ),
-                  ];
-                  default:
-                  return [
-                    MaterialPageRoute(
-                      builder: (_) => const SplashPage()
-                    ),
-                  ];
-                }
+            case 'splash_page':          
+            return [
+              MaterialPageRoute(
+                builder: (_) => const SplashPage()
+              ),
+            ];
+            case 'choose_language_page':
+            return [
+              MaterialPageRoute(
+                builder: (_) => const ChooseLanguagePage()
+              ),
+            ];
+            case 'sign_in_page':
+            return [
+              MaterialPageRoute(
+                builder: (_) => const SignInPage()
+              ),
+            ];
+            default:
+            return [
+              MaterialPageRoute(
+                builder: (_) => const SplashPage()
+              ),
+            ];
+          }
         },
         builder: (context, child) {
           return ConnectivityListener(
