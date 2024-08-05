@@ -23,7 +23,6 @@ class AuthService{
   Future<dynamic> register(NewUser data) async {
     try {
       final response = await dio.post('/auth/register', data: data.newUserToJson());
-      log('response:${response.data}');
       final user = UserResponse.fromJson(response.data);
       return user.data;
     } on DioException catch (e) {

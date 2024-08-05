@@ -23,7 +23,6 @@ class UserResponse extends Equatable {
         "data": data.toJson(),
     };
       @override
-      // TODO: implement props
       List<Object?> get props => [success, message, data];
 }
 
@@ -88,7 +87,20 @@ class User extends Equatable {
     
     @override
     
-    List<Object?> get props => [id, username, name, lastName, email, address, phoneNumberCode, phoneNumber, accessFailedCount, birthdate, title, countryId];
+    List<Object?> get props => [
+      id, 
+      username, 
+      name, 
+      lastName, 
+      email, 
+      address, 
+      phoneNumberCode, 
+      phoneNumber, 
+      accessFailedCount, 
+      birthdate, 
+      title, 
+      countryId
+    ];
 }
 
 class Auth{
