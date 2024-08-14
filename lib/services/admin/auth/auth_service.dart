@@ -1,5 +1,5 @@
 import 'dart:developer';
-import '../../ui/pages/pages.dart';
+import '../../../ui/pages/pages.dart';
 
 class AuthService{
 
@@ -11,12 +11,12 @@ class AuthService{
     try {
       final response = await dio.post('/auth/login', data: data.login());
       final auth = Authentication.fromJson(response.data);
+      locator<Preferences>().saveData('token',auth.data.token);
       final LoggedUser loggedUser = LoggedUser.fromJson(auth.data.getTokenPayload);
       return loggedUser;
     } on DioException catch (e) {
       log('AuthService -> : ${e.response?.data}');
       ErrorHandler(e);
-      return RequestError.fromJson(e.response?.data);
     }
   }
 

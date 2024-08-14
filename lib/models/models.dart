@@ -1,3 +1,4 @@
+export 'package:ourshop_ecommerce/models/category/category.dart';
 export 'package:ourshop_ecommerce/models/auth/auth.dart';
 export 'package:ourshop_ecommerce/models/error/errors.dart';
 export 'package:ourshop_ecommerce/models/user/user.dart';

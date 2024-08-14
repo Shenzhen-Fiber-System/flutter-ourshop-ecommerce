@@ -1,3 +1,4 @@
+import 'package:ourshop_ecommerce/enums/enums.dart';
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 class UserResponse extends Equatable {
@@ -103,11 +104,11 @@ class User extends Equatable {
     ];
 }
 
-class Auth{
+class Auth extends Equatable {
   final String username;
   final String password;
 
-  Auth({
+  const Auth({
     required this.username,
     required this.password,
   });
@@ -116,6 +117,12 @@ class Auth{
     "username": username,
     "password": password,
   };
+  
+  @override
+  List<Object?> get props => [
+    username,
+    password
+  ];
 }
 
 
@@ -179,5 +186,126 @@ class NewUser extends Equatable {
     countryId,
     rolesIds,
     language
+  ];
+}
+
+class PaymentMethod extends Equatable{
+
+  const PaymentMethod({
+    required this.id,
+    required this.type,
+    required this.cardNumber,
+    required this.expirationDate,
+    required this.cvv,
+    this.isDefault = false,
+  });
+  
+  final String id;
+  final CardType type;
+  final String cardNumber;
+  final String expirationDate;
+  final String cvv;
+  final bool? isDefault;
+
+  factory PaymentMethod.fromJson(Map<String, dynamic> json) => PaymentMethod(
+    id: json["id"],
+    type: json["type"],
+    cardNumber: json["cardNumber"],
+    expirationDate: json["expirationDate"],
+    cvv: json["cvv"],
+    isDefault: json["isDefault"],
+  );
+
+  PaymentMethod copyWith({
+    String? id,
+    CardType? type,
+    String? cardNumber,
+    String? expirationDate,
+    String? cvv,
+    bool? isDefault,
+  }) {
+    return PaymentMethod(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      cardNumber: cardNumber ?? this.cardNumber,
+      expirationDate: expirationDate ?? this.expirationDate,
+      cvv: cvv ?? this.cvv,
+      isDefault: isDefault ?? this.isDefault,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "type": type,
+    "cardNumber": cardNumber,
+    "expirationDate": expirationDate,
+    "cvv": cvv,
+    "isDefault": isDefault,
+  };
+  
+  @override
+  
+  List<Object?> get props => [
+    id,
+    type,
+    cardNumber,
+    expirationDate,
+    cvv,
+    isDefault
+  ];
+
+  
+}
+
+
+class ShippingAddress extends Equatable {
+
+  final String id;
+  final String country;
+  final String fullName;
+  final String phoneNumber;
+  final String address;
+  final String? addtionalInstructions;
+  final int postalCode;
+  final String state;
+  final String municipality;
+
+  const ShippingAddress({required this.id,required this.country, required this.fullName, required this.phoneNumber, required this.address, this.addtionalInstructions, required this.postalCode, required this.state, required this.municipality});
+
+
+  factory ShippingAddress.fromJson(Map<String, dynamic> json) => ShippingAddress(
+    id: json['id'],
+    country: json["country"],
+    fullName: json["fullName"],
+    phoneNumber: json["phoneNumber"],
+    address: json["address"],
+    addtionalInstructions: json["addtionalInstructions"],
+    postalCode: json["postalCode"],
+    state: json["state"],
+    municipality: json["municipality"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "country": country,
+    "fullName": fullName,
+    "phoneNumber": phoneNumber,
+    "address": address,
+    "addtionalInstructions": addtionalInstructions,
+    "postalCode": postalCode,
+    "state": state,
+    "municipality": municipality,
+  };
+
+  @override
+  List<Object?> get props => [
+    id,
+    country,
+    fullName,
+    phoneNumber,
+    address,
+    addtionalInstructions,
+    postalCode,
+    state,
+    municipality
   ];
 }

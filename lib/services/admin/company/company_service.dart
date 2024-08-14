@@ -2,7 +2,6 @@
 
 
 import 'dart:developer';
-
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 class CompanyService {

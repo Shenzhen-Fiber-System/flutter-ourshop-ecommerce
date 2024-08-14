@@ -15,12 +15,14 @@ class DioInstance{
           baseUrl: '${dotenv.env[api]}',
           headers: {
             'Referer': dotenv.env[api],
+            'Authorization': '${locator<Preferences>().preferences['token']}',
           },
+          
         )
       );
     }
   }
 
   Dio get instance => _dio;
-
 }
+

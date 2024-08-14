@@ -77,8 +77,8 @@ class LoggedUser extends Equatable {
     final String email;
 
     const LoggedUser({
-        required this.userCountryName,
         required this.sub,
+        required this.userCountryName,
         required this.companyId,
         required this.roles,
         required this.companyCountryName,
@@ -119,6 +119,50 @@ class LoggedUser extends Equatable {
         iat: json["iat"],
         email: json["email"],
     );
+
+    LoggedUser copyWith({
+        String? userCountryName,
+        String? sub,
+        String? companyId,
+        String? roles,
+        String? companyCountryName,
+        String? lastName,
+        String? language,
+        String? companyMainCategoryId,
+        String? companyCurrentBusinessCategoryId,
+        String? userPhoneNumber,
+        String? companyCountryId,
+        String? userId,
+        String? userCountryId,
+        String? companyName,
+        String? name,
+        String? userPhoneNumberCode,
+        int? exp,
+        int? iat,
+        String? email,
+    }) {
+        return LoggedUser(
+          sub: sub ?? this.sub,
+          userCountryName: userCountryName ?? this.userCountryName,
+          companyId: companyId ?? this.companyId,
+          roles: roles ?? this.roles,
+          companyCountryName: companyCountryName ?? this.companyCountryName,
+          lastName: lastName ?? this.lastName,
+          language: language ?? this.language,
+          companyMainCategoryId: companyMainCategoryId ?? this.companyMainCategoryId,
+          companyCurrentBusinessCategoryId: companyCurrentBusinessCategoryId ?? this.companyCurrentBusinessCategoryId,
+          userPhoneNumber: userPhoneNumber ?? this.userPhoneNumber,
+          companyCountryId: companyCountryId ?? this.companyCountryId,
+          userId: userId ?? this.userId,
+          userCountryId: userCountryId ?? this.userCountryId,
+          companyName: companyName ?? this.companyName,
+          name: name ?? this.name,
+          userPhoneNumberCode: userPhoneNumberCode ?? this.userPhoneNumberCode,
+          exp: exp ?? this.exp,
+          iat: iat ?? this.iat,
+          email: email ?? this.email,
+        );
+      }
 
     Map<String, dynamic> toJson() => {
         "user_country_name": userCountryName,

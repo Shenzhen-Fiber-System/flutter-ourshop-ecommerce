@@ -2,7 +2,7 @@
 
 import 'dart:developer';
 
-import '../../ui/pages/pages.dart';
+import '../../../ui/pages/pages.dart';
 
 class CountryService{
 
@@ -17,6 +17,7 @@ class CountryService{
       return countries.data;
     } on DioException catch (e) {
       log('CountryService->${e.response?.data}');
+      ErrorHandler(e);
     }
     
     

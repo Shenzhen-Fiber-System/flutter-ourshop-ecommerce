@@ -19,6 +19,17 @@ class AppTheme{
   };
 
   static ThemeData light = ThemeData.light().copyWith(
+    // colorScheme: ColorScheme(
+    //   primary: palette[500]!,
+    //   secondary: palette[500]!,
+    //   surface: Colors.white,
+    //   error: Colors.red,
+    //   onPrimary: Colors.white,
+    //   onSecondary: Colors.white,
+    //   onSurface: Colors.black,
+    //   onError: Colors.white,
+    //   brightness: Brightness.light,
+    // ),
     primaryColor: Colors.black87,
     scaffoldBackgroundColor: Colors.white,
     appBarTheme: AppBarTheme(
@@ -32,7 +43,9 @@ class AppTheme{
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       selectedItemColor: Colors.blue,
       unselectedItemColor: Colors.grey,
-      elevation: 10.0
+      elevation: 10.0,
+      backgroundColor: Colors.white,
+      
     ),
     textTheme: const TextTheme(
       displayLarge: TextStyle(
@@ -187,6 +200,12 @@ class AppTheme{
         ),
       ),
     ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: ButtonStyle(
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0))),
+        side: WidgetStatePropertyAll(BorderSide(color: AppTheme.palette[500]!)),
+      ),
+    ),
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         overlayColor: WidgetStateColor.transparent,
@@ -222,7 +241,39 @@ class AppTheme{
           width: 1
         )
       ),
-    ), 
+    ),
+    tabBarTheme: TabBarTheme(
+      labelColor: palette[500],
+      labelStyle: const TextStyle(
+        overflow: TextOverflow.ellipsis,
+      ),
+      tabAlignment: TabAlignment.start,
+      splashFactory: NoSplash.splashFactory,
+      dividerHeight: 1.0,
+      unselectedLabelColor: Colors.grey,
+      indicatorSize: TabBarIndicatorSize.label,
+      indicatorColor: palette[400]
+    ),
+    dialogTheme: DialogTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      titleTextStyle: ThemeData().textTheme.titleMedium,
+      backgroundColor: Colors.white,
+      actionsPadding: const EdgeInsets.all(20.0),
+      contentTextStyle: ThemeData().textTheme.bodyMedium,      
+    ),
+    radioTheme: RadioThemeData(
+      fillColor: WidgetStateProperty.resolveWith((states){
+        if (states.contains(WidgetState.selected)){
+          return palette[500]!;
+        }
+        return Colors.grey.shade400;
+      }),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact
+    ),
+    
   );
 
   static ThemeData dark = ThemeData.dark().copyWith(

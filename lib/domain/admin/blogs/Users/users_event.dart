@@ -15,10 +15,46 @@ class AddLoggedUserEvent extends UsersEvent {
   List<Object> get props => [loggedUser];
 }
 
-class AddIsLoadingEvent extends UsersEvent {
-  final bool isLoading;
-  const AddIsLoadingEvent(this.isLoading);
 
+class AddPaymentMethodsEvent extends UsersEvent {
+  final List<PaymentMethod> cards;
+  const AddPaymentMethodsEvent(this.cards);
   @override
-  List<Object> get props => [isLoading];
+  List<Object> get props => [cards];
 }
+
+class AddPaymentMethodEvent extends UsersEvent {
+  final PaymentMethod card;
+  const AddPaymentMethodEvent(this.card);
+  @override
+  List<Object> get props => [card];
+}
+
+class RemovePaymentMethodEvent extends UsersEvent {
+  final PaymentMethod card;
+  const RemovePaymentMethodEvent(this.card);
+  @override
+  List<Object> get props => [card];
+}
+
+class AddSelectedCardEvent extends UsersEvent {
+  final PaymentMethod card;
+  const AddSelectedCardEvent(this.card);
+  @override
+  List<Object> get props => [card];
+}
+
+class AddSelectedShippingAddressEvent extends UsersEvent {
+  final ShippingAddress shippingAddress;
+  const AddSelectedShippingAddressEvent(this.shippingAddress);
+  @override
+  List<Object> get props => [shippingAddress];
+}
+
+// class AddIsLoadingEvent extends UsersEvent {
+//   final bool isLoading;
+//   const AddIsLoadingEvent(this.isLoading);
+
+//   @override
+//   List<Object> get props => [isLoading];
+// }

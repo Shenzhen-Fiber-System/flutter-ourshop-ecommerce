@@ -3,7 +3,6 @@ import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 import '../../main.dart';
 
 class ErrorHandler extends DioException{
-  final _context = navigatorKey.currentContext;
   ErrorHandler(DioException e) : super(
     requestOptions: e.requestOptions, 
     response: e.response, 
@@ -14,61 +13,41 @@ class ErrorHandler extends DioException{
   }
 
   void handleError() {
+    final BuildContext? context = navigatorKey.currentContext;
+    if (context == null) {
+      return;
+    }
     switch (response?.statusCode) {
 
       case 400:
         final error = RequestError.fromJson(response?.data);
-        //TODO talk with backend developer to return the key for dynamic translations..
         ErrorToast(
-          // title: AppLocalizations.of(_context!)!.user_exists,
           title: error.message,
-          // description: AppLocalizations.of(_context!)!.user_exist_description,
           style: ToastificationStyle.flatColored,
           foregroundColor: Colors.white,
           backgroundColor: Colors.red.shade500,
           icon: const Icon(Icons.error, color: Colors.white,),
-        ).showToast(_context!);
+        ).showToast(context);
         break;
-    //   case 401:
-    //     ErrorToast(
-    //       title: AppLocalizations.of(_context!)!.unauthorized,
-    //       description: AppLocalizations.of(_context)!.unauthorized_description,
-    //       style: ToastificationStyle.flatColored,
-    //       foregroundColor: Colors.white,
-    //       backgroundColor: Colors.red.shade500,
-    //       icon: const Icon(Icons.error, color: Colors.white,),
-    //     ).showToast(_context);
-    //     break;
-    //   case 403:
-    //     ErrorToast(
-    //       title: AppLocalizations.of(_context!)!.forbidden,
-    //       description: AppLocalizations.of(_context)!.forbidden_description,
-    //       style: ToastificationStyle.flatColored,
-    //       foregroundColor: Colors.white,
-    //       backgroundColor: Colors.red.shade500,
-    //       icon: const Icon(Icons.error, color: Colors.white,),
-    //     ).showToast(_context);
-    //     break;
-    //   case 404:
-    //     ErrorToast(
-    //       title: AppLocalizations.of(_context!)!.not_found,
-    //       description: AppLocalizations.of(_context)!.not_found_description,
-    //       style: ToastificationStyle.flatColored,
-    //       foregroundColor: Colors.white,
-    //       backgroundColor: Colors.red.shade500,
-    //       icon: const Icon(Icons.error, color: Colors.white,),
-    //     ).showToast(_context);
-    //     break;
-    //   case 500:
-    //     ErrorToast(
-    //       title: AppLocalizations.of(_context!)!.server_error,
-    //       description: AppLocalizations.of(_context)!.server_error_description,
-    //       style: ToastificationStyle.flatColored,
-    //       foregroundColor: Colors.white,
-    //       backgroundColor: Colors.red.shade500,
-    //       icon: const Icon(Icons.error, color: Colors.white,),
-    //     ).showToast(_context);
-    //     break;
+      case 500:
+        final error = RequestError.fromJson(response?.data);
+        ErrorToast(
+          title: error.debugMessage,
+          style: ToastificationStyle.flatColored,
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.red.shade500,
+          icon: const Icon(Icons.error, color: Colors.white,),
+        ).showToast(context);
+        break;
+      default:
+        final error = RequestError.fromJson(response?.data);
+        ErrorToast(
+          title: error.debugMessage ?? error.message,
+          style: ToastificationStyle.flatColored,
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.red.shade500,
+          icon: const Icon(Icons.error, color: Colors.white,),
+        ).showToast(context);
     }
   }
 
@@ -80,26 +59,29 @@ class RequestError extends Equatable {
     final bool success;
     final String message;
     final dynamic data;
+    final dynamic debugMessage;
 
     const RequestError({
         required this.success,
         required this.message,
         required this.data,
+        required this.debugMessage,
     });
 
     factory RequestError.fromJson(Map<String, dynamic> json) => RequestError(
         success: json["success"],
         message: json["message"],
         data: json["data"],
+        debugMessage: json["debugMessage"],
     );
 
     Map<String, dynamic> toJson() => {
         "success": success,
         "message": message,
         "data": data,
+        "debugMessage": debugMessage,
     };
     
       @override
-      // TODO: implement props
-      List<Object?> get props => [success, message, data];
+      List<Object?> get props => [success, message, data, debugMessage];
 }

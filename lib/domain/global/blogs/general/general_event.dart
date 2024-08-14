@@ -7,6 +7,13 @@ sealed class GeneralEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class AddIsLoadingEvent extends GeneralEvent {
+  final bool isLoading;
+  const AddIsLoadingEvent(this.isLoading);
+  @override
+  List<Object> get props => [isLoading];
+}
+
 class ChangeBottomNavTab extends GeneralEvent {
   final int index;
 

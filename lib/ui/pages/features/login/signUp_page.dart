@@ -429,9 +429,9 @@ class _FormView extends StatelessWidget {
                   child: BlocBuilder<UsersBloc, UsersState>(
                     builder: (context, state) {
                       return ElevatedButton(
-                        onPressed: state.isLoading ? null : () {
+                        onPressed: context.read<UsersBloc>().generalBloc.state.isLoading ? null : () {
                           if (_formKey.currentState!.saveAndValidate()) {
-                            context.read<UsersBloc>().registerUser(_formKey.currentState!.value)
+                            context.watch<UsersBloc>().registerUser(_formKey.currentState!.value)
                             .then((value) {
                               if (value is User) {
                                 SuccessToast(
@@ -447,7 +447,7 @@ class _FormView extends StatelessWidget {
                             });
                           }
                         },
-                        child: state.isLoading ? const CircularProgressIndicator.adaptive() : Text(translations.sign_up, style: textS.labelMedium,),
+                        child: context.watch<UsersBloc>().generalBloc.state.isLoading ? const CircularProgressIndicator.adaptive() : Text(translations.sign_up, style: textS.labelMedium,),
                       );
                     },
                   ),

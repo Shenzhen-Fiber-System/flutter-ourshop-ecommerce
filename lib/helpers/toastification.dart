@@ -26,6 +26,7 @@ class SuccessToast extends Toast {
   final Color? primaryColor;
   final Color? backgroundColor;
   final Color? foregroundColor;
+  final Function(ToastificationItem)? onAutoCompleted;
 
   SuccessToast({
     required this.title,
@@ -47,6 +48,7 @@ class SuccessToast extends Toast {
     this.primaryColor,
     this.backgroundColor, 
     this.foregroundColor, 
+    this.onAutoCompleted,
   });
 
   @override
@@ -93,7 +95,7 @@ class SuccessToast extends Toast {
       callbacks: ToastificationCallbacks(
         onTap: (toastItem) => print('Toast ${toastItem.id} tapped'),
         onCloseButtonTap: (toastItem) => print('Toast ${toastItem.id} close button tapped'),
-        onAutoCompleteCompleted: (toastItem) => print('Toast ${toastItem.id} auto complete completed'),
+        onAutoCompleteCompleted: (toastItem) => onAutoCompleted != null ? onAutoCompleted!(toastItem) : null,
         onDismissed: (toastItem) => print('Toast ${toastItem.id} dismissed'),
       ),
     );

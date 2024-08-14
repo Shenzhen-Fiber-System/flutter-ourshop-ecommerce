@@ -13,6 +13,7 @@ class GeneralBloc extends Bloc<GeneralEvent, GeneralState> {
     _subscription = _monitorConnectivity().listen((isConnected) {
       add(InternetConnectionChangedEvent(isConnected));
     });
+    on<AddIsLoadingEvent>((event, emit) => emit(state.copyWith(isLoading: event.isLoading)));
     on<ChangeBottomNavTab>((event, emit) => emit(state.copyWith(selectedBottomNavTab: event.index)));
     on<InternetConnectionChangedEvent>((event, emit) => emit(state.copyWith(isInterentConnectionActive: event.interNetConnectionActive)));
   }

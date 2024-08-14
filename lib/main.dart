@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: true,
         initialRoute: AppRoutes.initialPage,
         routes: AppRoutes.routes,
-        onGenerateInitialRoutes: (initialRoute){
+        onGenerateInitialRoutes: (_){
           final String? lastVisitedPage = locator<Preferences>().preferences['last_visited_page'];
           if ((lastVisitedPage != null &&lastVisitedPage.isEmpty) || lastVisitedPage == null) {
             return [

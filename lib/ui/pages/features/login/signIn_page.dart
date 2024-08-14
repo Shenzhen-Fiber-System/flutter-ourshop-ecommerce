@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../pages.dart';
 
 class SignInPage extends StatefulWidget {
@@ -129,6 +131,7 @@ class _SignInPageState extends State<SignInPage> {
                             FormBuilderValidators.required(),
                           ]),
                           autovalidateMode: AutovalidateMode.onUserInteraction,
+                          onTapOutside: (event) => FocusScope.of(context).unfocus(),
                         ),
                         SizedBox(height: _space,),
                         ValueListenableBuilder(
@@ -138,7 +141,9 @@ class _SignInPageState extends State<SignInPage> {
                               focusNode: _passwordFocusNode,
                               style: inputValueStyle,
                               controller: _passwordController,
-                              textInputAction: TextInputAction.done,
+                              textInputAction: TextInputAction.send,
+                              onEditingComplete: () => _formKey.currentState!.save(),
+                              onSubmitted: (_) => _doLogin(),
                               name: "password",
                               cursorColor: _cursorColor,
                               decoration: InputDecoration(
@@ -154,6 +159,7 @@ class _SignInPageState extends State<SignInPage> {
                                 FormBuilderValidators.minLength(6),
                               ]),
                               obscureText: value,
+                              onTapOutside: (event) => FocusScope.of(context).unfocus(),
                               autovalidateMode: AutovalidateMode.onUserInteraction,
                             );
                           },
@@ -199,18 +205,8 @@ class _SignInPageState extends State<SignInPage> {
                           child: BlocBuilder<UsersBloc, UsersState>(
                             builder: (context, state) {
                               return ElevatedButton(
-                                onPressed: state.isLoading ? null : (){
-                                  if (_formKey.currentState!.saveAndValidate()) {
-                                    if (_formKey.currentState!.value['remember_me']) {
-                                      locator<Preferences>().saveData('username', _formKey.currentState!.value['username']);
-                                      locator<Preferences>().saveData('password', _formKey.currentState!.value['password']);
-                                    }
-                                    context.read<UsersBloc>().loginUser(_formKey.currentState!.value)
-                                    .then((value) => value is RequestError ? null : Navigator.pushNamed(context, '/home'));
-                                  }
-                                  
-                                },
-                                child: state.isLoading ? const CircularProgressIndicator.adaptive() : Text(translations.sign_in_with(translations.email.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
+                                onPressed: context.watch<UsersBloc>().generalBloc.state.isLoading ? null : () => _doLogin(),
+                                child: context.watch<UsersBloc>().generalBloc.state.isLoading ? const CircularProgressIndicator.adaptive() : Text(translations.sign_in_with(translations.email.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
                               );
                             },
                           ),
@@ -280,5 +276,21 @@ class _SignInPageState extends State<SignInPage> {
         ),
       )
     );
+  }
+
+  void _doLogin(){
+    if (_formKey.currentState!.saveAndValidate()) {
+      if (_formKey.currentState!.value['remember_me']) {
+        locator<Preferences>().saveData('username', _formKey.currentState!.value['username']);
+        locator<Preferences>().saveData('password', _formKey.currentState!.value['password']);
+      }
+      FocusScope.of(context).unfocus();
+      context.read<UsersBloc>().loginUser(_formKey.currentState!.value)
+        .then((value) {
+          if (value is LoggedUser) {
+            Navigator.pushReplacementNamed(context, '/home');
+          }
+        });
+    }
   }
 }

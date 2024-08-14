@@ -29,7 +29,17 @@ class Observable extends BlocObserver {
       final currentState = change.currentState as UsersState;
       final nextState = change.nextState as UsersState;
       if (currentState.loggedUser != nextState.loggedUser) {
-        log('User changed to ${nextState.loggedUser}');
+        // log('User changed to ${nextState.loggedUser}');
+      }
+    } else if (bloc is ProductsBloc){
+      final currentState = change.currentState as ProductsState;
+      final nextState = change.nextState as ProductsState;
+      if (currentState.categories.length != nextState.categories.length) {
+        log('products ${nextState.products}');
+      }
+      if (currentState.selectedCategory != nextState.selectedCategory) {
+        log('selectedCategory ${nextState.selectedCategory}');
+
       }
     }
   }

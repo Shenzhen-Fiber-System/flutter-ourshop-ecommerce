@@ -24,7 +24,6 @@ class Preferences{
       };
     }
     hasPreferences = preferences.isNotEmpty;
-
   }
 
   Future<void> removeData(String key) async {
