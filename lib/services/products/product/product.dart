@@ -35,6 +35,7 @@ class ProductService {
       final products = ProductResponse.fromJson(response.data);
       return products.data;
     } on DioException catch (e) {
+      log(e.response?.data);
       ErrorHandler(e);
     }
   }

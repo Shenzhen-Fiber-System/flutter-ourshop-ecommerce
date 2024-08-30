@@ -96,5 +96,17 @@
     "add":"Add",
     "update":"Update",
     "city":"City",
-    "zip_code":"Zip code"
+    "zip_code":"Zip code",
+    "delete":"Delete",
+    "delete_title": "Delete {product}?",
+    "delete_description": "Are you sure you want to delete ${product} from the cart?",
+    "select_all":"Select all",
+    "clear_all":"Clear all",
+    "cart_empty":"Your cart is empty",
+    "deselect_all":"Deselect all",
+    "choose_shipping_address":"Please choose a shipping address",
+    "submit_order":"Submit order",
+    "no_Categories_products_found":"No cateogories or products found",
+    "product_added_to_cart":"Product added to cart",
+    "close":"Close"
 }

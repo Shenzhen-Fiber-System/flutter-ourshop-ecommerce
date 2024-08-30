@@ -182,7 +182,7 @@ class PersonalInformationDialog extends AlertDialogs {
                                    backgroundColor: Colors.green.shade500,
                                    icon: const Icon(Icons.check, color: Colors.white,),
                                    autoCloseDuration: const Duration(seconds: 1),
-                                   onAutoCompleted: (ToastificationItem item) => Navigator.of(context).pop()
+                                   onAutoCompleted: (ToastificationItem item) => context.pop()
                                  ).showToast(context);
                            }
                          },
@@ -292,7 +292,7 @@ class ShippingAddressDialog extends AlertDialogs {
             actionsPadding: theme.dialogTheme.actionsPadding,
             actions: <Widget>[
               ElevatedButton(
-                onPressed: () =>Navigator.of(context).pop(),
+                onPressed: () =>context.pop(),
                 child: Text(translations.cancel, style: theme.textTheme.labelMedium,),
               ),
               ElevatedButton(
@@ -300,7 +300,7 @@ class ShippingAddressDialog extends AlertDialogs {
                   if (_formKey.currentState!.saveAndValidate()) {
                     //TODO need to connect with the API...
                     log('updated shipping address: ${_formKey.currentState!.value}');
-                    Navigator.of(context).pop();
+                    context.pop();
                   }
                 },
                 child: Text(type == ShippingAddressDialogType.ADD ? translations.add : translations.update, style: theme.textTheme.labelMedium,),
@@ -311,4 +311,36 @@ class ShippingAddressDialog extends AlertDialogs {
       );
     }
             
+}
+
+
+class DeleteCartProductDialog extends AlertDialogs {
+  
+  final Product product;
+  
+  DeleteCartProductDialog({required this.product});
+  
+  @override
+  Future<bool?> showAlertDialog(BuildContext context, AppLocalizations translations, ThemeData theme,) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Delete ${product.name}?'),
+          content: Text('Are you sure you want to delete ${product.name} from the cart?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(translations.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(translations.delete),
+            ),
+          ],
+        );
+      },
+    );
+  }
+          
 }

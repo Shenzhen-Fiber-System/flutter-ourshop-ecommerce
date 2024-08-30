@@ -1,4 +1,7 @@
 // pages
+export 'package:ourshop_ecommerce/ui/pages/features/checkout_page.dart';
+export 'package:ourshop_ecommerce/ui/pages/features/home/product_page.dart';
+export 'package:ourshop_ecommerce/ui/pages/features/sub_category.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/selected-product/selected_product.dart';
 export 'package:ourshop_ecommerce/ui/pages/connection_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/choose_language_page.dart';
@@ -9,6 +12,7 @@ export 'package:ourshop_ecommerce/ui/pages/features/account/my_account.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/cart/cart.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/messenger/messenger.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/home/home_page.dart';
+
 
 
 
@@ -45,6 +49,8 @@ export 'package:get_it/get_it.dart';
 export 'package:equatable/equatable.dart';
 export 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 export 'package:flutter_svg/flutter_svg.dart';
+export 'package:carousel_slider/carousel_slider.dart';
+export 'package:go_router/go_router.dart';
 
 //theme
 export '../../../../theme/theme.dart';

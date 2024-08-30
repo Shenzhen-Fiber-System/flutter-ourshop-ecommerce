@@ -9,6 +9,7 @@ class ProductsState extends Equatable {
   final List<Product> favoriteProducts;
   final List<Product> cartProducts;
   final String selectedCategory;
+  final List<String> categoryHeaderImages;
 
   const ProductsState({
     this.isLoading = false,
@@ -18,6 +19,7 @@ class ProductsState extends Equatable {
     this.favoriteProducts = const [],
     this.cartProducts = const [],
     this.selectedCategory = '',
+    this.categoryHeaderImages = const [],
     
   });
 
@@ -29,6 +31,7 @@ class ProductsState extends Equatable {
     List<Product>? favoriteProducts,
     List<Product>? cartProducts,
     String? selectedCategory,
+    List<String>? categoryHeaderImages,
   }) {
     return ProductsState(
       isLoading: isLoading ?? this.isLoading,
@@ -38,6 +41,7 @@ class ProductsState extends Equatable {
       favoriteProducts: favoriteProducts ?? this.favoriteProducts,
       cartProducts: cartProducts ?? this.cartProducts,
       selectedCategory: selectedCategory ?? this.selectedCategory,
+      categoryHeaderImages: categoryHeaderImages ?? this.categoryHeaderImages,
     );
   }
   
@@ -50,5 +54,6 @@ class ProductsState extends Equatable {
     favoriteProducts,
     cartProducts,
     selectedCategory,
+    categoryHeaderImages,
   ];
 }

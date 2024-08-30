@@ -62,15 +62,6 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
 
     _scrollController.addListener(listener);
     _animationController.addListener(animationControllerListener);
-
-  //TODO this is temporary, you need to set the default card in the request...
-
-    // if (context.read<UsersBloc>().state.selectedCard.id.isEmpty && PaymentMethod.cards.isNotEmpty) {
-    //   context.read<UsersBloc>().addSelectedCard(PaymentMethod.cards[0]);
-    // }
-    // if (context.read<UsersBloc>().state.selectedShippingAddress.id.isEmpty && ShippingAddress.shippingAddresses.isNotEmpty) {
-    //   context.read<UsersBloc>().addSelectedShippingAddress(ShippingAddress.shippingAddresses[0]);
-    // }
   }
 
   @override
@@ -137,22 +128,6 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
         mode: SettingsOptionsMode.Phone,
         onClick: () => showBottomSheet(context),
         data: Text(loggedUser.userCountryName, style: _personalInformationTextTheme)
-      ),
-    ];
-
-    final List<SettignsOptions> shippingAddress = [
-      SettignsOptions(
-        title: 'Address', 
-        mode: SettingsOptionsMode.Deliver,
-        onClick: () => showBottomSheet(context)
-      ),
-    ];
-
-    final List<SettignsOptions> paymentMethods = [
-      SettignsOptions(
-        title: 'Credit Card', 
-        mode: SettingsOptionsMode.Deliver,
-        onClick: () => showBottomSheet(context)
       ),
     ];
 
@@ -557,7 +532,7 @@ class _AccountSecction extends StatelessWidget {
             return SizedBox(
               width: size.width,
               child: ElevatedButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, '/'),
+                onPressed: () => context.go('/'),
                 child: Text(translations.logout, style: theme.textTheme.bodyMedium,)
               ),
             );

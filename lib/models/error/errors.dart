@@ -1,6 +1,5 @@
 
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
-import '../../main.dart';
 
 class ErrorHandler extends DioException{
   ErrorHandler(DioException e) : super(
@@ -13,7 +12,7 @@ class ErrorHandler extends DioException{
   }
 
   void handleError() {
-    final BuildContext? context = navigatorKey.currentContext;
+    final BuildContext? context = AppRoutes.globalContext;
     if (context == null) {
       return;
     }
@@ -23,6 +22,7 @@ class ErrorHandler extends DioException{
         final error = RequestError.fromJson(response?.data);
         ErrorToast(
           title: error.message,
+          description: error.message,
           style: ToastificationStyle.flatColored,
           foregroundColor: Colors.white,
           backgroundColor: Colors.red.shade500,
@@ -32,7 +32,7 @@ class ErrorHandler extends DioException{
       case 500:
         final error = RequestError.fromJson(response?.data);
         ErrorToast(
-          title: error.debugMessage,
+          title: error.debugMessage ?? error.message,
           style: ToastificationStyle.flatColored,
           foregroundColor: Colors.white,
           backgroundColor: Colors.red.shade500,
@@ -43,6 +43,7 @@ class ErrorHandler extends DioException{
         final error = RequestError.fromJson(response?.data);
         ErrorToast(
           title: error.debugMessage ?? error.message,
+          description: error.message,
           style: ToastificationStyle.flatColored,
           foregroundColor: Colors.white,
           backgroundColor: Colors.red.shade500,
@@ -50,8 +51,6 @@ class ErrorHandler extends DioException{
         ).showToast(context);
     }
   }
-
-
 }
 
 

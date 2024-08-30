@@ -61,6 +61,8 @@ class Product extends Equatable {
     final List<ProductPhotosVideos> productVideos;
     final dynamic mainPhotoUrl;
     final dynamic mainVideoUrl;
+    final bool selected;
+    final int quantity;
 
     const Product({
         required this.id,
@@ -92,6 +94,8 @@ class Product extends Equatable {
         required this.productVideos,
         required this.mainPhotoUrl,
         required this.mainVideoUrl,
+        this.selected = false,
+        this.quantity = 0,
     });
 
     factory Product.fromJson(Map<String, dynamic> json) => Product(
@@ -125,6 +129,76 @@ class Product extends Equatable {
         mainPhotoUrl: json["mainPhotoUrl"],
         mainVideoUrl: json["mainVideoUrl"],
     );
+
+
+    Product copyWith({
+      String?id,
+      String?name,
+      String?keyValue,
+      String?productGroupId,
+      String?companyId,
+      dynamic subCategoryId,
+      String?categoryId,
+      String?categoryName,
+      String?modelNumber,
+      String?productTypeId,
+      String?brandName,
+      String?unitMeasurementId,
+      double?fboPriceStart,
+      double?fboPriceEnd,
+      dynamic moqUnit,
+      dynamic stock,
+      double?packageLength,
+      double?packageWidth,
+      double?packageHeight,
+      double?packageWeight,
+      double?unitPrice,
+      List<Certification>?specifications,
+      List<Certification>?details,
+      List<Certification>?certifications,
+      String?productStatus,
+      List<ProductPhotosVideos>?productPhotos,
+      List<ProductPhotosVideos>?productVideos,
+      dynamic mainPhotoUrl,
+      dynamic mainVideoUrl,
+      bool?selected,
+      int? quantity,
+    }) => Product(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      keyValue: keyValue ?? this.keyValue,
+      productGroupId: productGroupId ?? this.productGroupId,
+      companyId: companyId ?? this.companyId,
+      subCategoryId: subCategoryId ?? this.subCategoryId,
+      categoryId: categoryId ?? this.categoryId,
+      categoryName: categoryName ?? this.categoryName,
+      modelNumber: modelNumber ?? this.modelNumber,
+      productTypeId: productTypeId ?? this.productTypeId,
+      brandName: brandName ?? this.brandName,
+      unitMeasurementId: unitMeasurementId ?? this.unitMeasurementId,
+      fboPriceStart: fboPriceStart ?? this.fboPriceStart,
+      fboPriceEnd: fboPriceEnd ?? this.fboPriceEnd,
+      moqUnit: moqUnit ?? this.moqUnit,
+      stock: stock ?? this.stock,
+      packageLength: packageLength ?? this.packageLength,
+      packageWidth: packageWidth ?? this.packageWidth,
+      packageHeight: packageHeight ?? this.packageHeight,
+      packageWeight: packageWeight ?? this.packageWeight,
+      unitPrice: unitPrice ?? this.unitPrice,
+      specifications: specifications ?? this.specifications,
+      details: details ?? this.details,
+      certifications: certifications ?? this.certifications,
+      productStatus: productStatus ?? this.productStatus,
+      productPhotos: productPhotos ?? this.productPhotos,
+      productVideos: productVideos ?? this.productVideos,
+      mainPhotoUrl: mainPhotoUrl ?? this.mainPhotoUrl,
+      mainVideoUrl: mainVideoUrl ?? this.mainVideoUrl,
+      selected: selected ?? this.selected,
+      quantity: quantity ?? this.quantity,
+    );
+
+
+    
 
     Map<String, dynamic> toJson() => {
         "id": id,
@@ -188,7 +262,9 @@ class Product extends Equatable {
       productPhotos, 
       productVideos, 
       mainPhotoUrl, 
-      mainVideoUrl, 
+      mainVideoUrl,
+      selected,
+      quantity,
     ];
 }
 
