@@ -532,7 +532,7 @@ class _AccountSecction extends StatelessWidget {
             return SizedBox(
               width: size.width,
               child: ElevatedButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, '/'),
+                onPressed: () => context.go('/'),
                 child: Text(translations.logout, style: theme.textTheme.bodyMedium,)
               ),
             );

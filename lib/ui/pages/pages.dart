@@ -50,6 +50,7 @@ export 'package:equatable/equatable.dart';
 export 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:carousel_slider/carousel_slider.dart';
+export 'package:go_router/go_router.dart';
 
 //theme
 export '../../../../theme/theme.dart';

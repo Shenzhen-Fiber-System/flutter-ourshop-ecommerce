@@ -260,7 +260,7 @@ class _SignInPageState extends State<SignInPage> {
                           children: [
                             Text(translations.dont_have_account, style: theme.textTheme.bodySmall,),
                             TextButton(
-                              onPressed: () => Navigator.pushNamed(context, '/sign-up'),
+                              onPressed: () => context.push('/sign-up'),
                               child: Text(translations.sign_up, 
                                 style: theme.textTheme.bodySmall?.copyWith(color: Colors.blue, fontWeight: FontWeight.w600),
                               ),
@@ -287,9 +287,7 @@ class _SignInPageState extends State<SignInPage> {
       FocusScope.of(context).unfocus();
       context.read<UsersBloc>().loginUser(_formKey.currentState!.value)
         .then((value) {
-          if (value is LoggedUser) {
-            Navigator.pushReplacementNamed(context, '/home');
-          }
+          if (value is LoggedUser) context.go('/home');
         });
     }
   }

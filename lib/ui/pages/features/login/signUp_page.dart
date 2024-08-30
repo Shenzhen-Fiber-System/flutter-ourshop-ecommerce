@@ -489,7 +489,7 @@ class _ActivateAccount extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () => Navigator.pushReplacementNamed(context, '/'),
+            onPressed: () => context.go('/'),
             child: Text(translations.done, style: textS.labelMedium,),
           ),
         ),

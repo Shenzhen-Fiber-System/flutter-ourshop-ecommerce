@@ -74,7 +74,7 @@ class Cart extends StatelessWidget {
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.9,
               child: ElevatedButton(
-                onPressed: context.read<ProductsBloc>().state.cartProducts.isEmpty || context.read<ProductsBloc>().selectedCartProductsPrice == 0.00 ? null : () => Navigator.of(context).pushNamed('/checkout'),
+                onPressed: context.read<ProductsBloc>().state.cartProducts.isEmpty || context.read<ProductsBloc>().selectedCartProductsPrice == 0.00 ? null : () => context.push('/checkout'),
                 child: Text('${translations.checkout} \$${context.watch<ProductsBloc>().selectedCartProductsPrice}', style: theme.textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),),
               ),
             ),

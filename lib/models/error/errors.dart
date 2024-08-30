@@ -1,6 +1,5 @@
 
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
-import '../../main.dart';
 
 class ErrorHandler extends DioException{
   ErrorHandler(DioException e) : super(
@@ -13,7 +12,7 @@ class ErrorHandler extends DioException{
   }
 
   void handleError() {
-    final BuildContext? context = navigatorKey.currentContext;
+    final BuildContext? context = AppRoutes.globalContext;
     if (context == null) {
       return;
     }

@@ -21,7 +21,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/selected-product', arguments: product),
+      onTap: () => context.push('/selected-product', extra: product),
       child: Container(
         height: height,
         width: width,

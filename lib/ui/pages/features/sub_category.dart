@@ -4,7 +4,8 @@ import 'package:ourshop_ecommerce/models/models.dart';
 import '../pages.dart';
 
 class SubCategoryPage extends StatefulWidget {
-  const SubCategoryPage({super.key});
+  const SubCategoryPage({super.key, required this.category});
+  final Category category;
 
   @override
   State<SubCategoryPage> createState() => _SubCategoryPageState();
@@ -25,12 +26,11 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
     final Size size = MediaQuery.of(context).size;
     final ThemeData theme = Theme.of(context);
     final AppLocalizations translations = AppLocalizations.of(context)!;
-    final Category category = ModalRoute.of(context)!.settings.arguments as Category;
 
-    log('category: ${category.id}');
+    log('category: ${widget.category.id}');
 
     return FutureBuilder<List<Product>>(
-      future: context.read<ProductsBloc>().getProductsByCategory(category.id),
+      future: context.read<ProductsBloc>().getProductsByCategory(widget.category.id),
       builder: (BuildContext context, AsyncSnapshot<List<Product>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator.adaptive());
@@ -42,7 +42,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
           return Center(child: Text('No data', style: theme.textTheme.titleMedium?.copyWith(color: Colors.black),));
         }
 
-        if (snapshot.data!.isEmpty && category.subCategories!.isEmpty) {
+        if (snapshot.data!.isEmpty && widget.category.subCategories!.isEmpty) {
           return Stack(
             children: [
               Positioned(
@@ -77,7 +77,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                 slivers: [
                   SliverAppBar(
                     expandedHeight: state.categoryHeaderImages.isNotEmpty ? size.height * 0.20 : size.height * 0.10,
-                    title: state.categoryHeaderImages.isNotEmpty ? const SizedBox.shrink() : Text(category.name, style: theme.textTheme.titleLarge,),
+                    title: state.categoryHeaderImages.isNotEmpty ? const SizedBox.shrink() : Text(widget.category.name, style: theme.textTheme.titleLarge,),
                     flexibleSpace: state.categoryHeaderImages.isNotEmpty ? CarouselSlider(
                       items: state.categoryHeaderImages.map((e) {
                         return Builder(
@@ -106,15 +106,15 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                       ),
                     ) :const SizedBox.shrink()
                   ),
-                  if (category.subCategories!.isNotEmpty) SliverToBoxAdapter(
+                  if (widget.category.subCategories!.isNotEmpty) SliverToBoxAdapter(
                     child: SizedBox(
                       height: size.height * 0.20,
                       width: size.width,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: category.subCategories?.length ?? 0,
+                        itemCount: widget.category.subCategories?.length ?? 0,
                         itemBuilder: (context, index) {
-                          final Category c = category.subCategories![index];
+                          final Category c = widget.category.subCategories![index];
                           return CustomCard(
                             height: size.height * 0.15, 
                             width: size.width * 0.35,
@@ -124,8 +124,9 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                               Text(c.name, style: theme.textTheme.labelSmall,),
                             ],
                             onTap: () async {
-                              log('current selected category: ${c.id}');
-                              await Navigator.pushNamed(context, '/sub-category', arguments: c);
+                              // log('current selected category: ${c.id}');
+                              // await Navigator.pushNamed(context, '/sub-category', arguments: c);
+                              await context.push('/sub-category', extra: c);
                             },
                           );
                         },

@@ -1,12 +1,12 @@
 import '../../pages.dart';
 
 class SelectedProductPage extends StatelessWidget {
-  const SelectedProductPage({super.key});
+  const SelectedProductPage({super.key, required this.product});
+
+  final Product product;
 
   @override
   Widget build(BuildContext context) {
-
-    final Product product = ModalRoute.of(context)!.settings.arguments as Product;
     final Size size = MediaQuery.of(context).size;
     final ThemeData theme = Theme.of(context);
     final AppLocalizations translations = AppLocalizations.of(context)!;
@@ -128,7 +128,7 @@ class SelectedProductPage extends StatelessWidget {
                   SizedBox(
                     width: size.width * 0.4,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pushNamed(context,'/checkout'),
+                      onPressed: () => context.push('/checkout'),
                       child: Text(translations.checkout, style: theme.textTheme.labelMedium),
                     ),
                   ),

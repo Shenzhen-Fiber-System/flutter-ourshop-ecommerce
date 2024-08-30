@@ -88,7 +88,7 @@ class _ChooseLanguagePageState extends State<ChooseLanguagePage> {
                 child: BlocBuilder<SettingsBloc, SettingsState>(
                   builder: (context, state) {
                     return ElevatedButton(
-                      onPressed: state.disable ? null : () => Navigator.pushNamed(context, '/'),
+                      onPressed: state.disable ? null : () => context.go('/'),
                       child: Text(translation.next, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
                     );
                   },

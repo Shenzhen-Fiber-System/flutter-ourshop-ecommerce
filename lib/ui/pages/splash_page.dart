@@ -40,7 +40,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   }
 
   void _startIncrementing() {
-    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
       if (percent.value < 100) {
         percent.value += 1;
       } else {
@@ -51,25 +51,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   }
   void _navigateToChooseLanguagePage() {
     locator<Preferences>().saveLastVisitedPage('splash_page');
-    Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const ChooseLanguagePage(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.easeInOut;
-
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          var offsetAnimation = animation.drive(tween);
-
-          return SlideTransition(
-            position: offsetAnimation,
-            child: child,
-          );
-        },
-      ),
-    );
+    context.go('/choose-language');
   }
 
   @override

@@ -69,8 +69,8 @@ class _ProductsPageState extends State<ProductsPage> {
                           size: size, 
                           translations: translations, 
                           theme: theme,
-                          onTap: (selectedSubCategory) async {
-                            await Navigator.pushNamed(context, '/sub-category', arguments: selectedSubCategory!);
+                          onTap: (selectedSubCategory) {
+                             context.push('/sub-category', extra: selectedSubCategory!);
                           },    
                         ),
                       ),
