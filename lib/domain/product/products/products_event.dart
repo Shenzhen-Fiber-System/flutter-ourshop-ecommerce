@@ -61,3 +61,43 @@ class AddSelectedCategoryEvent extends ProductsEvent {
   @override
   List<Object> get props => [selectedCategory];
 }
+
+class SelectAllCartProductsEvent extends ProductsEvent {
+  const SelectAllCartProductsEvent();
+  @override
+  List<Object> get props => [];
+}
+
+class DeselectAllCartProductsEvent extends ProductsEvent {
+  const DeselectAllCartProductsEvent();
+  @override
+  List<Object> get props => [];
+}
+
+class SelectOrDeselectCartProductEvent extends ProductsEvent {
+  final Product product;
+  const SelectOrDeselectCartProductEvent({required this.product});
+  @override
+  List<Object> get props => [product];
+}
+
+class ClearCart extends ProductsEvent {
+  const ClearCart();
+  @override
+  List<Object> get props => [];
+}
+
+
+class AddCategoryHeaderImagesEvent extends ProductsEvent {
+  final List<String> categoryHeaderImages;
+  const AddCategoryHeaderImagesEvent({required this.categoryHeaderImages});
+  @override
+  List<Object> get props => [categoryHeaderImages];
+}
+
+class AddSelectedSubCategoryEvent extends ProductsEvent {
+  final String selectedSubCategory;
+  const AddSelectedSubCategoryEvent({required this.selectedSubCategory});
+  @override
+  List<Object> get props => [selectedSubCategory];
+}

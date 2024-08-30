@@ -23,6 +23,7 @@ class ErrorHandler extends DioException{
         final error = RequestError.fromJson(response?.data);
         ErrorToast(
           title: error.message,
+          description: error.message,
           style: ToastificationStyle.flatColored,
           foregroundColor: Colors.white,
           backgroundColor: Colors.red.shade500,
@@ -32,7 +33,7 @@ class ErrorHandler extends DioException{
       case 500:
         final error = RequestError.fromJson(response?.data);
         ErrorToast(
-          title: error.debugMessage,
+          title: error.debugMessage ?? error.message,
           style: ToastificationStyle.flatColored,
           foregroundColor: Colors.white,
           backgroundColor: Colors.red.shade500,
@@ -43,6 +44,7 @@ class ErrorHandler extends DioException{
         final error = RequestError.fromJson(response?.data);
         ErrorToast(
           title: error.debugMessage ?? error.message,
+          description: error.message,
           style: ToastificationStyle.flatColored,
           foregroundColor: Colors.white,
           backgroundColor: Colors.red.shade500,
@@ -50,8 +52,6 @@ class ErrorHandler extends DioException{
         ).showToast(context);
     }
   }
-
-
 }
 
 

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../ui/pages/pages.dart';
 
 sealed class Toast{
@@ -93,10 +95,10 @@ class SuccessToast extends Toast {
       dragToClose: dragToClose ?? true,
       applyBlurEffect: applyBlurEffect ?? false,
       callbacks: ToastificationCallbacks(
-        onTap: (toastItem) => print('Toast ${toastItem.id} tapped'),
-        onCloseButtonTap: (toastItem) => print('Toast ${toastItem.id} close button tapped'),
+        onTap: (toastItem) => log('Toast ${toastItem.id} tapped'),
+        onCloseButtonTap: (toastItem) => log('Toast ${toastItem.id} close button tapped'),
         onAutoCompleteCompleted: (toastItem) => onAutoCompleted != null ? onAutoCompleted!(toastItem) : null,
-        onDismissed: (toastItem) => print('Toast ${toastItem.id} dismissed'),
+        onDismissed: (toastItem) => log('Toast ${toastItem.id} dismissed'),
       ),
     );
   }
@@ -188,10 +190,10 @@ class ErrorToast extends Toast {
       dragToClose: dragToClose ?? true,
       applyBlurEffect: applyBlurEffect ?? false,
       callbacks: ToastificationCallbacks(
-        onTap: (toastItem) => print('Toast ${toastItem.id} tapped'),
-        onCloseButtonTap: (toastItem) => print('Toast ${toastItem.id} close button tapped'),
-        onAutoCompleteCompleted: (toastItem) => print('Toast ${toastItem.id} auto complete completed'),
-        onDismissed: (toastItem) => print('Toast ${toastItem.id} dismissed'),
+        onTap: (toastItem) => log('Toast ${toastItem.id} tapped'),
+        onCloseButtonTap: (toastItem) => log('Toast ${toastItem.id} close button tapped'),
+        onAutoCompleteCompleted: (toastItem) => log('Toast ${toastItem.id} auto complete completed'),
+        onDismissed: (toastItem) => log('Toast ${toastItem.id} dismissed'),
       ),
     );
   }

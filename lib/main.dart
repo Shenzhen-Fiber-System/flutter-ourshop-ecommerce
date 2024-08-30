@@ -6,7 +6,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async  {
   WidgetsFlutterBinding.ensureInitialized();
   const bool isProduction = bool.fromEnvironment('dart.vm.product');
-  await dotenv.load(fileName: isProduction ? ".env.prod" : ".env.dev");
+  await dotenv.load(fileName: isProduction ? ".env.prod" : ".env.prod");
   Bloc.observer = Observable();
   await initializeServiceLocator();
   runApp(

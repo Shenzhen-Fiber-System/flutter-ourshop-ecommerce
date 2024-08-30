@@ -8,7 +8,8 @@ class AppRoutes{
     '/sign-up': (_) => const SignUpPage(),
     '/home' : (_) => const HomePage(),
     '/selected-product': (_) => const SelectedProductPage(),
-    // '/settings_page': (_) => const SettingsPage()
+    '/sub-category': (_) => const SubCategoryPage(),
+    '/checkout': (_) => const CheckoutPage(),
   };
 
 }

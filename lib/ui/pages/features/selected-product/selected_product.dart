@@ -11,115 +11,132 @@ class SelectedProductPage extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final AppLocalizations translations = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          style: theme.iconButtonTheme.style?.copyWith(
-            shadowColor: WidgetStatePropertyAll(Colors.grey.shade300),
-          ),
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Text(translations.detail_product, style: theme.textTheme.titleLarge,),
-      ),
-      body: Column(
-        children: [
-          _Image(size: size, product: product, theme: theme, translations: translations,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10.0),
-                child: Text(product.name, style: theme.textTheme.titleLarge?.copyWith(color: const Color(0xff5d5f61), fontWeight: FontWeight.w700),),
-              ),
-              IconButton(
-                icon: BlocBuilder<ProductsBloc, ProductsState>(
-                  builder: (context, state) {
-                    return Icon(
-                      state.favoriteProducts.contains(product) ? Icons.favorite : Icons.favorite_border_outlined, 
-                      color: state.favoriteProducts.contains(product) ?  Colors.red : Colors.grey.shade400,
-                    );
-                  },
-                ),
-                onPressed: () => context.read<ProductsBloc>().addFavoriteProduct(product)
+    return BlocListener<ProductsBloc, ProductsState>(
+      listenWhen: (previous, current) => previous.cartProducts.length != current.cartProducts.length,
+      listener: (context, state) {
+        ScaffoldMessenger.of(context).showMaterialBanner(
+          MaterialBanner(
+            content: Text(translations.product_added_to_cart),
+            actions: [
+              TextButton(
+                onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(),
+                child: Text(translations.close, style: theme.textTheme.bodyMedium?.copyWith(color: theme.primaryColor),),
               )
             ],
+          )
+        );
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              style: theme.iconButtonTheme.style?.copyWith(
+                shadowColor: WidgetStatePropertyAll(Colors.grey.shade300),
+              ),
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            title: Text(translations.detail_product, style: theme.textTheme.titleLarge,),
           ),
-          Row(
+          body: Column(
             children: [
-              Column(
+              _Image(size: size, product: product, theme: theme, translations: translations,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
-                        child: Text('USD \$${product.unitPrice}', style: theme.textTheme.titleMedium?.copyWith(color: const Color(0xff5d5f61), fontWeight: FontWeight.w500),),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
-                        child: Chip(
-                          visualDensity: VisualDensity.compact,
-                          side: BorderSide.none,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-                          padding: const EdgeInsets.all(0),
-                          label: Text('6% off', style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[700]),), 
-                          backgroundColor: AppTheme.palette[50],
+                  Expanded(  // Coloca Expanded directamente aquí
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Text(
+                        product.name,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: const Color(0xff5d5f61),
+                          fontWeight: FontWeight.w700,
                         ),
+                        softWrap: true,
                       ),
-                    ],
+                    ),
                   ),
-                  Text('USD \$${product.unitPrice}', style: theme.textTheme.titleSmall?.copyWith(color: Colors.grey.shade400, decoration: TextDecoration.lineThrough),),
+                  IconButton(
+                    icon: BlocBuilder<ProductsBloc, ProductsState>(
+                      builder: (context, state) {
+                        return Icon(
+                          state.favoriteProducts.contains(product) ? Icons.favorite : Icons.favorite_border_outlined, 
+                          color: state.favoriteProducts.contains(product) ?  Colors.red : Colors.grey.shade400,
+                        );
+                      },
+                    ),
+                    onPressed: () => context.read<ProductsBloc>().addFavoriteProduct(product),
+                  ),
                 ],
               ),
-            ],
-          ),
-          
-        ],
-      ),
-      bottomNavigationBar: CustomBottomBar(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: size.width * 0.4,
-                child: OutlinedButton(
-                  style: const ButtonStyle(
-                  
-                  ),
-                  
-                  onPressed: () {
-                          
-                  },
-                  child: Row(
+              Row(
+                children: [
+                  Column(
                     children: [
-                      Icon(Icons.shopping_bag_outlined, color: AppTheme.palette[500], size: 14,),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 5.0),
-                        child: Text(translations.add_to_cart, style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[500]),),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Text('USD \$${product.unitPrice}', style: theme.textTheme.titleMedium?.copyWith(color: const Color(0xff5d5f61), fontWeight: FontWeight.w500),),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Chip(
+                              visualDensity: VisualDensity.compact,
+                              side: BorderSide.none,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                              padding: const EdgeInsets.all(0),
+                              label: Text('6% off', style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[700]),), 
+                              backgroundColor: AppTheme.palette[50],
+                            ),
+                          ),
+                        ],
                       ),
+                      Text('USD \$${product.unitPrice}', style: theme.textTheme.titleSmall?.copyWith(color: Colors.grey.shade400, decoration: TextDecoration.lineThrough),),
                     ],
                   ),
-                ),
+                ],
               ),
-              SizedBox(
-                width: size.width * 0.4,
-                child: ElevatedButton(
-                  onPressed: () {
-                          
-                  },
-                  child: Text(translations.checkout, style: theme.textTheme.labelMedium),
-                ),
-              ),
+              
             ],
           ),
+          bottomNavigationBar: CustomBottomBar(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: size.width * 0.4,
+                    child: OutlinedButton(
+                      onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
+                      child: Row(
+                        children: [
+                          Icon(Icons.shopping_bag_outlined, color: AppTheme.palette[500], size: 14,),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 5.0),
+                            child: Text(translations.add_to_cart, style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[500]),),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: size.width * 0.4,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pushNamed(context,'/checkout'),
+                      child: Text(translations.checkout, style: theme.textTheme.labelMedium),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
-      ),
     );
   }
 }

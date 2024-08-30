@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   bloc: ^8.1.4
+  carousel_slider: ^5.0.0
   cupertino_icons: ^1.0.6
   dart_jsonwebtoken: ^2.14.0
   dio: ^5.5.0+1
@@ -48,7 +49,7 @@ dependencies:
   toastification: ^2.1.0
 
 dev_dependencies:
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
 

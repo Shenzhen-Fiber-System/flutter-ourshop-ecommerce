@@ -312,3 +312,35 @@ class ShippingAddressDialog extends AlertDialogs {
     }
             
 }
+
+
+class DeleteCartProductDialog extends AlertDialogs {
+  
+  final Product product;
+  
+  DeleteCartProductDialog({required this.product});
+  
+  @override
+  Future<bool?> showAlertDialog(BuildContext context, AppLocalizations translations, ThemeData theme,) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Delete ${product.name}?'),
+          content: Text('Are you sure you want to delete ${product.name} from the cart?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(translations.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(translations.delete),
+            ),
+          ],
+        );
+      },
+    );
+  }
+          
+}

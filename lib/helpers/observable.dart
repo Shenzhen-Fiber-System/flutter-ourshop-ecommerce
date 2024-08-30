@@ -34,12 +34,14 @@ class Observable extends BlocObserver {
     } else if (bloc is ProductsBloc){
       final currentState = change.currentState as ProductsState;
       final nextState = change.nextState as ProductsState;
-      if (currentState.categories.length != nextState.categories.length) {
-        log('products ${nextState.products}');
-      }
+      // if (currentState.categories.length != nextState.categories.length) {
+      //   log('products ${nextState.products}');
+      // }
       if (currentState.selectedCategory != nextState.selectedCategory) {
         log('selectedCategory ${nextState.selectedCategory}');
-
+      }
+      if (currentState.cartProducts.length != nextState.cartProducts.length) {
+        log('cart ´products ${nextState.cartProducts}');
       }
     }
   }
