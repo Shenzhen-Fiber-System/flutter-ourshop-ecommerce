@@ -273,6 +273,9 @@ class AppTheme{
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.compact
     ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: palette[500],
+    ),
     
   );
 

@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:ourshop_ecommerce/models/models.dart';
+
 import '../../../ui/pages/pages.dart';
 part 'products_event.dart';
 part 'products_state.dart';
@@ -7,29 +9,41 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 
   //Repository
   final ProductService _productService;
+  final CategoryService _categoryService;
   //dependency injection
   final GeneralBloc generalBloc;
 
 
   ProductsBloc(
     ProductService productService,
+    CategoryService categoryService,
     this.generalBloc
   ) : 
     _productService = productService,
+    _categoryService = categoryService,
   super(const ProductsState()) {
-    on<AddIsLoadingProdEvent>((event, emit)=> emit(state.copyWith(isLoading: event.isLoading)));
+    on<AddProductsStatesEvent>((event, emit)=> emit(state.copyWith(prodyctsStates: event.productsState)));
     on<AddCategoriesEvent>((event, emit)=> emit(state.copyWith(categories: event.categories)));
     on<AddProductsEvent>((event, emit)=> emit(state.copyWith(products: event.products)));
     on<ChangeGridCountEvent>((event, emit)=> emit(state.copyWith(gridCount: event.gridCount)));
     on<AddFavoriteProductEvent>(_addFavoriteProduct);
     on<AddCartProductEvent>(_addCartProduct);
     on<RemoveCartProductEvent>(_removeCartProduct);
-    on<AddSelectedCategoryEvent>((event,emit) => emit(state.copyWith(selectedCategory: event.selectedCategory)));
+    on<AddSelectedParentCategoryEvent>((event,emit) => emit(state.copyWith(selectedParentCategory: event.selectedParentCategory)));
+    on<AddSelectedSubCategoryEvent>((event,emit) => emit(state.copyWith(selectedSubCategory: event.selectedSubCategory)));
     on<SelectAllCartProductsEvent>(_selectAllCartProducts);
     on<DeselectAllCartProductsEvent>((event, emit) => emit(state.copyWith(cartProducts: state.cartProducts.map((e) => e.copyWith(selected: false)).toList())));
     on<SelectOrDeselectCartProductEvent> (_selectOrDeselectCartProductEvent);
     on<ClearCart>((event, emit) => emit(state.copyWith(cartProducts: [])));
     on<AddCategoryHeaderImagesEvent>((event, emit) => emit(state.copyWith(categoryHeaderImages: event.categoryHeaderImages)));
+    on<AddSubCategoryProductsEvent>(_addSubCategoryProductsEvent);
+    on<AddSubCategoriesEvent>((event, emit) => emit(state.copyWith(subCategories: event.subCategories)));
+  }
+
+  FutureOr<void> _addSubCategoryProductsEvent(event, emit) {
+    final List<Product> updatedList = List.from(state.subCategoryProducts);
+    updatedList.addAll(event.subCategoryProducts);
+    emit(state.copyWith(subCategoryProducts: event.subCategoryProducts));
   }
 
   FutureOr<void> _selectOrDeselectCartProductEvent(SelectOrDeselectCartProductEvent event, Emitter<ProductsState> emit){
@@ -43,9 +57,6 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 
   FutureOr<void> _selectAllCartProducts(event, emit) {
     final List<Product> updatedList = List.from(state.cartProducts);
-    // for (final product in updatedList) {
-    //   product.copyWith(selected: true);
-    // }
     for (var i = 0; i < updatedList.length; i++) {
       updatedList[i] = updatedList[i].copyWith(selected: true);
     }
@@ -95,47 +106,71 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 
 
   Future<void> getProducts() async {
-    add(const AddIsLoadingProdEvent(true));
+    add(const AddProductsStatesEvent(productsState: ProductsStates.loading));
     final products = await _productService.getProducts();
     if(products is List<Product>) add(AddProductsEvent(products));
-    add(const AddIsLoadingProdEvent(false));
+    add(const AddProductsStatesEvent(productsState: ProductsStates.loaded));
   }
 
   Future<List<Category>> getCategories() async {
-    add(const AddIsLoadingProdEvent(true));
+    add(const AddProductsStatesEvent(productsState: ProductsStates.loading));
     final categories = await _productService.getCategories();
     if(categories is List<Category>) {
-      if (state.selectedCategory.isEmpty) {
-        add(AddSelectedCategoryEvent(selectedCategory:categories.first.id));
+      if (state.selectedParentCategory.isEmpty) {
+        add(AddSelectedParentCategoryEvent(selectedParentCategory:categories.first.id));
       }
       for (var category in categories) {
         final index = categories.indexOf(category);
         final products = await _productService.getProductsByCategory(category.id);
-        final updatedCategory = category.copyWith(products: products);
-        categories[index] = updatedCategory;
+        if (products is List<Product>) {
+          final updatedCategory = category.copyWith(products: products);
+          categories[index] = updatedCategory;
+        }
       }
       add(AddCategoriesEvent(categories));
     }
-    add(const AddIsLoadingProdEvent(false));
+    add(const AddProductsStatesEvent(productsState: ProductsStates.loaded));
     return categories;
   }
 
-  Future<List<Product>> getProductsByCategory(String selectedCategory) async {
-    add(const AddIsLoadingProdEvent(true));
+  Future<void> getProductsByCategory(String selectedCategory) async {
+    add(const AddCategoryHeaderImagesEvent(categoryHeaderImages: []));
+    add(const AddSubCategoryProductsEvent(subCategoryProducts: []));
+    add(const AddProductsStatesEvent(productsState: ProductsStates.loading));
     final products = await _productService.getProductsByCategory(selectedCategory);
-    add(const AddIsLoadingProdEvent(false));
-    if (products is List<Product>){
+    add(const AddProductsStatesEvent(productsState: ProductsStates.loaded));
+    // if(subCategories is List<SubCategory> && subCategories.isNotEmpty){
+    //   add(AddSubCategoriesEvent(subCategories: subCategories));
+    // }
+    if (products is List<Product> && products.isNotEmpty) {
       getHeaderImages(products);
-      return products;
+      add(AddSubCategoryProductsEvent(subCategoryProducts: products));
     } 
-    return [];
+  }
+
+  Future<void> fetchSubCategoriesWithProducts(String categoryId) async {
+    add(const AddSelectedSubCategoryEvent(selectedSubCategory: Category(id: '', name: '', description: '', parentCategoryId: '')));
+    add(const AddSubCategoriesEvent(subCategories: []));
+    add(const AddSubCategoryProductsEvent(subCategoryProducts: []));
+    add(const AddProductsStatesEvent(productsState: ProductsStates.loading));
+    final subCategoryName =await  _categoryService.getCategoryById(categoryId);
+    if (subCategoryName is Category) add(AddSelectedSubCategoryEvent(selectedSubCategory: subCategoryName)); 
+    final subcateogries = await _categoryService.getSubCategoriesByCategory(categoryId);
+    if (subcateogries is List<Category>) {
+      add(AddSubCategoriesEvent(subCategories: subcateogries));
+    }
+    final products = await _productService.getProductsByCategory(categoryId);
+    if (products is List<Product>) {
+      add(AddSubCategoryProductsEvent(subCategoryProducts: products));
+    }
+    add(const AddProductsStatesEvent(productsState: ProductsStates.loaded));
   }
 
   void changeGridCount(int gridCount) => add(ChangeGridCountEvent(gridCount));
 
   void addFavoriteProduct(Product product) => add(AddFavoriteProductEvent(product));
   
-  void addSelectedCategory(String selectedCategory) => add(AddSelectedCategoryEvent(selectedCategory: selectedCategory));
+  void addSelectedCategory(String selectedCategory) => add(AddSelectedParentCategoryEvent(selectedParentCategory: selectedCategory));
 
   void addCartProduct(Product product) => add(AddCartProductEvent(product));
 
@@ -150,8 +185,8 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   void getHeaderImages(List<Product> products){
     final List<String> updatedList = List.from(state.categoryHeaderImages);
     for (var product in products) {
-      if (product.productPhotos.isNotEmpty) {
-        updatedList.add('${dotenv.env['PRODUCT_URL']}${product.productPhotos.first.photo!.url}');
+      if (product.photos.isNotEmpty) {
+        updatedList.add('${dotenv.env['PRODUCT_URL']}${product.photos.first.url}');
       }
     }
     add(AddCategoryHeaderImagesEvent(categoryHeaderImages: updatedList));

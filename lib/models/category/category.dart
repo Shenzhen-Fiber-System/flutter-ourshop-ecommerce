@@ -3,7 +3,7 @@ import '../../ui/pages/pages.dart';
 class CategoryResponse {
     bool success;
     String message;
-    List<Category> data;
+    dynamic data;
 
     CategoryResponse({
         required this.success,
@@ -14,13 +14,13 @@ class CategoryResponse {
     factory CategoryResponse.fromJson(Map<String, dynamic> json) => CategoryResponse(
         success: json["success"],
         message: json["message"],
-        data: List<Category>.from(json["data"].map((x) => Category.fromJson(x))),
+        data: json['data'] is Map<String,dynamic> ? Category.fromJson(json['data']) : List<Category>.from(json["data"].map((x) => Category.fromJson(x))),
     );
 
     CategoryResponse copyWith({
         bool? success,
         String? message,
-        List<Category>? data,
+        dynamic data,
     }) => 
       CategoryResponse(
           success: success ?? this.success,
@@ -33,7 +33,7 @@ class CategoryResponse {
     Map<String, dynamic> toJson() => {
         "success": success,
         "message": message,
-        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+        "data": data is List<Category> ? List<dynamic>.from(data.map((x) => x.toJson())) : data.toJson(),
     };
 }
 
@@ -42,7 +42,7 @@ class Category extends Equatable {
     final String name;
     final String description;
     final String? iconSvg;
-    final String? parentCategoryId;
+    final String parentCategoryId;
     final List<Category>? subCategories;
     final int? level;
     final List<Product> products;
@@ -52,7 +52,7 @@ class Category extends Equatable {
         required this.name,
         required this.description,
         this.iconSvg,
-        this.parentCategoryId,
+        required this.parentCategoryId,
         this.subCategories,
         this.level,
         this.products = const []
@@ -63,7 +63,7 @@ class Category extends Equatable {
         name: json["name"],
         description: json["description"],
         iconSvg: json["iconSvg"],
-        parentCategoryId: json["parentCategoryId"],
+        parentCategoryId: json["parentCategoryId"] ?? '',
         subCategories: json["subCategories"] == null ? [] : List<Category>.from(json["subCategories"].map((x) => Category.fromJson(x))),
         level: json["level"],
     );

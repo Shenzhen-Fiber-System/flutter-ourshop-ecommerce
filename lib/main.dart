@@ -47,44 +47,6 @@ class MyApp extends StatelessWidget {
         theme: context.watch<SettingsBloc>().state.currentTheme == ThemeMode.light ? AppTheme.light : AppTheme.dark,
         locale: Locale(context.watch<SettingsBloc>().state.currentLanguege.value),
         debugShowCheckedModeBanner: true,
-        // initialRoute: AppRoutes.initialPage,
-        // routes: AppRoutes.routes,
-        // onGenerateInitialRoutes: (_){
-        //   final String? lastVisitedPage = locator<Preferences>().preferences['last_visited_page'];
-        //   if ((lastVisitedPage != null &&lastVisitedPage.isEmpty) || lastVisitedPage == null) {
-        //     return [
-        //       MaterialPageRoute(
-        //         builder: (_) => const SplashPage()
-        //       ),
-        //     ];
-        //   }
-        //   switch (lastVisitedPage) {
-        //     case 'splash_page':          
-        //     return [
-        //       MaterialPageRoute(
-        //         builder: (_) => const SplashPage()
-        //       ),
-        //     ];
-        //     case 'choose_language_page':
-        //     return [
-        //       MaterialPageRoute(
-        //         builder: (_) => const ChooseLanguagePage()
-        //       ),
-        //     ];
-        //     case 'sign_in_page':
-        //     return [
-        //       MaterialPageRoute(
-        //         builder: (_) => const SignInPage()
-        //       ),
-        //     ];
-        //     default:
-        //     return [
-        //       MaterialPageRoute(
-        //         builder: (_) => const SplashPage()
-        //       ),
-        //     ];
-        //   }
-        // },
         builder: (context, child) {
           return ConnectivityListener(
             child: child!,

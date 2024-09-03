@@ -33,9 +33,7 @@ class SelectedProductPage extends StatelessWidget {
                 shadowColor: WidgetStatePropertyAll(Colors.grey.shade300),
               ),
               icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => context.pop()
             ),
             title: Text(translations.detail_product, style: theme.textTheme.titleLarge,),
           ),
@@ -183,6 +181,9 @@ class _ImageState extends State<_Image> {
 
   @override
   Widget build(BuildContext context) {
+
+    if (widget.product.photos.isEmpty) Center(child: Icon(Icons.image_not_supported, size: 100.0, color: Colors.grey.shade500,),);
+
     return SizedBox(
       height: widget.size.height * 0.4,
       width: widget.size.width,
@@ -190,10 +191,10 @@ class _ImageState extends State<_Image> {
         children: [
           Expanded(
             child:
-             widget.product.productPhotos.isNotEmpty ?
+             widget.product.photos.isNotEmpty ?
              PageView.builder(
               controller: _pageController,
-              itemCount: widget.product.productPhotos.length,
+              itemCount: widget.product.photos.length,
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
@@ -202,7 +203,7 @@ class _ImageState extends State<_Image> {
                     child: Hero(
                       tag: widget.product.id,
                       child: Image(
-                        image: NetworkImage('${dotenv.env['PRODUCT_URL']}${widget.product.productPhotos[index].photo!.url}'),
+                        image: NetworkImage('${dotenv.env['PRODUCT_URL']}${widget.product.photos[index].url}'),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -238,7 +239,7 @@ class _ImageState extends State<_Image> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                for (int i = 0; i < widget.product.productPhotos.length; i++)
+                                for (int i = 0; i < widget.product.photos.length; i++)
                                   Container(
                                     margin: const EdgeInsets.symmetric(horizontal: 4.0),
                                     height: 10.0,
@@ -271,7 +272,7 @@ class _ImageState extends State<_Image> {
                       child: ValueListenableBuilder(
                         valueListenable: _currentPage,
                         builder: (BuildContext context, value, Widget? child) {
-                          return Text('${value + 1}/${widget.product.productPhotos.length}', style: widget.theme.textTheme.labelSmall?.copyWith(fontSize: 10.0, color: AppTheme.palette[600]),);
+                          return Text('${value + 1}/${widget.product.photos.length}', style: widget.theme.textTheme.labelSmall?.copyWith(fontSize: 10.0, color: AppTheme.palette[600]),);
                         },
                       )
                     ),
@@ -281,8 +282,7 @@ class _ImageState extends State<_Image> {
             ),
           ),
         ],
-      ),
-    
+      )
     );
   }
 }

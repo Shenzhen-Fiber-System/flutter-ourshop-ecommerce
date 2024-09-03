@@ -5,11 +5,19 @@ class Messenger extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: double.maxFinite,
-      width: double.maxFinite,
-      color: Colors.amber,
-      child:  const Text('Messgenger', style: TextStyle(fontSize: 50, color: Colors.black)),
+
+    final ThemeData theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Search'),
+        centerTitle: true,
+      ),
+      body: Container(
+        height: double.maxFinite,
+        width: double.maxFinite,
+        color: Colors.white,
+        child:  Center(child: Text('Search products...', style: theme.textTheme.titleMedium,)),
+      ),
     );
   }
 }

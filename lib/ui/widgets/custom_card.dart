@@ -20,7 +20,7 @@ class CustomCard extends StatelessWidget {
   final double width;
   final ThemeData theme;
   final AppLocalizations translations;
-  final Function onTap;
+  final void Function() onTap;
   final String? urlImage;
   final List<Widget>? children;
   final Widget? child;
@@ -28,7 +28,7 @@ class CustomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => onTap(),
+      onTap: onTap,
       child: Container(
         height: height,
         width: width,
