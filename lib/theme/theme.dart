@@ -276,6 +276,12 @@ class AppTheme{
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: palette[500],
     ),
+    bannerTheme: MaterialBannerThemeData(
+      backgroundColor: palette[500]!,
+      contentTextStyle: ThemeData().textTheme.bodyMedium,
+      padding: const EdgeInsets.all(20.0),
+      leadingPadding: const EdgeInsets.all(20.0),
+    )
     
   );
 

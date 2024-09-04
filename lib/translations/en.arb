@@ -110,5 +110,8 @@
     "product_added_to_cart":"Product added to cart",
     "close":"Close",
     "send": "Send",
-    "product_ratings": "{count} ratings"
+    "product_ratings": "{count} ratings",
+    "specifications": "Specifications",
+    "details": "Details",
+    "videos": "Videos"
 }

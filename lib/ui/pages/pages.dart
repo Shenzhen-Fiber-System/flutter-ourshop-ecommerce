@@ -37,6 +37,7 @@ export 'package:ourshop_ecommerce/services/services.dart';
 
 //widgets
 export 'package:ourshop_ecommerce/ui/widgets/widgets.dart';
+export 'package:ourshop_ecommerce/ui/pages/features/selected-product/widgets/widgets.dart';
 
 // packages
 export 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -51,6 +52,10 @@ export 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:carousel_slider/carousel_slider.dart';
 export 'package:go_router/go_router.dart';
+export 'package:flutter_rating_bar/flutter_rating_bar.dart';
+export 'package:video_player/video_player.dart';
+export 'package:flick_video_player/flick_video_player.dart';
+export 'package:wakelock_plus/wakelock_plus.dart';
 
 //theme
 export '../../../../theme/theme.dart';

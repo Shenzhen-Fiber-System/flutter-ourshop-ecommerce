@@ -85,9 +85,7 @@ class ProductCard extends StatelessWidget {
                           empty: const Icon(Icons.star_border, color: Colors.amber,),
                         ),
                         tapOnlyMode: true,
-                        onRatingUpdate: (rating) {
-                          print(rating);
-                        },
+                        onRatingUpdate: (rating) {},
                       ),
                     ],
                   ),
@@ -96,7 +94,7 @@ class ProductCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(translations.product_ratings(product.productReviewInfo!.summary.length), style: theme.textTheme.bodySmall,),
+                      Text(translations.product_ratings(product.productReviewInfo!.reviewCount), style: theme.textTheme.bodySmall,),
                     ],
                   )
                   else const SizedBox.shrink(),
@@ -110,7 +108,6 @@ class ProductCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       IconButton.filled(
-                        // iconSize: 20.0,
                         style: theme.textButtonTheme.style?.copyWith(
                           backgroundColor: const WidgetStatePropertyAll(Color(0xff003049)),
                           fixedSize: const WidgetStatePropertyAll( Size(10.0, 10.0)),

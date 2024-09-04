@@ -37,69 +37,123 @@ class SelectedProductPage extends StatelessWidget {
             ),
             title: Text(translations.detail_product, style: theme.textTheme.titleLarge,),
           ),
-          body: Column(
-            children: [
-              _Image(size: size, product: product, theme: theme, translations: translations,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(  // Coloca Expanded directamente aquí
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10.0),
-                      child: Text(
-                        product.name,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: const Color(0xff5d5f61),
-                          fontWeight: FontWeight.w700,
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                _Image(size: size, product: product, theme: theme, translations: translations,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(  // Coloca Expanded directamente aquí
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Text(
+                          product.name,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: const Color(0xff5d5f61),
+                            fontWeight: FontWeight.w700,
+                          ),
+                          softWrap: true,
                         ),
-                        softWrap: true,
                       ),
                     ),
-                  ),
-                  IconButton(
-                    icon: BlocBuilder<ProductsBloc, ProductsState>(
-                      builder: (context, state) {
-                        return Icon(
-                          state.favoriteProducts.contains(product) ? Icons.favorite : Icons.favorite_border_outlined, 
-                          color: state.favoriteProducts.contains(product) ?  Colors.red : Colors.grey.shade400,
-                        );
-                      },
+                    IconButton(
+                      icon: BlocBuilder<ProductsBloc, ProductsState>(
+                        builder: (context, state) {
+                          return Icon(
+                            state.favoriteProducts.contains(product) ? Icons.favorite : Icons.favorite_border_outlined, 
+                            color: state.favoriteProducts.contains(product) ?  Colors.red : Colors.grey.shade400,
+                          );
+                        },
+                      ),
+                      onPressed: () => context.read<ProductsBloc>().addFavoriteProduct(product),
                     ),
-                    onPressed: () => context.read<ProductsBloc>().addFavoriteProduct(product),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            child: Text('USD \$${product.unitPrice}', style: theme.textTheme.titleMedium?.copyWith(color: const Color(0xff5d5f61), fontWeight: FontWeight.w500),),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            child: Chip(
-                              visualDensity: VisualDensity.compact,
-                              side: BorderSide.none,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-                              padding: const EdgeInsets.all(0),
-                              label: Text('6% off', style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[700]),), 
-                              backgroundColor: AppTheme.palette[50],
+                  ],
+                ),
+                const SizedBox(height: 5.0,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0, left: 10.0),
+                      child: Text('${product.productReviewInfo?.ratingAvg.toStringAsFixed(1)}', style: theme.textTheme.labelLarge?.copyWith(color: Colors.black),),
+                    ),
+                    RatingBar(
+                      initialRating: product.productReviewInfo?.ratingAvg ?? 0,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      ignoreGestures: true,
+                      itemCount: 5,
+                      itemSize: size.width * 0.07,
+                      glowColor: Colors.amber,
+                      unratedColor: Colors.amber,
+                      ratingWidget: RatingWidget(                          
+                        full: const Icon(Icons.star, color: Colors.amber,),
+                        half: const Icon(Icons.star_half, color: Colors.amber,),
+                        empty: const Icon(Icons.star_border, color: Colors.amber,),
+                      ),
+                      tapOnlyMode: true,
+                      onRatingUpdate: (rating) {},
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5.0,),
+                Row(
+                  children: [
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10.0),
+                              child: Text('USD ${product.unitPrice != null ? '\$${product.unitPrice?.toStringAsFixed(2)}' : ('\$${product.fboPriceStart?.toStringAsFixed(2)}-\$${product.fboPriceEnd?.toStringAsFixed(2)}')}', style: theme.textTheme.titleMedium?.copyWith(color: const Color(0xff5d5f61), fontWeight: FontWeight.w600),),
                             ),
-                          ),
-                        ],
-                      ),
-                      Text('USD \$${product.unitPrice}', style: theme.textTheme.titleSmall?.copyWith(color: Colors.grey.shade400, decoration: TextDecoration.lineThrough),),
-                    ],
-                  ),
-                ],
-              ),
-              
-            ],
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10.0),
+                              child: Chip(
+                                visualDensity: VisualDensity.compact,
+                                side: BorderSide.none,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                                padding: const EdgeInsets.all(0),
+                                label: Text('6% off', style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[700]),), 
+                                backgroundColor: AppTheme.palette[50],
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Text('USD \$${product.unitPrice != null ? '\$${product.unitPrice?.toStringAsFixed(2)}' : ('\$${product.fboPriceStart?.toStringAsFixed(2)}-\$${product.fboPriceEnd?.toStringAsFixed(2)}')}', style: theme.textTheme.titleSmall?.copyWith(color: Colors.grey.shade400, decoration: TextDecoration.lineThrough),),
+                        
+                        
+                      ],
+                    ),
+                  ],
+                ),
+                Section(
+                  title: translations.specifications, 
+                  content: product.name,
+                  theme: theme, 
+                  translations: translations,
+                  type: SectionType.text,
+                ),
+                Section(
+                  title: translations.details, 
+                  content: product.name,
+                  theme: theme, 
+                  translations: translations,
+                  type: SectionType.text,
+                ),
+                Section(
+                  title: translations.videos,
+                  content: '',
+                  theme: theme, 
+                  translations: translations,
+                  type: SectionType.videos,
+                  product: product,
+                )
+              ],
+            ),
           ),
           bottomNavigationBar: CustomBottomBar(
             child: Padding(
@@ -230,7 +284,6 @@ class _ImageState extends State<_Image> {
                     return Align(
                       alignment: Alignment.center,
                       child: SizedBox(
-                        
                         height: 30,
                         width: 75,
                         child: ListView(

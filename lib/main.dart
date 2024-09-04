@@ -3,6 +3,7 @@ import 'ui/pages/pages.dart';
 
 void main() async  {
   WidgetsFlutterBinding.ensureInitialized();
+  WakelockPlus.enable();
   const bool isProduction = bool.fromEnvironment('dart.vm.product');
   await dotenv.load(fileName: isProduction ? ".env.prod" : ".env.prod");
   Bloc.observer = Observable();
