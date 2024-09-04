@@ -22,7 +22,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     _productService = productService,
     _categoryService = categoryService,
   super(const ProductsState()) {
-    on<AddProductsStatesEvent>((event, emit)=> emit(state.copyWith(prodyctsStates: event.productsState)));
+    on<AddProductsStatesEvent>((event, emit)=> emit(state.copyWith(productsStates: event.productsState)));
     on<AddCategoriesEvent>((event, emit)=> emit(state.copyWith(categories: event.categories)));
     on<AddProductsEvent>((event, emit)=> emit(state.copyWith(products: event.products)));
     on<ChangeGridCountEvent>((event, emit)=> emit(state.copyWith(gridCount: event.gridCount)));

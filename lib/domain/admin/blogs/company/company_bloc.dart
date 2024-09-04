@@ -4,6 +4,7 @@ part 'company_event.dart';
 part 'company_state.dart';
 
 class CompanyBloc extends Bloc<CompanyEvent, CompanyState> {
+  // ignore: prefer_final_fields
   CompanyService _companyService;
   CompanyBloc(CompanyService companyService) : _companyService = companyService,
   super(const CompanyState()) {

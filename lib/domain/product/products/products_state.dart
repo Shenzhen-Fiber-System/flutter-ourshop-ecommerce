@@ -38,7 +38,7 @@ class ProductsState extends Equatable {
   });
 
   ProductsState copyWith({
-    ProductsStates? prodyctsStates,
+    ProductsStates? productsStates,
     List<Category>? categories,
     List<Product>? products,
     int? gridCount,
@@ -51,7 +51,7 @@ class ProductsState extends Equatable {
     List<Category>? subCategories
   }) {
     return ProductsState(
-      productsStates: prodyctsStates ?? this.productsStates,
+      productsStates: productsStates ?? this.productsStates,
       categories: categories ?? this.categories,
       products: products ?? this.products,
       gridCount: gridCount ?? this.gridCount,
