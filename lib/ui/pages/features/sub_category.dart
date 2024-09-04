@@ -36,7 +36,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
       key: UniqueKey(),
       builder: (BuildContext context, state) {
 
-        if (state.prodyctsStates == ProductsStates.loading) {
+        if (state.productsStates == ProductsStates.loading) {
           return const Center(child: CircularProgressIndicator.adaptive());
         }
 
@@ -63,6 +63,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
         return SafeArea(
           top: true,
           child: CustomScrollView(
+            key: UniqueKey(),
             slivers: [
               SliverAppBar(
                 leading: IconButton(
@@ -76,7 +77,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                     context.go('/sub-category/${state.selectedSubCategory.parentCategoryId}');
                   },
                 ),
-                expandedHeight: state.categoryHeaderImages.isNotEmpty ? size.height * 0.20 : size.height * 0.10,
+                expandedHeight: state.categoryHeaderImages.isNotEmpty ? size.height * 0.20 : size.height * 0.05,
                 title: state.categoryHeaderImages.isNotEmpty ? const SizedBox.shrink() : Text(state.selectedSubCategory.name, style: theme.textTheme.titleLarge,),
                 flexibleSpace: state.categoryHeaderImages.isNotEmpty ? CarouselSlider(
                   items: state.categoryHeaderImages.map((e) {
@@ -108,23 +109,33 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
               if (state.subCategories.isNotEmpty) 
                SliverToBoxAdapter(
                 child: SizedBox(
-                  height: size.height * 0.20,
+                  // height: size.height * 0.20,
+                  height: size.height * 0.10,
                   width: size.width,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: state.subCategories.length,
                     itemBuilder: (context, index) {
                       final Category subCategory = state.subCategories[index];
-                      return CustomCard(
-                        height: size.height * 0.15, 
-                        width: size.width * 0.35,
-                        theme: theme,
-                        translations: translations,
-                        children: [
-                          Text(subCategory.name, style: theme.textTheme.labelSmall,),
-                        ],
-                        onTap: () =>context.go('/sub-category/${subCategory.id}'),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                        child: SubCategoryChip(
+                          onTap: (subCateogry) => context.go('/sub-category/${subCategory.id}'),
+                          c: subCategory, 
+                          theme: theme
+                        ),
                       );
+                      // return SubcategoryCard(
+                      //   height: size.height * 0.15, 
+                      //   width: size.width * 0.35,
+                      //   theme: theme,
+                      //   translations: translations,
+                      //   urlImage: subCategory.iconSvg ?? '',
+                      //   children: [
+                      //     Text(subCategory.name, style: theme.textTheme.labelSmall,),
+                      //   ],
+                      //   onTap: () => context.go('/sub-category/${subCategory.id}'),
+                      // );
                     },
                   ),
                 ),

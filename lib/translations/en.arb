@@ -114,5 +114,6 @@
     "specifications": "Specifications",
     "details": "Details",
     "videos": "Videos",
-    "comments": "Comments"
+    "comments": "Comments",
+    "no_internet_connection": "No internet connection"
 }

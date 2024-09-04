@@ -281,7 +281,30 @@ class AppTheme{
       contentTextStyle: ThemeData().textTheme.bodyMedium,
       padding: const EdgeInsets.all(20.0),
       leadingPadding: const EdgeInsets.all(20.0),
-    )
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: Colors.white,
+      labelStyle: ThemeData().textTheme.bodyMedium,
+      padding: const EdgeInsets.all(10.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5.0),
+        side: BorderSide(
+          color: Colors.grey.shade400,
+          width: 1.0
+        )
+      ),
+      secondaryLabelStyle: ThemeData().textTheme.bodyMedium,
+      secondarySelectedColor: palette[500]!,
+      selectedColor: palette[500]!,
+      labelPadding: const EdgeInsets.only(right: 10.0, top: 10.0, bottom: 10.0),
+      elevation: 1.0,
+      color: WidgetStateColor.resolveWith((states){
+        if (states.contains(WidgetState.selected)){
+          return palette[500]!;
+        }
+        return Colors.white;
+      })
+    ),
     
   );
 

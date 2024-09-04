@@ -31,9 +31,9 @@ class _ProductsPageState extends State<ProductsPage> {
     return BlocBuilder<ProductsBloc, ProductsState>(
       builder: (context, state) {
 
-        if (state.prodyctsStates == ProductsStates.loading)  return const Center(child: CircularProgressIndicator.adaptive());
+        if (state.productsStates == ProductsStates.loading)  return const Center(child: CircularProgressIndicator.adaptive());
 
-        if (state.prodyctsStates == ProductsStates.error) return Center(child: Text('Something went wrong!', style: theme.textTheme.bodyMedium,));
+        if (state.productsStates == ProductsStates.error) return Center(child: Text('Something went wrong!', style: theme.textTheme.bodyMedium,));
 
         return DefaultTabController(
           initialIndex: state.selectedParentCategory.isEmpty ? 0 : state.categories.indexWhere((element) => element.id == state.selectedParentCategory),
@@ -41,13 +41,27 @@ class _ProductsPageState extends State<ProductsPage> {
           child: SafeArea(
             top: true,
             child: Scaffold(
-              appBar: TabBar(
-                isScrollable: true,
-                indicatorSize: TabBarIndicatorSize.label,
-                onTap: (index) => context.read<ProductsBloc>().addSelectedCategory(state.categories[index].id),
-                tabs: state.categories.map((category,) => Tab(
-                  text: Helpers.truncateText(category.name, 25), 
-                )).toList(),
+              appBar: AppBar(
+                leadingWidth: size.width * 0.25,
+                leading: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => showSearch(context: context, delegate: Search()),
+                      icon: const Icon(Icons.search)
+                    ),
+                    Text(translations.search, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black),)
+                  ],
+                ),
+                centerTitle: true,
+                title: Image.asset('assets/logos/logo_ourshop_1.png', height: 150, width: 150,),
+                bottom: TabBar(
+                  isScrollable: true,
+                  indicatorSize: TabBarIndicatorSize.label,
+                  onTap: (index) => context.read<ProductsBloc>().addSelectedCategory(state.categories[index].id),
+                  tabs: state.categories.map((category,) => Tab(
+                    text: Helpers.truncateText(category.name, 25), 
+                  )).toList(),
+                ),
               ),
               body: SizedBox(
                 height: size.height,
@@ -59,7 +73,7 @@ class _ProductsPageState extends State<ProductsPage> {
                     slivers: [
                       SliverAppBar(
                           automaticallyImplyLeading: false,
-                          expandedHeight: size.height * 0.20,
+                          expandedHeight: size.height * 0.10,
                           flexibleSpace: FlexibleSpaceBar(
                             stretchModes: const [StretchMode.zoomBackground],
                             background: SubCategoryList(

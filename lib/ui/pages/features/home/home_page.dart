@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> pages = [
     const ProductsPage(),
-    const Messenger(),
+    const SearchPage(),
     const Cart(),
     const MyAccount()
   ];
@@ -50,10 +50,13 @@ class _HomePageState extends State<HomePage> {
         useLegacyColorScheme: false,
         showUnselectedLabels: true,
         currentIndex: context.watch<GeneralBloc>().state.selectedBottomNavTab,
-        onTap: (value) {
-          _pageController.jumpToPage(value);
-          context.read<GeneralBloc>().add(ChangeBottomNavTab(value));
-        },
+        onTap: 
+        context.watch<ProductsBloc>().state.productsStates == ProductsStates.loading 
+          ? null 
+          : (value) {
+            _pageController.jumpToPage(value);
+            context.read<GeneralBloc>().add(ChangeBottomNavTab(value));
+          },
         items:   [
           BottomNavigationBarItem( label: translations.home, icon:const Icon(Icons.home)),
           BottomNavigationBarItem( label: translations.search, icon:const Icon(Icons.search)),
@@ -90,26 +93,36 @@ class SubCategoryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if(category.subCategories!.isEmpty) {
-      return Center(child: Text(translations.no_sub_categories_found, style: theme.textTheme.titleMedium,));
+      return Center(child: Text(translations.no_sub_categories_found, style: theme.textTheme.titleMedium?.copyWith(color: Colors.black)));
     }
-    return Container(
-      padding: const EdgeInsets.only(top: 10.0),
-      height: height ?? size.height * 0.20,
+    return SizedBox(
+      // margin: const EdgeInsets.only(top: 10.0),
+      // height: height ?? size.height * 0.20,
       width: width ?? size.width,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: category.subCategories?.length,
         itemBuilder: (context, index) {
-          return CustomCard(
-            height: size.height * 0.15, 
-            width: size.width * 0.35,
-            theme: theme,
-            translations: translations,
-            children: [
-              Text(category.subCategories![index].name, style: theme.textTheme.labelSmall,),
-            ],
-            onTap: () => onTap != null ? onTap!(category.subCategories![index]) : null,
+          final Category c = category.subCategories![index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3.0),
+            child: SubCategoryChip(
+              onTap: onTap, 
+              c: c, 
+              theme: theme
+            ),
           );
+          // return SubcategoryCard(
+          //   height: size.height * 0.01, 
+          //   width: size.width * 0.35,
+          //   theme: theme,
+          //   translations: translations,
+            // urlImage: category.subCategories![index].iconSvg,
+          //   children: [
+          //     Text(category.subCategories![index].name, style: theme.textTheme.labelSmall,),
+          //   ],
+          //   onTap: () => onTap != null ? onTap!(category.subCategories![index]) : null,
+          // );
         },
       ),
     );

@@ -1,7 +1,7 @@
 import '../../pages.dart';
 
-class Messenger extends StatelessWidget {
-  const Messenger({super.key});
+class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -10,7 +10,7 @@ enum ProductsStates{
 
 class ProductsState extends Equatable {
 
-  final ProductsStates prodyctsStates;
+  final ProductsStates productsStates;
   final List<Category> categories;
   final List<Product> products;
   final int gridCount;
@@ -23,7 +23,7 @@ class ProductsState extends Equatable {
   final List<Category> subCategories;
 
   const ProductsState({
-    this.prodyctsStates = ProductsStates.initial,
+    this.productsStates = ProductsStates.initial,
     this.categories = const [],
     this.products = const [],
     this.gridCount = 2,
@@ -51,7 +51,7 @@ class ProductsState extends Equatable {
     List<Category>? subCategories
   }) {
     return ProductsState(
-      prodyctsStates: prodyctsStates ?? this.prodyctsStates,
+      productsStates: prodyctsStates ?? this.productsStates,
       categories: categories ?? this.categories,
       products: products ?? this.products,
       gridCount: gridCount ?? this.gridCount,
@@ -67,7 +67,7 @@ class ProductsState extends Equatable {
   
   @override
   List<Object> get props => [
-    prodyctsStates,
+    productsStates,
     categories,
     products,
     gridCount,

@@ -304,7 +304,7 @@ class CartCard extends StatelessWidget {
                     ),
                     Row(
                       children: [
-                        Text((product.unitPrice! * product.quantity).toStringAsFixed(2), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black, fontWeight:  FontWeight.w600),),
+                        Text(product.unitPrice != null ? (product.unitPrice! * product.quantity).toStringAsFixed(2) : '0.00', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black, fontWeight:  FontWeight.w600),),
                       ],
                     ), 
                     Row(

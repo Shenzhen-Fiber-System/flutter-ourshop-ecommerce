@@ -116,6 +116,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     add(const AddProductsStatesEvent(productsState: ProductsStates.loading));
     final categories = await _productService.getCategories();
     if(categories is List<Category>) {
+      // Assign first parent category for default
       if (state.selectedParentCategory.isEmpty) {
         add(AddSelectedParentCategoryEvent(selectedParentCategory:categories.first.id));
       }

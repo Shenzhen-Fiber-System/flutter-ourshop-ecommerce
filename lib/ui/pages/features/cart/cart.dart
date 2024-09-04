@@ -11,13 +11,13 @@ class Cart extends StatelessWidget {
       appBar: AppBar(
         leading: TextButton(
           onPressed: () => context.read<ProductsBloc>().selectedCartProductsCount == 0 ? context.read<ProductsBloc>().selectAllCartProducts() : context.read<ProductsBloc>().deselectAllCartProducts(),
-          child: Text('${context.watch<ProductsBloc>().selectedCartProductsCount == 0 ? translations.select_all : translations.deselect_all} ${context.watch<ProductsBloc>().selectedCartProductsCount}',)
+          child: Text('${context.watch<ProductsBloc>().selectedCartProductsCount == 0 ? translations.select_all : translations.deselect_all} ${context.watch<ProductsBloc>().selectedCartProductsCount}', style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[400]),)
         ),
         leadingWidth: 100.0,
-        title: Text(translations.cart, style: theme.textTheme.titleLarge,),
+        title: Text(translations.cart, style: theme.textTheme.titleLarge?.copyWith(color: AppTheme.palette[400]),),
         actions: [
           TextButton(
-            child: Text(translations.clear_all),
+            child: Text(translations.clear_all, style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[400]),),
             onPressed: () {
               context.read<ProductsBloc>().add(const ClearCart());
             },
@@ -47,13 +47,15 @@ class Cart extends StatelessWidget {
                         ),
                         direction: DismissDirection.endToStart,
                         confirmDismiss: (direction) {
-                          return DeleteCartProductDialog(product: state.cartProducts[index]).showAlertDialog(context, translations, theme).then((value){
-                            if (value != null && value) {
-                              context.read<ProductsBloc>().removeCartProduct(state.cartProducts[index]);
-                              return Future.value(value);
+                          return DeleteCartProductDialog(product: state.cartProducts[index]).showAlertDialog(context, translations, theme)
+                          .then((value){
+                              if (value != null && value) {
+                                context.read<ProductsBloc>().removeCartProduct(state.cartProducts[index]);
+                                return Future.value(value);
+                              }
+                              return Future.value(false);
                             }
-                            return Future.value(false);
-                          });
+                          );
                         },
                         onDismissed: (direction) {
                           context.read<ProductsBloc>().removeCartProduct(state.cartProducts[index]);

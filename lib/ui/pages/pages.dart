@@ -38,6 +38,7 @@ export 'package:ourshop_ecommerce/services/services.dart';
 //widgets
 export 'package:ourshop_ecommerce/ui/widgets/widgets.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/selected-product/widgets/widgets.dart';
+export 'package:ourshop_ecommerce/ui/pages/features/home/widgets/widgets.dart';
 
 // packages
 export 'package:flutter_form_builder/flutter_form_builder.dart';
