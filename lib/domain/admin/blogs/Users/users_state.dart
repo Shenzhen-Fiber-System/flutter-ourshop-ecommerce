@@ -7,6 +7,7 @@ class UsersState extends Equatable {
   final PaymentMethod selectedCard;
   final ShippingAddress selectedShippingAddress;
   final List<ShippingAddress> shippingAddresses;
+  final bool isLoading;
 
   const UsersState({
       this.loggedUser = const LoggedUser(
@@ -125,7 +126,8 @@ class UsersState extends Equatable {
           state: "BCS",
           municipality: "SJDC",
         ),
-      ]
+      ],
+      this.isLoading = false,
     });
 
   UsersState copyWith({
@@ -140,6 +142,7 @@ class UsersState extends Equatable {
       cards: cards ?? this.cards,
       selectedCard: selectedCard ?? this.selectedCard,
       selectedShippingAddress: selectedShippingAddress ?? this.selectedShippingAddress,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
   
@@ -149,5 +152,6 @@ class UsersState extends Equatable {
     cards,
     selectedCard,
     selectedShippingAddress,
+    isLoading,
   ];
 }

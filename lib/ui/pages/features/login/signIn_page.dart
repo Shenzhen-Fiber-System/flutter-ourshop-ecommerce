@@ -112,9 +112,12 @@ class _SignInPageState extends State<SignInPage> {
               SizedBox(height: _space,),
               FormBuilder(
                 key: _formKey,
-                child: Column(
-                  children: [
-                    FormBuilderTextField(
+                child: BlocBuilder<UsersBloc, UsersState>(
+                  builder: (context, state) {
+                    return Column(
+                      children: [
+                        FormBuilderTextField(
+                          readOnly: state.isLoading,
                           autofocus: rememberMe  ? false : true,
                           focusNode: _userFocusNode,
                           controller: _userController,
@@ -138,19 +141,20 @@ class _SignInPageState extends State<SignInPage> {
                           valueListenable: showPassword,
                           builder: (BuildContext context, value, _) {
                             return FormBuilderTextField(
+                              readOnly: state.isLoading,
                               focusNode: _passwordFocusNode,
                               style: inputValueStyle,
                               controller: _passwordController,
                               textInputAction: TextInputAction.send,
                               onEditingComplete: () => _formKey.currentState!.save(),
-                              onSubmitted: (_) => _doLogin(),
+                              onSubmitted: (_) async => await _doLogin(),
                               name: "password",
                               cursorColor: _cursorColor,
                               decoration: InputDecoration(
                                 labelText: translations.password,
                                 hintText: translations.placeholder(translations.password.toLowerCase()),
                                 suffixIcon: IconButton(
-                                  onPressed: () => showPassword.value = !showPassword.value,
+                                  onPressed: state.isLoading ? null : () => showPassword.value = !showPassword.value,
                                   icon: Icon(showPassword.value ? Icons.visibility : Icons.visibility_off),
                                 )
                               ),
@@ -169,32 +173,35 @@ class _SignInPageState extends State<SignInPage> {
                           children: [
                             SizedBox(
                               width: size.width * 0.4,
-                              child: FormBuilderCheckbox(
-                                shape: const RoundedRectangleBorder(
-                                  side: BorderSide.none
+                              child: IgnorePointer(
+                                ignoring: state.isLoading,
+                                child: FormBuilderCheckbox(
+                                  shape: const RoundedRectangleBorder(
+                                    side: BorderSide.none
+                                  ),
+                                  initialValue: rememberMe,
+                                  onChanged: (value) {
+                                    if(!value!){
+                                      locator<Preferences>().removeData('remember_me');
+                                      locator<Preferences>().removeData('username');
+                                      locator<Preferences>().removeData('password');
+                                    }
+                                    locator<Preferences>().saveData('remember_me', value.toString());
+                                  },
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                  ),
+                                  name: "remember_me", 
+                                  title: Text(translations.remember_me, style: theme.textTheme.bodySmall,),
                                 ),
-                                initialValue: rememberMe,
-                                onChanged: (value) {
-                                  if(!value!){
-                                    locator<Preferences>().removeData('remember_me');
-                                    locator<Preferences>().removeData('username');
-                                    locator<Preferences>().removeData('password');
-                                  }
-                                  locator<Preferences>().saveData('remember_me', value.toString());
-                                },
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                ),
-                                name: "remember_me", 
-                                title: Text(translations.remember_me, style: theme.textTheme.bodySmall,),
                               ),
                             ),
                             TextButton(
-                              onPressed: (){},
+                              onPressed: state.isLoading ? null : (){},
                               child: Text(translations.forgot_password, style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.palette[700]),),
                             )
                           ],
@@ -202,13 +209,9 @@ class _SignInPageState extends State<SignInPage> {
                         const SizedBox(height: 10,),
                         SizedBox(
                           width: double.infinity,
-                          child: BlocBuilder<UsersBloc, UsersState>(
-                            builder: (context, state) {
-                              return ElevatedButton(
-                                onPressed: context.watch<UsersBloc>().generalBloc.state.isLoading ? null : () => _doLogin(),
-                                child: context.watch<UsersBloc>().generalBloc.state.isLoading ? const CircularProgressIndicator.adaptive() : Text(translations.sign_in_with(translations.email.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
-                              );
-                            },
+                          child: ElevatedButton(
+                            onPressed: state.isLoading ? null : () async  => await _doLogin(),
+                            child: state.isLoading ? const CircularProgressIndicator.adaptive() : Text(translations.sign_in_with(translations.email.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
                           ),
                         ),
                         const SizedBox(height: 5,),
@@ -218,7 +221,7 @@ class _SignInPageState extends State<SignInPage> {
                             style: Theme.of(context).elevatedButtonTheme.style!.copyWith(
                               backgroundColor: const WidgetStatePropertyAll(Colors.white)
                             ),
-                            onPressed: (){},
+                            onPressed: state.isLoading ? null : (){},
                             child: Stack(
                               children: [
                                 Align(
@@ -240,10 +243,10 @@ class _SignInPageState extends State<SignInPage> {
                             style: Theme.of(context).elevatedButtonTheme.style!.copyWith(
                               backgroundColor: const WidgetStatePropertyAll(Colors.black)
                             ),
-                            onPressed: (){},
+                            onPressed: state.isLoading ? null : (){},
                             child: Stack(
                               children: [
-                                 const Align(
+                                  const Align(
                                   alignment: Alignment.centerLeft,
                                   child: Icon(Icons.apple, color: Colors.white, size: 25,)
                                 ),
@@ -260,15 +263,16 @@ class _SignInPageState extends State<SignInPage> {
                           children: [
                             Text(translations.dont_have_account, style: theme.textTheme.bodySmall,),
                             TextButton(
-                              onPressed: () => context.push('/sign-up'),
+                              onPressed: state.isLoading ? null : () => context.push('/sign-up'),
                               child: Text(translations.sign_up, 
                                 style: theme.textTheme.bodySmall?.copyWith(color: Colors.blue, fontWeight: FontWeight.w600),
                               ),
                             )
                           ],
-                        )
-                        
-                  ],
+                        )   
+                      ],
+                    );
+                  },
                 )
               )
             ],
@@ -278,15 +282,15 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  void _doLogin(){
+  Future<void> _doLogin() async {
     if (_formKey.currentState!.saveAndValidate()) {
       if (_formKey.currentState!.value['remember_me']) {
         locator<Preferences>().saveData('username', _formKey.currentState!.value['username']);
         locator<Preferences>().saveData('password', _formKey.currentState!.value['password']);
       }
       FocusScope.of(context).unfocus();
-      context.read<UsersBloc>().loginUser(_formKey.currentState!.value)
-        .then((value) {
+      await context.read<UsersBloc>().loginUser(_formKey.currentState!.value)
+        .then((value) async {
           if (value is LoggedUser) context.go('/home');
         });
     }

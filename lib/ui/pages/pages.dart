@@ -56,6 +56,7 @@ export 'package:flutter_rating_bar/flutter_rating_bar.dart';
 export 'package:video_player/video_player.dart';
 export 'package:flick_video_player/flick_video_player.dart';
 export 'package:wakelock_plus/wakelock_plus.dart';
+export 'package:cached_network_image/cached_network_image.dart';
 
 //theme
 export '../../../../theme/theme.dart';

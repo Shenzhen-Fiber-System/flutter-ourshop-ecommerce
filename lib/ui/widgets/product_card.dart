@@ -1,5 +1,6 @@
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
+
 class ProductCard extends StatelessWidget {
   const ProductCard({
     super.key, 
@@ -191,34 +192,26 @@ class ProductImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: Image(
-        image: NetworkImage(product.photos.isNotEmpty ? '${dotenv.env['PRODUCT_URL']}${product.photos.first.url}' : 'https://placehold.co/600x400'),
-        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          if (wasSynchronouslyLoaded) {
-            return child;
-          }
-          return AnimatedOpacity(
-            opacity: frame == null ? 0 : 1,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeOut,
-            child: child,
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(Icons.image_not_supported, size: 50.0, color: Colors.grey.shade500,),
-              Text(translations.no_image, style: theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500)),
-            ],
-          );
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return const Center(child: CircularProgressIndicator.adaptive());
-        },
-        fit: BoxFit.cover,
+      child: CachedNetworkImage(
+        imageUrl: product.photos.isNotEmpty ? '${dotenv.env['PRODUCT_URL']}${product.photos.first.url}' : 'https://placehold.co/600x400',
+        placeholder: (context, url) => const Center(child: CircularProgressIndicator.adaptive()),
+        errorWidget: (context, url, error) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.image_not_supported, size: 50.0, color: Colors.grey.shade500,),
+            Text(translations.no_image, style: theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500)),
+          ],
+        ),
+        imageBuilder: (context, imageProvider) => AnimatedOpacity(
+          opacity: 1,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeOut,
+          child: Image(
+            image: imageProvider,
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
     );
   }
