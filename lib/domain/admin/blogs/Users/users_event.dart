@@ -51,10 +51,10 @@ class AddSelectedShippingAddressEvent extends UsersEvent {
   List<Object> get props => [shippingAddress];
 }
 
-// class AddIsLoadingEvent extends UsersEvent {
-//   final bool isLoading;
-//   const AddIsLoadingEvent(this.isLoading);
+class AddIsLoadingUevent extends UsersEvent {
+  final bool isLoading;
+  const AddIsLoadingUevent(this.isLoading);
 
-//   @override
-//   List<Object> get props => [isLoading];
-// }
+  @override
+  List<Object> get props => [isLoading];
+}

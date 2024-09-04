@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../../ui/pages/pages.dart';
 
 class CategoryService{
@@ -13,6 +15,27 @@ class CategoryService{
       return categoryResponse.data;
     } on DioException catch (e) {
       ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> getCategoryById(String categoryId) async {
+    try {
+      final response = await dio.get('/categories/$categoryId');
+      final categoryResponse = CategoryResponse.fromJson(response.data);
+      return categoryResponse.data;
+    } on DioException catch (e) {
+      ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> getSubCategoriesByCategory(String categoryId)async {
+    try {
+      final response = await dio.get('/categories/parent/$categoryId');
+      final subCategoryResponse = CategoryResponse.fromJson(response.data);
+      return subCategoryResponse.data;
+    } on DioException catch (e) {
+      log('DioException: ${e.response?.data}');
+      // ErrorHandler(e);
     }
   }
 }

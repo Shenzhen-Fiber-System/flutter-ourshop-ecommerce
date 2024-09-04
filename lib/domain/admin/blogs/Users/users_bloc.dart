@@ -20,11 +20,12 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     on<RemovePaymentMethodEvent>((event,emit) => emit(state.copyWith(cards: List.from(state.cards)..remove(event.card))));
     on<AddSelectedCardEvent>((event,emit) => emit(state.copyWith(selectedCard: event.card)));
     on<AddSelectedShippingAddressEvent>((event,emit) => emit(state.copyWith(selectedShippingAddress: event.shippingAddress)));
+    on<AddIsLoadingUevent>((event,emit) => emit(state.copyWith(isLoading: event.isLoading)));
   }
 
 
   Future<dynamic> loginUser(Map<String, dynamic> data) async {
-    generalBloc.add(const AddIsLoadingEvent(true));
+    add(const AddIsLoadingUevent(true));
     final Auth auth = Auth(
       username: data['username'],
       password: data['password'],);
@@ -33,12 +34,12 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       add(AddLoggedUserEvent(response));
       return response;
     }
-    generalBloc.add(const AddIsLoadingEvent(false));
+    add(const AddIsLoadingUevent(false));
   }
 
 
   Future<dynamic> registerUser(Map<String, dynamic> data) async {
-    generalBloc.add(const AddIsLoadingEvent(true));
+    add(const AddIsLoadingUevent(true));
     final NewUser newUser = NewUser(
       username: data['username'],
       email: data['email'],
@@ -54,10 +55,10 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     );
     final user = await _userServices.register(newUser);
     if(user is User) {
-      generalBloc.add(const AddIsLoadingEvent(false));
+      add(const AddIsLoadingUevent(false));
       return user;
     }
-    generalBloc.add(const AddIsLoadingEvent(false));
+    add(const AddIsLoadingUevent(false));
   }
 
 

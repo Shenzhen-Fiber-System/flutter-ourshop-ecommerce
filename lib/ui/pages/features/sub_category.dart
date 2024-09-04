@@ -4,8 +4,8 @@ import 'package:ourshop_ecommerce/models/models.dart';
 import '../pages.dart';
 
 class SubCategoryPage extends StatefulWidget {
-  const SubCategoryPage({super.key, required this.category});
-  final Category category;
+  const SubCategoryPage({super.key, required this.categoryId});
+  final String categoryId;
 
   @override
   State<SubCategoryPage> createState() => _SubCategoryPageState();
@@ -16,9 +16,14 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
   CarouselSliderController buttonCarouselController = CarouselSliderController();
 
   @override
-  void deactivate() {
-    super.deactivate();
-    context.read<ProductsBloc>().add(const AddCategoryHeaderImagesEvent(categoryHeaderImages: []));
+  void initState() {
+    fetchData().then((_) => log('fetchData completed'));
+    super.initState();
+  }
+
+
+  Future<void> fetchData() async {
+    await context.read<ProductsBloc>().fetchSubCategoriesWithProducts(widget.categoryId);
   }
 
   @override
@@ -27,22 +32,15 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
     final ThemeData theme = Theme.of(context);
     final AppLocalizations translations = AppLocalizations.of(context)!;
 
-    log('category: ${widget.category.id}');
+    return BlocBuilder<ProductsBloc,ProductsState>(
+      key: UniqueKey(),
+      builder: (BuildContext context, state) {
 
-    return FutureBuilder<List<Product>>(
-      future: context.read<ProductsBloc>().getProductsByCategory(widget.category.id),
-      builder: (BuildContext context, AsyncSnapshot<List<Product>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (state.productsStates == ProductsStates.loading) {
           return const Center(child: CircularProgressIndicator.adaptive());
         }
-        if (snapshot.hasError) {
-          return Center(child: Text('Something went wrong!!!', style: theme.textTheme.titleMedium?.copyWith(color: Colors.black),));
-        }
-        if (snapshot.data == null) {
-          return Center(child: Text('No data', style: theme.textTheme.titleMedium?.copyWith(color: Colors.black),));
-        }
 
-        if (snapshot.data!.isEmpty && widget.category.subCategories!.isEmpty) {
+        if (state.subCategoryProducts.isEmpty && state.subCategories.isEmpty) {
           return Stack(
             children: [
               Positioned(
@@ -51,7 +49,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                 child: IconButton(
                   splashColor: Colors.transparent,
                   icon: const Icon(Icons.arrow_back_ios, color: Colors.black,), 
-                  onPressed: () => Navigator.pop(context)
+                  onPressed: () => context.go('/sub-category/${state.selectedSubCategory.parentCategoryId}'),
                 ),
               ),
               Align(
@@ -64,99 +62,108 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
 
         return SafeArea(
           top: true,
-          child: BlocConsumer<ProductsBloc, ProductsState>(
-            listenWhen: (previous, current) => current.cartProducts.length > previous.cartProducts.length,
-            listener: (context, state) {
-              if (state.cartProducts.isNotEmpty) {
-                SuccessToast(title: translations.product_added_to_cart).showToast(context);
-              }
-            },
-            buildWhen: (previous, current) => previous.products != current.products || previous.categoryHeaderImages != current.categoryHeaderImages,
-            builder: (context, state) {
-              return CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    expandedHeight: state.categoryHeaderImages.isNotEmpty ? size.height * 0.20 : size.height * 0.10,
-                    title: state.categoryHeaderImages.isNotEmpty ? const SizedBox.shrink() : Text(widget.category.name, style: theme.textTheme.titleLarge,),
-                    flexibleSpace: state.categoryHeaderImages.isNotEmpty ? CarouselSlider(
-                      items: state.categoryHeaderImages.map((e) {
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return Container(
-                              width: MediaQuery.of(context).size.width,
-                              // margin: const EdgeInsets.only(top: 10.0),
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(e),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            );
-                          },
+          child: CustomScrollView(
+            key: UniqueKey(),
+            slivers: [
+              SliverAppBar(
+                leading: IconButton(
+                  splashColor: Colors.transparent,
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black,), 
+                  onPressed: () {
+                    if (state.selectedParentCategory == state.selectedSubCategory.parentCategoryId) {
+                      context.go('/home');
+                      return;
+                    }
+                    context.go('/sub-category/${state.selectedSubCategory.parentCategoryId}');
+                  },
+                ),
+                expandedHeight: state.categoryHeaderImages.isNotEmpty ? size.height * 0.20 : size.height * 0.05,
+                title: state.categoryHeaderImages.isNotEmpty ? const SizedBox.shrink() : Text(state.selectedSubCategory.name, style: theme.textTheme.titleLarge,),
+                flexibleSpace: state.categoryHeaderImages.isNotEmpty ? CarouselSlider(
+                  items: state.categoryHeaderImages.map((e) {
+                    return Builder(
+                      builder: (BuildContext context) {
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(e),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         );
-                      }).toList(),
-                      carouselController: buttonCarouselController,
-                      options: CarouselOptions(
-                        autoPlayAnimationDuration: const Duration(milliseconds: 1200),
-                        autoPlay: true,
-                        enlargeCenterPage: true,
-                        viewportFraction: 0.9,
-                        aspectRatio: 2.0,
-                        initialPage: 2,
-                      ),
-                    ) :const SizedBox.shrink()
+                      },
+                    );
+                  }).toList(),
+                  carouselController: buttonCarouselController,
+                  options: CarouselOptions(
+                    autoPlayAnimationDuration: const Duration(milliseconds: 1200),
+                    autoPlay: true,
+                    enlargeCenterPage: true,
+                    viewportFraction: 0.9,
+                    aspectRatio: 2.0,
+                    initialPage: 2,
                   ),
-                  if (widget.category.subCategories!.isNotEmpty) SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: size.height * 0.20,
-                      width: size.width,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: widget.category.subCategories?.length ?? 0,
-                        itemBuilder: (context, index) {
-                          final Category c = widget.category.subCategories![index];
-                          return CustomCard(
-                            height: size.height * 0.15, 
-                            width: size.width * 0.35,
-                            theme: theme,
-                            translations: translations,
-                            children: [
-                              Text(c.name, style: theme.textTheme.labelSmall,),
-                            ],
-                            onTap: () async {
-                              // log('current selected category: ${c.id}');
-                              // await Navigator.pushNamed(context, '/sub-category', arguments: c);
-                              await context.push('/sub-category', extra: c);
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ) else const SliverToBoxAdapter(child: SizedBox.shrink()),
-                  SliverAnimatedGrid(
-                    initialItemCount: snapshot.data!.length,
-                    itemBuilder: (context, index, animation) {
-                      final Product product = snapshot.data![index];
-                      return FadeTransition(
-                        opacity: animation,
-                        child: ProductCard(
-                          height: size.height * 0.25, 
-                          width: size.width * 0.35,
-                          theme: theme,
-                          translations: translations, 
-                          product: product,
+                ) : const SizedBox.shrink()
+              ),
+              if (state.subCategories.isNotEmpty) 
+               SliverToBoxAdapter(
+                child: SizedBox(
+                  // height: size.height * 0.20,
+                  height: size.height * 0.10,
+                  width: size.width,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: state.subCategories.length,
+                    itemBuilder: (context, index) {
+                      final Category subCategory = state.subCategories[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                        child: SubCategoryChip(
+                          onTap: (subCateogry) => context.go('/sub-category/${subCategory.id}'),
+                          c: subCategory, 
+                          theme: theme
                         ),
                       );
-                    }, 
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10.0,
-                      mainAxisSpacing: 10.0,
+                      // return SubcategoryCard(
+                      //   height: size.height * 0.15, 
+                      //   width: size.width * 0.35,
+                      //   theme: theme,
+                      //   translations: translations,
+                      //   urlImage: subCategory.iconSvg ?? '',
+                      //   children: [
+                      //     Text(subCategory.name, style: theme.textTheme.labelSmall,),
+                      //   ],
+                      //   onTap: () => context.go('/sub-category/${subCategory.id}'),
+                      // );
+                    },
+                  ),
+                ),
+              )
+              else const SliverToBoxAdapter(child: SizedBox.shrink()),
+              SliverAnimatedGrid(
+                initialItemCount: state.subCategoryProducts.length,
+                itemBuilder: (context, index, animation) {
+                  final Product product = state.subCategoryProducts[index];
+                  return FadeTransition(
+                    opacity: animation,
+                    child: ProductCard(
+                      height: size.height * 0.35, 
+                      width: size.width * 0.35,
+                      theme: theme,
+                      translations: translations, 
+                      product: product,
                     ),
-                  )
-                ],
-              );
-            },
+                  );
+                }, 
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10.0,
+                  mainAxisSpacing: 10.0,
+                  childAspectRatio: 0.7
+                ),
+              )
+            ],
           ),
         );
       },

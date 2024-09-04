@@ -26,7 +26,7 @@ class GeneralBloc extends Bloc<GeneralEvent, GeneralState> {
 
   Stream<bool> _monitorConnectivity() async* {
     while (true) {
-      await Future.delayed(const Duration(milliseconds: 2500));
+      await Future.delayed(const Duration(milliseconds: 500));
       yield await _hasInternetConnection();
     }
   }

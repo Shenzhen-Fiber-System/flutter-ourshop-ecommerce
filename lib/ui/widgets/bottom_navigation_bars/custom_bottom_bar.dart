@@ -1,4 +1,5 @@
-import '../pages/pages.dart';
+import '../../pages/pages.dart';
+import 'floating_navigation_bar.dart';
 
 class CustomBottomBar extends StatelessWidget {
   const CustomBottomBar({

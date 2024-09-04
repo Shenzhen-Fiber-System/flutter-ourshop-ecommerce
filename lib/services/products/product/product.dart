@@ -40,6 +40,16 @@ class ProductService {
     }
   }
 
+  Future<dynamic> getReviewByProduct(String productId) async {
+    try {
+      final response = await dio.get('/product-reviews/product/$productId');
+      final reviews = ReviewsResponse.fromJson(response.data);
+      return reviews.data;
+    } on DioException catch (e) {
+      ErrorHandler(e);
+    }
+  }
+
   Future<List<Content>> filtered(String uuid) async {
 
     final Map<String, dynamic> body = {

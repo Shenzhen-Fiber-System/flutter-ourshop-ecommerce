@@ -43,5 +43,6 @@ Future<void> admin(Dio instance) async {
 
 Future<void> product(Dio instance) async {
   final ProductService productService = locator.registerSingleton(ProductService(dio: instance));
-  locator.registerSingleton(ProductsBloc(productService, locator<GeneralBloc>()));
+  final CategoryService categoryService = locator.registerSingleton(CategoryService(dio: instance));
+  locator.registerSingleton(ProductsBloc(productService, categoryService ,locator<GeneralBloc>()));
 }

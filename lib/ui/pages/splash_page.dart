@@ -40,7 +40,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   }
 
   void _startIncrementing() {
-    _timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (percent.value < 100) {
         percent.value += 1;
       } else {

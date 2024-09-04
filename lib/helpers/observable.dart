@@ -1,6 +1,3 @@
-
-
-import 'dart:developer';
 import '../ui/pages/pages.dart';
 
 class Observable extends BlocObserver {
@@ -37,12 +34,18 @@ class Observable extends BlocObserver {
       // if (currentState.categories.length != nextState.categories.length) {
       //   log('products ${nextState.products}');
       // }
-      if (currentState.selectedCategory != nextState.selectedCategory) {
-        log('selectedCategory ${nextState.selectedCategory}');
-      }
-      if (currentState.cartProducts.length != nextState.cartProducts.length) {
-        log('cart ´products ${nextState.cartProducts}');
-      }
+      // if (currentState.selectedParentCategory != nextState.selectedParentCategory) {
+      //   log('selectedCategory ${nextState.selectedParentCategory}');
+      // }
+      // if (currentState.cartProducts.length != nextState.cartProducts.length) {
+      //   log('cart ´products ${nextState.cartProducts}');
+      // }
+      // if (currentState.subCategories.length != nextState.subCategories.length) {
+      //   log('subCategories ${nextState.subCategories}');
+      // }
+      // if (currentState.subCategoryProducts.length != nextState.subCategoryProducts.length) {
+      //   log('subCategoryProducts ${nextState.subCategoryProducts}');
+      // }
     }
   }
 }

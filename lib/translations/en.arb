@@ -106,7 +106,14 @@
     "deselect_all":"Deselect all",
     "choose_shipping_address":"Please choose a shipping address",
     "submit_order":"Submit order",
-    "no_Categories_products_found":"No cateogories or products found",
+    "no_Categories_products_found":"No categories or products found",
     "product_added_to_cart":"Product added to cart",
-    "close":"Close"
+    "close":"Close",
+    "send": "Send",
+    "product_ratings": "{count} ratings",
+    "specifications": "Specifications",
+    "details": "Details",
+    "videos": "Videos",
+    "comments": "Comments",
+    "no_internet_connection": "No internet connection"
 }

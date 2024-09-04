@@ -7,11 +7,11 @@ sealed class ProductsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class AddIsLoadingProdEvent extends ProductsEvent {
-  final bool isLoading;
-  const AddIsLoadingProdEvent(this.isLoading);
+class AddProductsStatesEvent extends ProductsEvent {
+  final ProductsStates productsState;
+  const AddProductsStatesEvent({required this.productsState});
   @override
-  List<Object> get props => [isLoading];
+  List<Object> get props => [productsState];
 }
 
 class AddCategoriesEvent extends ProductsEvent {
@@ -55,11 +55,11 @@ class RemoveCartProductEvent extends ProductsEvent {
   @override
   List<Object> get props => [product];
 }
-class AddSelectedCategoryEvent extends ProductsEvent {
-  final String selectedCategory;
-  const AddSelectedCategoryEvent({required this.selectedCategory});
+class AddSelectedParentCategoryEvent extends ProductsEvent {
+  final String selectedParentCategory;
+  const AddSelectedParentCategoryEvent({required this.selectedParentCategory});
   @override
-  List<Object> get props => [selectedCategory];
+  List<Object> get props => [selectedParentCategory];
 }
 
 class SelectAllCartProductsEvent extends ProductsEvent {
@@ -96,8 +96,22 @@ class AddCategoryHeaderImagesEvent extends ProductsEvent {
 }
 
 class AddSelectedSubCategoryEvent extends ProductsEvent {
-  final String selectedSubCategory;
+  final Category selectedSubCategory;
   const AddSelectedSubCategoryEvent({required this.selectedSubCategory});
   @override
   List<Object> get props => [selectedSubCategory];
+}
+
+class AddSubCategoryProductsEvent extends ProductsEvent {
+  final List<Product> subCategoryProducts;
+  const AddSubCategoryProductsEvent({required this.subCategoryProducts});
+  @override
+  List<Object> get props => [subCategoryProducts];
+}
+
+class AddSubCategoriesEvent extends ProductsEvent {
+  final List<Category> subCategories;
+  const AddSubCategoriesEvent({required this.subCategories});
+  @override
+  List<Object> get props => [subCategories];
 }

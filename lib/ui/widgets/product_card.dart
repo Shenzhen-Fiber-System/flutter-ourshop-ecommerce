@@ -1,5 +1,6 @@
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
+
 class ProductCard extends StatelessWidget {
   const ProductCard({
     super.key, 
@@ -20,6 +21,8 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final ThemeData theme = Theme.of(context);
+
     return GestureDetector(
       onTap: () => context.push('/selected-product', extra: product),
       child: Container(
@@ -28,7 +31,7 @@ class ProductCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(5.0),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.5),
@@ -42,7 +45,7 @@ class ProductCard extends StatelessWidget {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(10.0), topRight: Radius.circular(10.0)),
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(5.0), topRight: Radius.circular(5.0)),
                 child: Hero(
                   tag: product.id,
                   child: ProductImage(product: product, translations: translations, theme: theme),
@@ -57,28 +60,117 @@ class ProductCard extends StatelessWidget {
                     Helpers.truncateText(product.name, 18),
                     style: theme.textTheme.labelMedium?.copyWith(color: Colors.black, fontWeight: FontWeight.w400),
                   ),
+                  const SizedBox(height: 5.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Text('${product.productReviewInfo?.ratingAvg.toStringAsFixed(1)}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
+                      ),
+                      RaitingBarWidget(product: product),
+                    ],
+                  ),
+                  if (product.productReviewInfo?.summary != null && product.productReviewInfo!.summary.isNotEmpty)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(translations.product_ratings(product.productReviewInfo!.reviewCount), style: theme.textTheme.bodySmall,),
+                    ],
+                  )
+                  else const SizedBox.shrink(),
                   const SizedBox(height: 2.0),
+                  _SendAnimatedWidget(translations: translations, theme: theme),
                   Row(
                     children: [
                       Text(
-                        product.unitPrice != null ? '\$${product.unitPrice?.toStringAsFixed(2)}' : '\$0.00',
-                        style: theme.textTheme.labelLarge,
+                        product.unitPrice != null ? '\$${product.unitPrice?.toStringAsFixed(2)}' : ('\$${product.fboPriceStart?.toStringAsFixed(2)}-\$${product.fboPriceEnd?.toStringAsFixed(2)}'),
+                        style: theme.textTheme.labelMedium?.copyWith(color: Colors.black, fontWeight: FontWeight.w600),
                       ),
                       const Spacer(),
-                      IconButton(
+                      IconButton.filled(
+                        style: theme.textButtonTheme.style?.copyWith(
+                          backgroundColor: const WidgetStatePropertyAll(Color(0xff003049)),
+                          fixedSize: const WidgetStatePropertyAll( Size(10.0, 10.0)),
+                        ),
                         onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
                         icon: const Icon(
                           Icons.add_shopping_cart_rounded,
-                          color: Colors.blue,
+                          color: Colors.white,
                         ),
                       ),
                     ],
                   ),
+                  Text('(min 1)', style: theme.textTheme.labelSmall,),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+class _SendAnimatedWidget extends StatefulWidget {
+  const _SendAnimatedWidget({
+    required this.translations,
+    required this.theme,
+  });
+
+  final AppLocalizations translations;
+  final ThemeData theme;
+
+  @override
+  State<_SendAnimatedWidget> createState() => _SendAnimatedWidgetState();
+}
+
+class _SendAnimatedWidgetState extends State<_SendAnimatedWidget> with TickerProviderStateMixin {
+
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween(begin: 0.5, end: 1.0).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
+
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([
+        _controller
+      ]),
+      builder: (BuildContext context, Widget? child) {
+        return Transform.scale(
+          scale: _animation.value,
+          child: child
+        );
+
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(widget.translations.send, style: widget.theme.textTheme.labelMedium?.copyWith(color: Colors.pink),),
+          const Padding(
+            padding: EdgeInsets.only(left:5.0),
+            child: Icon(Icons.delivery_dining, color: Colors.pink, size: 20.0,),
+          )
+        ],
       ),
     );
   }
@@ -100,34 +192,26 @@ class ProductImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: Image(
-        image: NetworkImage(product.productPhotos.isNotEmpty ? '${dotenv.env['PRODUCT_URL']}${product.productPhotos.first.photo!.url}' : 'https://placehold.co/600x400'),
-        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          if (wasSynchronouslyLoaded) {
-            return child;
-          }
-          return AnimatedOpacity(
-            opacity: frame == null ? 0 : 1,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeOut,
-            child: child,
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(Icons.image_not_supported, size: 50.0, color: Colors.grey.shade500,),
-              Text(translations.no_image, style: theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500)),
-            ],
-          );
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return const Center(child: CircularProgressIndicator.adaptive());
-        },
-        fit: BoxFit.cover,
+      child: CachedNetworkImage(
+        imageUrl: product.photos.isNotEmpty ? '${dotenv.env['PRODUCT_URL']}${product.photos.first.url}' : 'https://placehold.co/600x400',
+        placeholder: (context, url) => const Center(child: CircularProgressIndicator.adaptive()),
+        errorWidget: (context, url, error) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.image_not_supported, size: 50.0, color: Colors.grey.shade500,),
+            Text(translations.no_image, style: theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500)),
+          ],
+        ),
+        imageBuilder: (context, imageProvider) => AnimatedOpacity(
+          opacity: 1,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeOut,
+          child: Image(
+            image: imageProvider,
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
     );
   }
@@ -220,7 +304,7 @@ class CartCard extends StatelessWidget {
                     ),
                     Row(
                       children: [
-                        Text((product.unitPrice! * product.quantity).toStringAsFixed(2), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black, fontWeight:  FontWeight.w600),),
+                        Text(product.unitPrice != null ? (product.unitPrice! * product.quantity).toStringAsFixed(2) : '0.00', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black, fontWeight:  FontWeight.w600),),
                       ],
                     ), 
                     Row(

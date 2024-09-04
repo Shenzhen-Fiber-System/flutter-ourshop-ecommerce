@@ -71,10 +71,13 @@ class AppRoutes {
         },
       ),
       GoRoute(
-        path: '/sub-category',
+        path: '/sub-category/:id',
         builder: (context, state) {
-          final Category category = state.extra as Category;
-          return SubCategoryPage(category: category,);
+          final String categoryId = state.pathParameters['id']!;
+          return SubCategoryPage(
+            key: ValueKey(categoryId),
+            categoryId: categoryId,
+          );
         },
       ),
       GoRoute(

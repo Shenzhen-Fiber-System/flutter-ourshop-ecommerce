@@ -330,11 +330,11 @@ class DeleteCartProductDialog extends AlertDialogs {
           content: Text('Are you sure you want to delete ${product.name} from the cart?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: () => context.pop(false),
               child: Text(translations.cancel),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () => context.pop(true),
               child: Text(translations.delete),
             ),
           ],

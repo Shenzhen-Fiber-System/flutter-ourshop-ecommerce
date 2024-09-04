@@ -57,12 +57,14 @@ class Product extends Equatable {
     final List<Certification> details;
     final List<Certification> certifications;
     final String? productStatus;
-    final List<ProductPhotosVideos> productPhotos;
-    final List<ProductPhotosVideos> productVideos;
+    final List<Photo> photos;
+    final List<Photo> videos;
     final dynamic mainPhotoUrl;
     final dynamic mainVideoUrl;
     final bool selected;
+    final ProductReviewInfo? productReviewInfo;
     final int quantity;
+    final List<Review>? reviews;
 
     const Product({
         required this.id,
@@ -90,12 +92,14 @@ class Product extends Equatable {
         required this.details,
         required this.certifications,
         required this.productStatus,
-        required this.productPhotos,
-        required this.productVideos,
+        required this.photos,
+        required this.videos,
         required this.mainPhotoUrl,
         required this.mainVideoUrl,
         this.selected = false,
+        this.productReviewInfo,
         this.quantity = 0,
+        this.reviews = const [],
     });
 
     factory Product.fromJson(Map<String, dynamic> json) => Product(
@@ -124,10 +128,11 @@ class Product extends Equatable {
         details: List<Certification>.from(json["details"].map((x) => Certification.fromJson(x))),
         certifications: List<Certification>.from(json["certifications"].map((x) => Certification.fromJson(x))),
         productStatus: json["productStatus"],
-        productPhotos: List<ProductPhotosVideos>.from(json["productPhotos"].map((x) => ProductPhotosVideos.fromJson(x))),
-        productVideos: List<ProductPhotosVideos>.from(json["productVideos"].map((x) => ProductPhotosVideos.fromJson(x))),
+        photos: List<Photo>.from(json["photos"].map((x) => Photo.fromJson(x))),
+        videos: List<Photo>.from(json["videos"].map((x) => Photo.fromJson(x))),
         mainPhotoUrl: json["mainPhotoUrl"],
         mainVideoUrl: json["mainVideoUrl"],
+        productReviewInfo: ProductReviewInfo.fromJson(json["productReviewInfo"]),        
     );
 
 
@@ -157,12 +162,14 @@ class Product extends Equatable {
       List<Certification>?details,
       List<Certification>?certifications,
       String?productStatus,
-      List<ProductPhotosVideos>?productPhotos,
-      List<ProductPhotosVideos>?productVideos,
+      List<Photo>? photos,
+      List<Photo>? videos,
       dynamic mainPhotoUrl,
       dynamic mainVideoUrl,
       bool?selected,
+      ProductReviewInfo? productReviewInfo,
       int? quantity,
+      List<Review>? reviews,
     }) => Product(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -189,12 +196,14 @@ class Product extends Equatable {
       details: details ?? this.details,
       certifications: certifications ?? this.certifications,
       productStatus: productStatus ?? this.productStatus,
-      productPhotos: productPhotos ?? this.productPhotos,
-      productVideos: productVideos ?? this.productVideos,
+      photos: photos ?? this.photos,
+      videos: videos ?? this.videos,
       mainPhotoUrl: mainPhotoUrl ?? this.mainPhotoUrl,
       mainVideoUrl: mainVideoUrl ?? this.mainVideoUrl,
       selected: selected ?? this.selected,
+      productReviewInfo: productReviewInfo ?? this.productReviewInfo,
       quantity: quantity ?? this.quantity,
+      reviews: reviews ?? this.reviews,
     );
 
 
@@ -226,10 +235,11 @@ class Product extends Equatable {
         "details": List<dynamic>.from(details.map((x) => x.toJson())),
         "certifications": List<dynamic>.from(certifications.map((x) => x.toJson())),
         "productStatus": productStatus,
-        "productPhotos": List<dynamic>.from(productPhotos.map((x) => x.toJson())),
-        "productVideos": List<dynamic>.from(productVideos.map((x) => x.toJson())),
+        "productPhotos": List<dynamic>.from(photos.map((x) => x.toJson())),
+        "productVideos": List<dynamic>.from(videos.map((x) => x.toJson())),
         "mainPhotoUrl": mainPhotoUrl,
         "mainVideoUrl": mainVideoUrl,
+        "productReviewInfo": productReviewInfo?.toJson(),
     };
     
     @override
@@ -259,12 +269,13 @@ class Product extends Equatable {
       details, 
       certifications, 
       productStatus, 
-      productPhotos, 
-      productVideos, 
+      photos, 
+      videos, 
       mainPhotoUrl, 
       mainVideoUrl,
       selected,
       quantity,
+      reviews,
     ];
 }
 
@@ -309,61 +320,33 @@ class Certification extends Equatable {
       ];
 }
 
-class ProductPhotosVideos extends Equatable {
-    final String id;
-    final String productId;
-    final ProductAsset? photo;
-    final int importanceOrder;
-    final ProductAsset? video;
-
-    const ProductPhotosVideos({
-        required this.id,
-        required this.productId,
-        this.photo,
-        required this.importanceOrder,
-        this.video,
-    });
-
-    factory ProductPhotosVideos.fromJson(Map<String, dynamic> json) => ProductPhotosVideos(
-        id: json["id"],
-        productId: json["productId"],
-        photo: json["photo"] == null ? null : ProductAsset.fromJson(json["photo"]),
-        importanceOrder: json["importanceOrder"],
-        video: json["video"] == null ? null : ProductAsset.fromJson(json["video"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "productId": productId,
-        "photo": photo?.toJson(),
-        "importanceOrder": importanceOrder,
-        "video": video?.toJson(),
-    };
-    
-      @override
-      List<Object?> get props => [
-        id, 
-        productId, 
-        photo, 
-        importanceOrder, 
-        video,
-      ];
-}
-
-class ProductAsset extends Equatable {
+class Photo {
     final String id;
     final String name;
     final String url;
-    final int? importanceOrder;
+    final int importanceOrder;
 
-    const ProductAsset({
+    Photo({
         required this.id,
         required this.name,
         required this.url,
         required this.importanceOrder,
     });
 
-    factory ProductAsset.fromJson(Map<String, dynamic> json) => ProductAsset(
+    Photo copyWith({
+        String? id,
+        String? name,
+        String? url,
+        int? importanceOrder,
+    }) => 
+        Photo(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            url: url ?? this.url,
+            importanceOrder: importanceOrder ?? this.importanceOrder,
+        );
+
+    factory Photo.fromJson(Map<String, dynamic> json) => Photo(
         id: json["id"],
         name: json["name"],
         url: json["url"],
@@ -376,15 +359,8 @@ class ProductAsset extends Equatable {
         "url": url,
         "importanceOrder": importanceOrder,
     };
-    
-      @override
-      List<Object?> get props => [
-        id, 
-        name, 
-        url, 
-        importanceOrder,
-      ];
 }
+
 
 
 class FilterResponse extends Equatable {
@@ -754,3 +730,178 @@ class EnumValues<T> {
             return reverseMap;
     }
 }
+
+class ProductReviewInfo {
+    final double ratingAvg;
+    final int reviewCount;
+    final List<Summary> summary;
+
+    ProductReviewInfo({
+        required this.ratingAvg,
+        required this.reviewCount,
+        required this.summary,
+    });
+
+    ProductReviewInfo copyWith({
+        double? ratingAvg,
+        int? reviewCount,
+        List<Summary>? summary,
+    }) => 
+        ProductReviewInfo(
+            ratingAvg: ratingAvg ?? this.ratingAvg,
+            reviewCount: reviewCount ?? this.reviewCount,
+            summary: summary ?? this.summary,
+        );
+
+    factory ProductReviewInfo.fromJson(Map<String, dynamic> json) => ProductReviewInfo(
+        ratingAvg: json["ratingAvg"]?.toDouble(),
+        reviewCount: json["reviewCount"],
+        summary: List<Summary>.from(json["summary"].map((x) => Summary.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "ratingAvg": ratingAvg,
+        "reviewCount": reviewCount,
+        "summary": List<dynamic>.from(summary.map((x) => x.toJson())),
+    };
+}
+
+class Summary {
+    final int rating;
+    final int reviewCount;
+    final int totalReviews;
+    final double percentage;
+
+    Summary({
+        required this.rating,
+        required this.reviewCount,
+        required this.totalReviews,
+        required this.percentage,
+    });
+
+    Summary copyWith({
+        int? rating,
+        int? reviewCount,
+        int? totalReviews,
+        double? percentage,
+    }) => 
+        Summary(
+            rating: rating ?? this.rating,
+            reviewCount: reviewCount ?? this.reviewCount,
+            totalReviews: totalReviews ?? this.totalReviews,
+            percentage: percentage ?? this.percentage,
+        );
+
+    factory Summary.fromJson(Map<String, dynamic> json) => Summary(
+        rating: json["rating"],
+        reviewCount: json["reviewCount"],
+        totalReviews: json["totalReviews"],
+        percentage: json["percentage"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "rating": rating,
+        "reviewCount": reviewCount,
+        "totalReviews": totalReviews,
+        "percentage": percentage,
+    };
+}
+
+class ReviewsResponse {
+    final bool success;
+    final String message;
+    final List<Review> data;
+
+    ReviewsResponse({
+        required this.success,
+        required this.message,
+        required this.data,
+    });
+
+    ReviewsResponse copyWith({
+        bool? success,
+        String? message,
+        List<Review>? data,
+    }) => 
+        ReviewsResponse(
+            success: success ?? this.success,
+            message: message ?? this.message,
+            data: data ?? this.data,
+        );
+
+    factory ReviewsResponse.fromJson(Map<String, dynamic> json) => ReviewsResponse(
+        success: json["success"],
+        message: json["message"],
+        data: List<Review>.from(json["data"].map((x) => Review.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "success": success,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
+}
+
+class Review extends Equatable {
+    final String content;
+    final String productId;
+    final int rating;
+    final String createdBy;
+    final DateTime createdAt;
+    final String fullName;
+
+    const Review({
+        required this.content,
+        required this.productId,
+        required this.rating,
+        required this.createdBy,
+        required this.createdAt,
+        required this.fullName,
+    });
+
+    Review copyWith({
+        String? content,
+        String? productId,
+        int? rating,
+        String? createdBy,
+        DateTime? createdAt,
+        String? fullName,
+    }) => 
+        Review(
+            content: content ?? this.content,
+            productId: productId ?? this.productId,
+            rating: rating ?? this.rating,
+            createdBy: createdBy ?? this.createdBy,
+            createdAt: createdAt ?? this.createdAt,
+            fullName: fullName ?? this.fullName,
+        );
+
+    factory Review.fromJson(Map<String, dynamic> json) => Review(
+        content: json["content"],
+        productId: json["productId"],
+        rating: json["rating"],
+        createdBy: json["createdBy"],
+        createdAt: DateTime.parse(json["createdAt"]),
+        fullName: json["fullName"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "content": content,
+        "productId": productId,
+        "rating": rating,
+        "createdBy": createdBy,
+        "createdAt": createdAt.toIso8601String(),
+        "fullName": fullName,
+    };
+    
+      @override
+      List<Object?> get props => [
+        content, 
+        productId, 
+        rating, 
+        createdBy, 
+        createdAt, 
+        fullName,
+      ];
+}
+

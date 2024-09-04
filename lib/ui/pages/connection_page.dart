@@ -1,5 +1,3 @@
-
-
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 class ConnectivityListener extends StatelessWidget {
@@ -11,13 +9,15 @@ class ConnectivityListener extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final ThemeData theme = Theme.of(context);
+    final AppLocalizations translations = AppLocalizations.of(context)!;
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: BlocConsumer<GeneralBloc, GeneralState>(
         listener: (context, state) {
           if (!state.isInterentConnectionActive) {
-            const  message = 'No internet connection';
+            final  String message = translations.no_internet_connection;
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text(message),
                 backgroundColor: Colors.red,
               ),
@@ -28,8 +28,17 @@ class ConnectivityListener extends StatelessWidget {
           if (state.isInterentConnectionActive) {
             return child;
           }
-          return Center(
-            child: Text('No internet connection', style:theme.textTheme.headlineLarge ),
+          return SizedBox(
+            height: size.height,
+            width: size.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(Icons.signal_wifi_connected_no_internet_4, size: 100, color: Colors.grey,),
+                Text(translations.no_internet_connection, style:theme.textTheme.headlineLarge?.copyWith(color: Colors.grey),),
+              ],
+            ),
           );
         },
       ),

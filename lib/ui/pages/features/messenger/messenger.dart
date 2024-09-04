@@ -1,15 +1,23 @@
 import '../../pages.dart';
 
-class Messenger extends StatelessWidget {
-  const Messenger({super.key});
+class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: double.maxFinite,
-      width: double.maxFinite,
-      color: Colors.amber,
-      child:  const Text('Messgenger', style: TextStyle(fontSize: 50, color: Colors.black)),
+
+    final ThemeData theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Search'),
+        centerTitle: true,
+      ),
+      body: Container(
+        height: double.maxFinite,
+        width: double.maxFinite,
+        color: Colors.white,
+        child:  Center(child: Text('Search products...', style: theme.textTheme.titleMedium,)),
+      ),
     );
   }
 }
