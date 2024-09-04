@@ -25,11 +25,12 @@ class Search extends SearchDelegate{
   @override
   Widget buildResults(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    return  Center(child: Text('Results', style: theme.textTheme.bodyLarge ,));
+    return  Center(child: Text('Results', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black),));
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return const Center(child: Text('Suggestions'));
+    final ThemeData theme = Theme.of(context);
+    return Center(child: Text('Suggestions', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black),));
   }
 }
