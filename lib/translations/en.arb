@@ -113,5 +113,6 @@
     "product_ratings": "{count} ratings",
     "specifications": "Specifications",
     "details": "Details",
-    "videos": "Videos"
+    "videos": "Videos",
+    "comments": "Comments"
 }

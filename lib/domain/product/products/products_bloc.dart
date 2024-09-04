@@ -133,18 +133,27 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     return categories;
   }
 
-  Future<void> getProductsByCategory(String selectedCategory) async {
-    add(const AddCategoryHeaderImagesEvent(categoryHeaderImages: []));
+  Future<void> getProductsByCategory(String categoryId) async {
+    // add(const AddCategoryHeaderImagesEvent(categoryHeaderImages: []));
     add(const AddSubCategoryProductsEvent(subCategoryProducts: []));
     add(const AddProductsStatesEvent(productsState: ProductsStates.loading));
-    final products = await _productService.getProductsByCategory(selectedCategory);
-    add(const AddProductsStatesEvent(productsState: ProductsStates.loaded));
+    final products = await _productService.getProductsByCategory(categoryId);
     // if(subCategories is List<SubCategory> && subCategories.isNotEmpty){
     //   add(AddSubCategoriesEvent(subCategories: subCategories));
     // }
-    if (products is List<Product> && products.isNotEmpty) {
-      getHeaderImages(products);
+    if (products is List<Product>) {
+      // getHeaderImages(products);
+      //TODO we gonna add the reviews in the model
+      for (var product in products) {
+        final reviews = await _productService.getReviewByProduct(product.id);
+        if (reviews is List<Review>) {
+          final updatedProduct = product.copyWith(reviews: reviews);
+          final index = products.indexOf(product);
+          products[index] = updatedProduct;
+        }
+      }
       add(AddSubCategoryProductsEvent(subCategoryProducts: products));
+      add(const AddProductsStatesEvent(productsState: ProductsStates.loaded));
     } 
   }
 
@@ -159,10 +168,11 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     if (subcateogries is List<Category>) {
       add(AddSubCategoriesEvent(subCategories: subcateogries));
     }
-    final products = await _productService.getProductsByCategory(categoryId);
-    if (products is List<Product>) {
-      add(AddSubCategoryProductsEvent(subCategoryProducts: products));
-    }
+    // final products = await _productService.getProductsByCategory(categoryId);
+    // if (products is List<Product>) {
+    //   add(AddSubCategoryProductsEvent(subCategoryProducts: products));
+    // }
+    await getProductsByCategory(categoryId);
     add(const AddProductsStatesEvent(productsState: ProductsStates.loaded));
   }
 

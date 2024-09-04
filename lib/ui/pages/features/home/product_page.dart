@@ -69,7 +69,6 @@ class _ProductsPageState extends State<ProductsPage> {
                               theme: theme,
                               onTap: (selectedSubCategory) {
                                 if (selectedSubCategory != null) {
-                                  // context.read<ProductsBloc>().getProductsByCategory(selectedSubCategory.id);
                                   context.go('/sub-category/${selectedSubCategory.id}',);
                                 }
                               },

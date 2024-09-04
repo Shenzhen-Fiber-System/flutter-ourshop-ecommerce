@@ -1,4 +1,3 @@
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 class ProductCard extends StatelessWidget {
@@ -21,7 +20,6 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final Size size = MediaQuery.of(context).size;
     final ThemeData theme = Theme.of(context);
 
     return GestureDetector(
@@ -70,23 +68,7 @@ class ProductCard extends StatelessWidget {
                         padding: const EdgeInsets.only(right: 8.0),
                         child: Text('${product.productReviewInfo?.ratingAvg.toStringAsFixed(1)}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
                       ),
-                      RatingBar(
-                        initialRating: product.productReviewInfo?.ratingAvg ?? 0,
-                        direction: Axis.horizontal,
-                        allowHalfRating: true,
-                        ignoreGestures: true,
-                        itemCount: 5,
-                        itemSize: size.width * 0.04,
-                        glowColor: Colors.amber,
-                        unratedColor: Colors.amber,
-                        ratingWidget: RatingWidget(                          
-                          full: const Icon(Icons.star, color: Colors.amber,),
-                          half: const Icon(Icons.star_half, color: Colors.amber,),
-                          empty: const Icon(Icons.star_border, color: Colors.amber,),
-                        ),
-                        tapOnlyMode: true,
-                        onRatingUpdate: (rating) {},
-                      ),
+                      RaitingBarWidget(product: product),
                     ],
                   ),
                   if (product.productReviewInfo?.summary != null && product.productReviewInfo!.summary.isNotEmpty)
@@ -130,10 +112,8 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
-
 class _SendAnimatedWidget extends StatefulWidget {
   const _SendAnimatedWidget({
-    super.key,
     required this.translations,
     required this.theme,
   });
