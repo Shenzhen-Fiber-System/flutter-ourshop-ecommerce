@@ -5,7 +5,7 @@ void main() async  {
   WidgetsFlutterBinding.ensureInitialized();
   WakelockPlus.enable();
   const bool isProduction = bool.fromEnvironment('dart.vm.product');
-  await dotenv.load(fileName: isProduction ? ".env.prod" : ".env.prod");
+  await dotenv.load(fileName: isProduction ? ".env.prod" : ".env.dev");
   Bloc.observer = Observable();
   await initializeServiceLocator();
   runApp(
