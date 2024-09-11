@@ -1,3 +1,5 @@
+export 'package:ourshop_ecommerce/models/orders/orders.dart';
+export 'package:ourshop_ecommerce/models/filtere_page.dart';
 export 'package:ourshop_ecommerce/models/category/category.dart';
 export 'package:ourshop_ecommerce/models/auth/auth.dart';
 export 'package:ourshop_ecommerce/models/error/errors.dart';

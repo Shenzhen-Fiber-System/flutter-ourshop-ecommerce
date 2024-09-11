@@ -32,6 +32,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     final response =  await _userServices.login(auth);
     if(response is LoggedUser) {
       add(AddLoggedUserEvent(response));
+      add(const AddIsLoadingUevent(false));
       return response;
     }
     add(const AddIsLoadingUevent(false));

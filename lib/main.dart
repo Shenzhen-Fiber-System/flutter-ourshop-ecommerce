@@ -18,6 +18,7 @@ void main() async  {
         BlocProvider(create: (_) => locator<UsersBloc>()),
         BlocProvider(create: (_) => locator<GeneralBloc>()),
         BlocProvider(create: (_) => locator<ProductsBloc>()),
+        BlocProvider(create: (_) => locator<OrdersBloc>()),
       ],
       child: const MyApp()
     )

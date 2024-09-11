@@ -180,6 +180,12 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
         mode: SettingsOptionsMode.Language,
         onClick: () => showBottomSheet(context)
       ),
+      if (loggedUser.roles.toLowerCase().split(', ').contains('admin')) 
+        SettignsOptions(
+          title: 'Admin', 
+          mode: SettingsOptionsMode.Language,
+          onClick: () => context.push('/admin')
+        ),
       SettignsOptions(
         title: 'logout', 
         mode: SettingsOptionsMode.Logout,
@@ -372,8 +378,11 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
                   onSelected: (value){},
                 ),
               ),
-              ),
+             ),
             ),
+            actions: [
+              Text('Role: ${loggedUser.roles}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
+            ],
           ),
           SliverToBoxAdapter(
             child: Container(
@@ -646,6 +655,7 @@ enum SettingsOptionsMode{
   Email,
   Phone,
   Country,
+  Admin,
   Logout
 }
 

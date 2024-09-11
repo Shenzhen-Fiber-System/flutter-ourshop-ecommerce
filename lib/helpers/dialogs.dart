@@ -314,11 +314,11 @@ class ShippingAddressDialog extends AlertDialogs {
 }
 
 
-class DeleteCartProductDialog extends AlertDialogs {
+class DeleteProductDialog extends AlertDialogs {
   
-  final Product product;
+  final String productName;
   
-  DeleteCartProductDialog({required this.product});
+  DeleteProductDialog({required this.productName});
   
   @override
   Future<bool?> showAlertDialog(BuildContext context, AppLocalizations translations, ThemeData theme,) async {
@@ -326,8 +326,8 @@ class DeleteCartProductDialog extends AlertDialogs {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Delete ${product.name}?'),
-          content: Text('Are you sure you want to delete ${product.name} from the cart?'),
+          title: Text(translations.delete_product(productName, '?'), style: theme.textTheme.titleMedium?.copyWith(color: Colors.grey.shade700),),
+          content: Text(translations.delete_product_description(productName, ''), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade700),),
           actions: [
             TextButton(
               onPressed: () => context.pop(false),

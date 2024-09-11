@@ -13,3 +13,10 @@ enum CardType{
   MASTERCARD,
   UNKNOWN
 }
+
+enum AdminOptions{
+  MY_COMPANY,
+  ORDERS,
+  PRODUCTS,
+  COMMUNICATION,
+}

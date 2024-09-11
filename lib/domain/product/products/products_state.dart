@@ -6,6 +6,7 @@ enum ProductsStates{
   loading,
   loaded,
   error,
+  loadingMore
 }
 
 class ProductsState extends Equatable {
@@ -21,6 +22,9 @@ class ProductsState extends Equatable {
   final List<String> categoryHeaderImages;
   final List<Product> subCategoryProducts;
   final List<Category> subCategories;
+  final List<FilteredProducts> adminProducts;
+  final int currentPage;
+  final bool hasMore;
 
   const ProductsState({
     this.productsStates = ProductsStates.initial,
@@ -33,7 +37,10 @@ class ProductsState extends Equatable {
     this.categoryHeaderImages = const [],
     this.selectedSubCategory = const Category(id: '', name: '', description: '', parentCategoryId: ''),
     this.subCategoryProducts = const [],
-    this.subCategories = const []
+    this.subCategories = const [],
+    this.adminProducts = const [],
+    this.currentPage = 1,
+    this.hasMore = true
     
   });
 
@@ -48,7 +55,10 @@ class ProductsState extends Equatable {
     List<String>? categoryHeaderImages,
     Category? selectedSubCategory,
     List<Product>? subCategoryProducts,
-    List<Category>? subCategories
+    List<Category>? subCategories,
+    List<FilteredProducts>? adminProducts,
+    int? currentPage,
+    bool? hasMore
   }) {
     return ProductsState(
       productsStates: productsStates ?? this.productsStates,
@@ -61,7 +71,10 @@ class ProductsState extends Equatable {
       categoryHeaderImages: categoryHeaderImages ?? this.categoryHeaderImages,
       selectedSubCategory: selectedSubCategory ?? this.selectedSubCategory,
       subCategoryProducts: subCategoryProducts ?? this.subCategoryProducts,
-      subCategories: subCategories ?? this.subCategories
+      subCategories: subCategories ?? this.subCategories,
+      adminProducts: adminProducts ?? this.adminProducts,
+      currentPage: currentPage ?? this.currentPage,
+      hasMore: hasMore ?? this.hasMore
     );
   }
   
@@ -77,6 +90,9 @@ class ProductsState extends Equatable {
     categoryHeaderImages,
     selectedSubCategory,
     subCategoryProducts,
-    subCategories
+    subCategories,
+    adminProducts,
+    currentPage,
+    hasMore
   ];
 }

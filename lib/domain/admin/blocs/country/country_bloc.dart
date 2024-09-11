@@ -18,4 +18,8 @@ class CountryBloc extends Bloc<CountryEvent, CountryState> {
     if (countries is List<Country>) add(AddCountriesEvent(countries));
   }
 
+  // String get countryName {
+  //   final country = state.countries.firstWhere((element) => element.id == locator<UsersBloc>().state.loggedUser.userCountryId,);
+  // }
+
 }

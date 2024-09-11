@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import '../../../ui/pages/pages.dart';
 
 class ProductService {
@@ -50,27 +49,29 @@ class ProductService {
     }
   }
 
-  Future<List<Content>> filtered(String uuid) async {
-
-    final Map<String, dynamic> body = {
-      "uuids": [ {
-          "fieldName":"category.id", 
-          "value":uuid
-        }
-      ],
-      "searchFields": [],
-      "sortOrders": [],
-      "page": 1,
-      "pageSize": 250,
-      "searchString": ""
-    };
+  Future<dynamic> filteredAdminProducts(Map<String, dynamic> filteredParamenters) async {
     try {
-      final response = await  dio.post('/products/filtered-page', data: body);
-      final FilterResponse products = FilterResponse.fromJson(response.data);
-      return products.data.content;
+      final response = await dio.post('/products/filtered-page', data: filteredParamenters);
+      final filteredProducts = FilteredResponse<FilteredProducts>.fromJson(response.data, (json) => FilteredProducts.fromJson(json));
+      return filteredProducts.data;
     } on DioException catch (e) {
       ErrorHandler(e);
-      return [];
+    }
+  }
+
+  Future<dynamic> deleteAdminProductById(String productId) async {
+    try {
+      await dio.delete('/products/$productId');
+      SuccessToast(
+        title: translations!.product_deleted,
+        style: ToastificationStyle.flatColored,
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.green.shade500,
+      )
+      .showToast(AppRoutes.globalContext!);
+      return true;
+    } on DioException catch (e) {
+      ErrorHandler(e);
     }
   }
 

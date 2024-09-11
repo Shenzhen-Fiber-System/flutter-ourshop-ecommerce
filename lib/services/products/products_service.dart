@@ -1,1 +1,1 @@
-export 'package:ourshop_ecommerce/services/products/product/product.dart';
+export 'package:ourshop_ecommerce/services/products/product/product_service.dart';

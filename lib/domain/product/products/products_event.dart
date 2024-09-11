@@ -115,3 +115,18 @@ class AddSubCategoriesEvent extends ProductsEvent {
   @override
   List<Object> get props => [subCategories];
 }
+
+class AddAdminProductsEvent extends ProductsEvent {
+  final String uuid;
+  final int page;
+  const AddAdminProductsEvent({required this.uuid, required this.page});
+  @override
+  List<Object> get props => [uuid, page];
+}
+
+class DeleteAdminProductEvent extends ProductsEvent {
+  final String productId;
+  const DeleteAdminProductEvent({required this.productId});
+  @override
+  List<Object> get props => [productId];
+}

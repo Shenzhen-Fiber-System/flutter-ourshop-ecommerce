@@ -15,7 +15,16 @@ class CountryState extends Equatable {
     );
   }
 
-  Country getCountryById(String id) => countries.firstWhere((country) => country.id == id);
+  Country getCountryById(String id) {
+    return countries.firstWhere(
+      (country) => country.id == id, 
+      orElse: () {
+        return countries.isNotEmpty
+        ? countries.first
+        : const Country(id: '', name: '', iso: '', iso3: '', numCode: 0, phoneCode: 0, flagUrl: '');
+      },
+    );
+  }
   
   @override
   List<Object> get props => [countries];

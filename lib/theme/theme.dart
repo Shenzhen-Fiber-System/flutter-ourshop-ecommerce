@@ -18,6 +18,8 @@ class AppTheme{
     950: Color(0xff032030),
   };
 
+  static Color mainWebColor = const Color(0xff003049);
+
   static ThemeData light = ThemeData.light().copyWith(
     // colorScheme: ColorScheme(
     //   primary: palette[500]!,
@@ -305,7 +307,6 @@ class AppTheme{
         return Colors.white;
       })
     ),
-    
   );
 
   static ThemeData dark = ThemeData.dark().copyWith(

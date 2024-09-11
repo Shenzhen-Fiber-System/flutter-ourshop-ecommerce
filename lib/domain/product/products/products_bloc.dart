@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:ourshop_ecommerce/models/models.dart';
 
 import '../../../ui/pages/pages.dart';
@@ -38,6 +39,51 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     on<AddCategoryHeaderImagesEvent>((event, emit) => emit(state.copyWith(categoryHeaderImages: event.categoryHeaderImages)));
     on<AddSubCategoryProductsEvent>(_addSubCategoryProductsEvent);
     on<AddSubCategoriesEvent>((event, emit) => emit(state.copyWith(subCategories: event.subCategories)));
+    on<AddAdminProductsEvent>((event, emit) async {
+      try {
+      
+        emit(state.copyWith(productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore));
+
+        final Map<String, dynamic> filteredParamenters = {
+          "uuids": [ {
+              "fieldName":"company.id", 
+              "value":event.uuid
+            }
+          ],
+          "searchFields": [],
+          "sortOrders": [],
+          "page": event.page,
+          "pageSize": 10,
+          "searchString": ""
+      };
+
+        final adminProducts = await _productService.filteredAdminProducts(filteredParamenters);
+        if(adminProducts is FilteredData){
+          final List<FilteredProducts> updatedList = List.from(state.adminProducts);
+          updatedList.addAll(adminProducts.content as List<FilteredProducts>);
+          final hasMore = adminProducts.page < adminProducts.totalPages;
+          emit(state.copyWith(
+              adminProducts: updatedList,
+              currentPage: adminProducts.page,
+              hasMore: hasMore,
+              productsStates: ProductsStates.loaded
+            )
+          );
+        }
+      } catch (e) {
+        log('error: ${e.toString()}');
+        emit(state.copyWith(productsStates: ProductsStates.error));
+      }
+
+    });
+    on<DeleteAdminProductEvent>((event, emit) async {
+        final value = await _productService.deleteAdminProductById(event.productId);
+        if(value is bool && value){
+          final List<FilteredProducts> updatedList = List.from(state.adminProducts);
+          updatedList.removeWhere((element) => element.id == event.productId);
+          emit(state.copyWith(adminProducts: updatedList));
+        }
+    });
   }
 
   FutureOr<void> _addSubCategoryProductsEvent(event, emit) {
@@ -175,6 +221,35 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     // }
     await getProductsByCategory(categoryId);
     add(const AddProductsStatesEvent(productsState: ProductsStates.loaded));
+  }
+
+  Future<List<File>> chooseAdminProductPhotos() async {
+    try {
+      final ImagePicker picker = locator<ImagePicker>();
+      final List<XFile> images = await picker.pickMultiImage();
+      final List<File> imagePaths = [];
+      for (var image in images) {
+        imagePaths.add(File(image.path));
+      }
+      return imagePaths;
+    } catch (e) {
+      log('error: ${e.toString()}');
+      return [];
+    }
+  }
+  Future<List<File>> chooseAdminProductVideos() async {
+    try {
+      final ImagePicker picker = locator<ImagePicker>();
+      final List<XFile> videos = await picker.pickMultipleMedia();
+      final List<File> videosResp = [];
+      for (var video in videos) {
+        videosResp.add(File(video.path));
+      }
+      return videosResp;
+    } catch (e) {
+      log('error: ${e.toString()}');
+      return [];
+    }
   }
 
   void changeGridCount(int gridCount) => add(ChangeGridCountEvent(gridCount));

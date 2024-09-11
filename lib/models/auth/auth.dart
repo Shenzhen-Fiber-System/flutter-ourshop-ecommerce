@@ -30,13 +30,16 @@ class Authentication extends Equatable {
 
 class Token extends Equatable {
     final String token;
+    final String refreshToken;
 
     const Token({
         required this.token,
+        required this.refreshToken,
     });
 
     factory Token.fromJson(Map<String, dynamic> json) => Token(
         token: json["token"],
+        refreshToken: json["refreshToken"],
     );
 
 
@@ -49,10 +52,54 @@ class Token extends Equatable {
 
     Map<String, dynamic> toJson() => {
         "token": token,
+        "refreshToken": refreshToken,
     };
     
       @override
-      List<Object?> get props => [token];
+      List<Object?> get props => [token, refreshToken];
+}
+
+class RefreshToken extends Equatable {
+  final bool success;
+  final String message;
+  final String data;
+
+  const RefreshToken({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
+
+  factory RefreshToken.fromJson(Map<String, dynamic> json) => RefreshToken(
+    success: json["success"],
+    message: json["message"],
+    data: json["data"],
+  );
+
+  RefreshToken copyWith({
+    bool? success,
+    String? message,
+    String? data,
+  }) {
+    return RefreshToken(
+      success: success ?? this.success,
+      message: message ?? this.message,
+      data: data ?? this.data,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "message": message,
+    "data": data,
+  };
+  
+  @override
+  List<Object?> get props => [
+    success, 
+    message, 
+    data
+  ];
 }
 
 class LoggedUser extends Equatable {

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 part 'general_event.dart';
 part 'general_state.dart';

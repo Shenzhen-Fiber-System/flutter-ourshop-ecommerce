@@ -47,7 +47,7 @@ class Cart extends StatelessWidget {
                         ),
                         direction: DismissDirection.endToStart,
                         confirmDismiss: (direction) {
-                          return DeleteCartProductDialog(product: state.cartProducts[index]).showAlertDialog(context, translations, theme)
+                          return DeleteProductDialog(productName: state.cartProducts[index].name).showAlertDialog(context, translations, theme)
                           .then((value){
                               if (value != null && value) {
                                 context.read<ProductsBloc>().removeCartProduct(state.cartProducts[index]);

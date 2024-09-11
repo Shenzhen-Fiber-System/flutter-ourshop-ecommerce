@@ -29,23 +29,13 @@ class Observable extends BlocObserver {
         // log('User changed to ${nextState.loggedUser}');
       }
     } else if (bloc is ProductsBloc){
-      // final currentState = change.currentState as ProductsState;
-      // final nextState = change.nextState as ProductsState;
-      // if (currentState.categories.length != nextState.categories.length) {
-      //   log('products ${nextState.products}');
-      // }
-      // if (currentState.selectedParentCategory != nextState.selectedParentCategory) {
-      //   log('selectedCategory ${nextState.selectedParentCategory}');
-      // }
-      // if (currentState.cartProducts.length != nextState.cartProducts.length) {
-      //   log('cart ´products ${nextState.cartProducts}');
-      // }
-      // if (currentState.subCategories.length != nextState.subCategories.length) {
-      //   log('subCategories ${nextState.subCategories}');
-      // }
-      // if (currentState.subCategoryProducts.length != nextState.subCategoryProducts.length) {
-      //   log('subCategoryProducts ${nextState.subCategoryProducts}');
-      // }
+      
+    } else if (bloc is OrdersBloc){
+      final currentState = change.currentState as OrdersState;
+      final nextState = change.nextState as OrdersState;
+      if (currentState.filteredAdminOrders != nextState.filteredAdminOrders) {
+        // log('Orders changed to ${nextState.filteredAdminOrders}');
+      }
     }
   }
 }
