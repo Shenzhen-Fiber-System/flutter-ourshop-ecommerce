@@ -20,12 +20,14 @@ class RefreshTokenInterceptor extends Interceptor {
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     log('Error interceptor: ${err.response?.data}');
     if (err.response?.statusCode == 401 && err.response?.data['message'] == 'Unauthorized') {
+      log('unauthorized');
       if (!_isRefreshing) {
         _isRefreshing = true;
         _refreshCompleter = Completer<void>();
 
         try {
           final newTokens = await _refreshToken();
+          log('after refresh token');
           if (newTokens != null) {
             locator<Preferences>().saveData('token', newTokens['accessToken']!);
             locator<Preferences>().saveData('refreshToken', newTokens['refreshToken']!);
@@ -73,7 +75,7 @@ class RefreshTokenInterceptor extends Interceptor {
     final refreshToken = locator<Preferences>().preferences['refreshToken'];
     if (refreshToken != null) {
       try {
-        final newTokens = await locator<AuthService>().refreshToken(refreshToken);
+        final newTokens = await AuthService(dio: DioInstance('admin').instance).refreshToken(refreshToken);
         if (newTokens != null) {
           return newTokens;
         }

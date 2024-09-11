@@ -74,7 +74,7 @@ class _SignInPageState extends State<SignInPage> {
                   children: [
                     TextSpan(
                       text: translations.ourshop, 
-                      style: theme.textTheme.titleMedium?.copyWith(color: Colors.blue)
+                      style: theme.textTheme.titleMedium?.copyWith(color: AppTheme.palette[800])
                     ),
                     TextSpan(
                       text: translations.e_commerce, 
@@ -82,7 +82,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     TextSpan(
                       text: translations.app, 
-                      style: theme.textTheme.titleMedium?.copyWith(color: Colors.blue)
+                      style: theme.textTheme.titleMedium?.copyWith(color: AppTheme.palette[800])
                     ),
                   ]
                 )
@@ -265,7 +265,7 @@ class _SignInPageState extends State<SignInPage> {
                             TextButton(
                               onPressed: state.isLoading ? null : () => context.push('/sign-up'),
                               child: Text(translations.sign_up, 
-                                style: theme.textTheme.bodySmall?.copyWith(color: Colors.blue, fontWeight: FontWeight.w600),
+                                style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.palette[800], fontWeight: FontWeight.w600),
                               ),
                             )
                           ],

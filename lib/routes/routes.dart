@@ -83,6 +83,10 @@ class AppRoutes {
         },
       ),
       GoRoute(
+        path: '/cart',
+        builder: (context, state) => const Cart(canBack: true,),
+      ),
+      GoRoute(
         path: '/checkout',
         builder: (context, state) => const CheckoutPage(),
       ),
@@ -96,6 +100,14 @@ class AppRoutes {
               final AdminOptions option = state.extra as AdminOptions;
               return AdminOptionPage(option: option,);
             },
+            routes: [
+               GoRoute(
+                path: 'WebEditor',
+                builder: (context, state) {
+                  return const WebEditor();
+                },
+              )
+            ]
           ),
           GoRoute(
             path: 'option/orders',
@@ -132,7 +144,7 @@ class AppRoutes {
                   final FilteredProducts product = state.extra as FilteredProducts;
                   return AdminProductDetail(product: product,);
                 },
-              )
+              ),
             ]
           )
         ]

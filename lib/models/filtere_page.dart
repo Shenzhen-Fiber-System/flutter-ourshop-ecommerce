@@ -127,10 +127,10 @@ class FilteredProducts extends Equatable {
   final dynamic fboPriceEnd;    // Estos pueden ser null
   final dynamic moqUnit;        // Estos pueden ser null
   final double stock;
-  final double packageLength;
-  final double packageWidth;
-  final double packageHeight;
-  final double packageWeight;
+  final double? packageLength;
+  final double? packageWidth;
+  final double? packageHeight;
+  final double? packageWeight;
   final double? unitPrice;      // Marcado como nullable
   final List<Detail> specifications;
   final List<Detail> details;
@@ -194,7 +194,7 @@ class FilteredProducts extends Equatable {
     fboPriceEnd: json["fboPriceEnd"],
     moqUnit: json["moqUnit"],
     stock: (json["stock"] as num).toDouble(),
-    packageLength: (json["packageLength"] as num).toDouble(),
+    packageLength: ((json["packageLength"] as num).toDouble()),
     packageWidth: (json["packageWidth"] as num).toDouble(),
     packageHeight: (json["packageHeight"] as num).toDouble(),
     packageWeight: (json["packageWeight"] as num).toDouble(),

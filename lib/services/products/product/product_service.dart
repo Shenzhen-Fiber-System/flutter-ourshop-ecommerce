@@ -75,5 +75,15 @@ class ProductService {
     }
   }
 
+  Future<dynamic> filteredProducts(Map<String, dynamic> filteredParamenters) async {
+    try {
+      final response = await dio.post('/products/filtered-page', data: filteredParamenters);
+      final filteredProducts = FilteredResponse<FilteredProducts>.fromJson(response.data, (json) => FilteredProducts.fromJson(json));
+      return filteredProducts.data;
+    } on DioException catch (e) {
+      ErrorHandler(e);
+    }
+  }
+
 
 }

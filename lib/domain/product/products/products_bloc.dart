@@ -55,7 +55,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
           "page": event.page,
           "pageSize": 10,
           "searchString": ""
-      };
+        };
 
         final adminProducts = await _productService.filteredAdminProducts(filteredParamenters);
         if(adminProducts is FilteredData){
@@ -83,6 +83,34 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
           updatedList.removeWhere((element) => element.id == event.productId);
           emit(state.copyWith(adminProducts: updatedList));
         }
+    });
+    on<AddFilteredProductsEvent>((event, emit) {
+
+      final Map<String, dynamic> filteredParamenters = {
+        "uuids": [],
+        "searchFields": [],
+        "sortOrders": [],
+        "page": event.page,
+        "pageSize": 10,
+        "searchString": ""
+      };
+
+      if (event.mode == SearchMode.suggestions){
+        filteredParamenters["uuids"] = [
+          {
+            "fieldName":"products", 
+            "value":""
+          }
+        ];
+      }
+
+      final response = _productService.filteredProducts(filteredParamenters);
+
+      if (response is FilteredData){
+        log('filteredData: ${response as FilteredData}');
+      }
+
+      // emit(state.copyWith(filteredProducts: event.filteredProducts));
     });
   }
 
@@ -252,6 +280,20 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     }
   }
 
+  Future<List<Product>> getAllProducts() async {
+    try {
+      final response = await _productService.getProducts();
+      if (response is List<Product>) {
+        return response;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      log('error: ${e.toString()}');
+      return [];
+    }
+  }
+
   void changeGridCount(int gridCount) => add(ChangeGridCountEvent(gridCount));
 
   void addFavoriteProduct(Product product) => add(AddFavoriteProductEvent(product));
@@ -282,7 +324,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     double total = 0.00;
     for (final product in state.cartProducts) {
       if(product.selected){
-        total += ((product.unitPrice! * product.quantity));
+        total += ((product.unitPrice ?? product.fboPriceEnd! * product.quantity));
       }
     }
     return total;

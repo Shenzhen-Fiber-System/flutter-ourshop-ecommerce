@@ -9,6 +9,11 @@ enum ProductsStates{
   loadingMore
 }
 
+enum SearchMode{
+  suggestions,
+  results,
+}
+
 class ProductsState extends Equatable {
 
   final ProductsStates productsStates;
@@ -23,6 +28,8 @@ class ProductsState extends Equatable {
   final List<Product> subCategoryProducts;
   final List<Category> subCategories;
   final List<FilteredProducts> adminProducts;
+  final List<FilteredProducts> suggestions;
+  final List<FilteredProducts> filteredProducts;
   final int currentPage;
   final bool hasMore;
 
@@ -40,8 +47,9 @@ class ProductsState extends Equatable {
     this.subCategories = const [],
     this.adminProducts = const [],
     this.currentPage = 1,
-    this.hasMore = true
-    
+    this.hasMore = true,
+    this.suggestions = const [],
+    this.filteredProducts = const []
   });
 
   ProductsState copyWith({
@@ -58,7 +66,9 @@ class ProductsState extends Equatable {
     List<Category>? subCategories,
     List<FilteredProducts>? adminProducts,
     int? currentPage,
-    bool? hasMore
+    bool? hasMore,
+    List<FilteredProducts>? suggestions,
+    List<FilteredProducts>? filteredProducts
   }) {
     return ProductsState(
       productsStates: productsStates ?? this.productsStates,
@@ -74,7 +84,9 @@ class ProductsState extends Equatable {
       subCategories: subCategories ?? this.subCategories,
       adminProducts: adminProducts ?? this.adminProducts,
       currentPage: currentPage ?? this.currentPage,
-      hasMore: hasMore ?? this.hasMore
+      hasMore: hasMore ?? this.hasMore,
+      suggestions: suggestions ?? this.suggestions,
+      filteredProducts: filteredProducts ?? this.filteredProducts
     );
   }
   
@@ -93,6 +105,8 @@ class ProductsState extends Equatable {
     subCategories,
     adminProducts,
     currentPage,
-    hasMore
+    hasMore,
+    suggestions,
+    filteredProducts
   ];
 }

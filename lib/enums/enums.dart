@@ -20,3 +20,11 @@ enum AdminOptions{
   PRODUCTS,
   COMMUNICATION,
 }
+
+enum FloatingActionButtonType{
+  ADD,
+  EDIT,
+  DELETE,
+  CART,
+  UNKNOWN
+}

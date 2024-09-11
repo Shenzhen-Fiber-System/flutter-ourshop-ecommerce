@@ -303,7 +303,7 @@ class ShippingAddressDialog extends AlertDialogs {
                     context.pop();
                   }
                 },
-                child: Text(type == ShippingAddressDialogType.ADD ? translations.add : translations.update, style: theme.textTheme.labelMedium,),
+                child: Text(type == ShippingAddressDialogType.ADD ? translations.add('') : translations.update, style: theme.textTheme.labelMedium,),
               ),
             ],
           );

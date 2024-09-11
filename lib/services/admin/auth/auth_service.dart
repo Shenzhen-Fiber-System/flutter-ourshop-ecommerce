@@ -38,6 +38,8 @@ class AuthService{
         '/auth/refresh-token', 
         options: Options(headers: {'Authorization': 'Bearer $refreshToken'})
       );
+
+      log('refreshToken response: ${response.data}');
       
       final newToken = response.data['accessToken'];
       final newRefreshToken = response.data['refreshToken'];

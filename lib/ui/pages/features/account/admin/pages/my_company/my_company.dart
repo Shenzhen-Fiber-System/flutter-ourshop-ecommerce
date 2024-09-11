@@ -223,7 +223,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
                                       )
                           ),
                           ElevatedButton(
-                            style: theme.elevatedButtonTheme.style?.copyWith(backgroundColor: WidgetStateProperty.all(AppTheme.mainWebColor)),
+                            style: theme.elevatedButtonTheme.style?.copyWith(backgroundColor: WidgetStateProperty.all(AppTheme.palette[1000])),
                             onPressed: state.logoStatus == CompanyLogoStatus.loading ? null : () => context.read<CompanyBloc>().chooseCompanyLogo(), 
                             child:  Row(
                               mainAxisAlignment: MainAxisAlignment.center,

@@ -27,13 +27,12 @@ class _ProductsPageState extends State<ProductsPage> {
     final Size size = MediaQuery.of(context).size;
     final AppLocalizations translations = AppLocalizations.of(context)!;
     final ThemeData theme = Theme.of(context);
-
     return BlocBuilder<ProductsBloc, ProductsState>(
       builder: (context, state) {
 
         if (state.productsStates == ProductsStates.loading)  return const Center(child: CircularProgressIndicator.adaptive());
 
-        if (state.productsStates == ProductsStates.error) return Center(child: Text('Something went wrong!', style: theme.textTheme.bodyMedium,));
+        if (state.productsStates == ProductsStates.error) return Center(child: Text('Something went wrong!', style: theme.textTheme.bodyMedium?.copyWith(color: AppTheme.palette[1000]),));
 
         return DefaultTabController(
           initialIndex: state.selectedParentCategory.isEmpty ? 0 : state.categories.indexWhere((element) => element.id == state.selectedParentCategory),
@@ -42,23 +41,27 @@ class _ProductsPageState extends State<ProductsPage> {
             top: true,
             child: Scaffold(
               appBar: AppBar(
+                backgroundColor: AppTheme.palette[900],
                 leadingWidth: size.width * 0.25,
                 leading: Row(
                   children: [
                     IconButton(
                       onPressed: () => showSearch(context: context, delegate: Search()),
-                      icon: const Icon(Icons.search)
+                      icon: const Icon(Icons.search, color: Colors.white,)
                     ),
-                    Text(translations.search, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black),)
+                    Text(translations.search, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),)
                   ],
                 ),
                 centerTitle: true,
                 title: Image.asset('assets/logos/logo_ourshop_1.png', height: 150, width: 150,),
                 bottom: TabBar(
+                  unselectedLabelStyle: theme.tabBarTheme.unselectedLabelStyle?.copyWith(color: Colors.white),
+                  labelStyle: theme.tabBarTheme.unselectedLabelStyle?.copyWith(color: Colors.white),
                   isScrollable: true,
                   indicatorSize: TabBarIndicatorSize.label,
                   onTap: (index) => context.read<ProductsBloc>().addSelectedCategory(state.categories[index].id),
                   tabs: state.categories.map((category,) => Tab(
+                    
                     text: Helpers.truncateText(category.name, 25), 
                   )).toList(),
                 ),

@@ -81,23 +81,6 @@ class SelectedProductPage extends StatelessWidget {
                       child: Text('${product.productReviewInfo?.ratingAvg.toStringAsFixed(1)}', style: theme.textTheme.labelLarge?.copyWith(color: Colors.black),),
                     ),
                     RaitingBarWidget(product: product),
-                    // RatingBar(
-                    //   initialRating: product.productReviewInfo?.ratingAvg ?? 0,
-                    //   direction: Axis.horizontal,
-                    //   allowHalfRating: true,
-                    //   ignoreGestures: true,
-                    //   itemCount: 5,
-                    //   itemSize: size.width * 0.07,
-                    //   glowColor: Colors.amber,
-                    //   unratedColor: Colors.amber,
-                    //   ratingWidget: RatingWidget(                          
-                    //     full: const Icon(Icons.star, color: Colors.amber,),
-                    //     half: const Icon(Icons.star_half, color: Colors.amber,),
-                    //     empty: const Icon(Icons.star_border, color: Colors.amber,),
-                    //   ),
-                    //   tapOnlyMode: true,
-                    //   onRatingUpdate: (rating) {},
-                    // ),
                   ],
                 ),
                 const SizedBox(height: 5.0,),
@@ -111,17 +94,17 @@ class SelectedProductPage extends StatelessWidget {
                               padding: const EdgeInsets.only(left: 10.0),
                               child: Text('USD ${product.unitPrice != null ? '\$${product.unitPrice?.toStringAsFixed(2)}' : ('\$${product.fboPriceStart?.toStringAsFixed(2)}-\$${product.fboPriceEnd?.toStringAsFixed(2)}')}', style: theme.textTheme.titleMedium?.copyWith(color: const Color(0xff5d5f61), fontWeight: FontWeight.w600),),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: Chip(
-                                visualDensity: VisualDensity.compact,
-                                side: BorderSide.none,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-                                padding: const EdgeInsets.all(0),
-                                label: Text('6% off', style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[700]),), 
-                                backgroundColor: AppTheme.palette[50],
-                              ),
-                            ),
+                            // Padding(
+                            //   padding: const EdgeInsets.only(left: 10.0),
+                            //   child: Chip(
+                            //     visualDensity: VisualDensity.compact,
+                            //     side: BorderSide.none,
+                            //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                            //     padding: const EdgeInsets.all(0),
+                            //     label: Text('6% off', style: theme.textTheme.labelMedium?.copyWith(color:Colors.white),), 
+                            //     backgroundColor: AppTheme.palette[900],
+                            //   ),
+                            // ),
                           ],
                         ),
                         // Text('USD \$${product.unitPrice != null ? '\$${product.unitPrice?.toStringAsFixed(2)}' : ('\$${product.fboPriceStart?.toStringAsFixed(2)}-\$${product.fboPriceEnd?.toStringAsFixed(2)}')}', style: theme.textTheme.titleSmall?.copyWith(color: Colors.grey.shade400, decoration: TextDecoration.lineThrough),),
@@ -177,10 +160,10 @@ class SelectedProductPage extends StatelessWidget {
                       onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
                       child: Row(
                         children: [
-                          Icon(Icons.shopping_bag_outlined, color: AppTheme.palette[500], size: 14,),
+                          Icon(Icons.shopping_bag_outlined, color: AppTheme.palette[1000], size: 14,),
                           Padding(
                             padding: const EdgeInsets.only(left: 5.0),
-                            child: Text(translations.add_to_cart, style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[500]),),
+                            child: Text(translations.add_to_cart, style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[1000]),),
                           ),
                         ],
                       ),
@@ -265,10 +248,9 @@ class _ImageState extends State<_Image> {
                     borderRadius: BorderRadius.circular(8.0),
                     child: Hero(
                       tag: widget.product.id,
-                      child: Image(
-                        image: NetworkImage('${dotenv.env['PRODUCT_URL']}${widget.product.photos[index].url}'),
-                        fit: BoxFit.cover,
-                      ),
+                      child: CachedNetworkImage(
+                        imageUrl: '${dotenv.env['PRODUCT_URL']}${widget.product.photos[index].url}'
+                      )
                     ),
                   ),
                 );
@@ -308,7 +290,7 @@ class _ImageState extends State<_Image> {
                                     width: 10.0,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: value == i ? AppTheme.palette[500] : AppTheme.palette[300],
+                                      color: value == i ? AppTheme.palette[1000] : AppTheme.palette[700],
                                     ),
                                   ),
                               ],
@@ -327,14 +309,14 @@ class _ImageState extends State<_Image> {
                     height: 30.0,
                     width: 50.0,
                     decoration: BoxDecoration(
-                      color: AppTheme.palette[100],
+                      color: AppTheme.palette[800],
                       borderRadius: BorderRadius.circular(25.0),
                     ),
                     child: Center(
                       child: ValueListenableBuilder(
                         valueListenable: _currentPage,
                         builder: (BuildContext context, value, Widget? child) {
-                          return Text('${value + 1}/${widget.product.photos.length}', style: widget.theme.textTheme.labelSmall?.copyWith(fontSize: 10.0, color: AppTheme.palette[600]),);
+                          return Text('${value + 1}/${widget.product.photos.length}', style: widget.theme.textTheme.labelSmall?.copyWith(fontSize: 10.0, color: Colors.white),);
                         },
                       )
                     ),

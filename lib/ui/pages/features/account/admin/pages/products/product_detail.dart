@@ -43,10 +43,194 @@ class ProductForm extends StatelessWidget {
     required GlobalKey<FormBuilderState> formKey,
   }) : _formKey = formKey;
 
+
   final GlobalKey<FormBuilderState> _formKey;
   final ValueNotifier<int> option = ValueNotifier<int>(0);
   final ValueNotifier<List<File>> selectedPhotos = ValueNotifier<List<File>>([]);
   final ValueNotifier<List<File>> selectedVideos = ValueNotifier<List<File>>([]);
+
+  final ValueNotifier<List<Widget>> details = ValueNotifier<List<Widget>>([]);
+  final ValueNotifier<List<Widget>> certifications = ValueNotifier<List<Widget>>([]);
+  final ValueNotifier<List<Widget>> specifications = ValueNotifier<List<Widget>>([]);
+
+
+  void addDetail(Size size, AppLocalizations translations, TextStyle style) {
+    final int index = details.value.length;
+    details.value = List.from(details.value)..add(
+      Container(
+        padding: const EdgeInsets.only(top: 10.0),
+        key: ValueKey(index),
+        width: size.width,
+        child: Row(
+          children: [
+            SizedBox(
+              width: size.width * 0.4,
+              child: FormBuilderTextField(
+                name: 'detail_name_${details.value.length}',
+                style: style,
+                decoration: InputDecoration(
+                  labelText: translations.generic(translations.details.split('s').first, translations.name.toLowerCase()),
+                  hintText: translations.generic(translations.details.split('s').first, translations.name.toLowerCase()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 3.0,),
+            SizedBox(
+              width: size.width * 0.4,
+              child: FormBuilderTextField(
+                name: 'detail_description_${details.value.length}',
+                style: style,
+                decoration: InputDecoration(
+                  labelText: translations.description,
+                  hintText: translations.description,
+                ),
+              ),
+            ),
+            const SizedBox(width: 3.0,),
+            IconButton(
+              onPressed: () {
+                removeDetail(index, size, translations, style);
+              }, 
+              icon: const Icon(Icons.delete)
+            )
+          ],
+        ),
+      )
+    );
+  }
+  void addCertification(Size size, AppLocalizations translations, TextStyle style) {
+    final int index = certifications.value.length;
+    certifications.value = List.from(certifications.value)..add(
+      Container(
+        padding: const EdgeInsets.only(top: 10.0),
+        key: ValueKey(index),
+        width: size.width,
+        child: Row(
+          children: [
+            SizedBox(
+              width: size.width * 0.4,
+              child: FormBuilderTextField(
+                name: 'certification_name_${certifications.value.length}',
+                style: style,
+                decoration: InputDecoration(
+                  labelText: translations.generic(translations.certifications.split('s').first, translations.name.toLowerCase()),
+                  hintText: translations.generic(translations.certifications.split('s').first, translations.name.toLowerCase()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 3.0,),
+            SizedBox(
+              width: size.width * 0.4,
+              child: FormBuilderTextField(
+                name: 'certification_number_${certifications.value.length}',
+                style: style,
+                decoration: InputDecoration(
+                  labelText: translations.number,
+                  hintText: translations.number,
+                ),
+              ),
+            ),
+            const SizedBox(width: 3.0,),
+            IconButton(
+              onPressed: () {
+                removeCertifications(index, size, translations, style);
+              }, 
+              icon: const Icon(Icons.delete)
+            )
+          ],
+        ),
+      )
+    );
+  }
+
+  void removeDetail(int index, Size size, AppLocalizations translations, TextStyle style) {
+    details.value = List.from(details.value)..removeWhere((widget) => (widget.key as ValueKey).value == index);
+    for (int i = 0; i < details.value.length; i++) {
+      details.value[i] = Container(
+        padding: const EdgeInsets.only(top: 10.0),
+        key: ValueKey(i),
+        width: size.width,
+        child: Row(
+          children: [
+            SizedBox(
+              width: size.width * 0.4,
+              child: FormBuilderTextField(
+                name: 'detail_name_$i',
+                style: style,
+                decoration: InputDecoration(
+                  labelText: translations.generic(translations.details.split('s').first, translations.name.toLowerCase()),
+                  hintText: translations.generic(translations.details.split('s').first, translations.name.toLowerCase()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 3.0,),
+            SizedBox(
+              width: size.width * 0.4,
+              child: FormBuilderTextField(
+                name: 'detail_description_$i',
+                style: style,
+                decoration: InputDecoration(
+                  labelText: translations.description,
+                  hintText: translations.description,
+                ),
+              ),
+            ),
+            const SizedBox(width: 3.0,),
+            IconButton(
+              onPressed: () {
+                removeDetail(i, size,translations, style);
+              }, 
+              icon: const Icon(Icons.delete)
+            )
+          ],
+        ),
+      );
+    }
+  }
+  void removeCertifications(int index, Size size, AppLocalizations translations, TextStyle style) {
+    certifications.value = List.from(certifications.value)..removeWhere((widget) => (widget.key as ValueKey).value == index);
+    for (int i = 0; i < certifications.value.length; i++) {
+      certifications.value[i] = Container(
+        padding: const EdgeInsets.only(top: 10.0),
+        key: ValueKey(i),
+        width: size.width,
+        child: Row(
+          children: [
+            SizedBox(
+              width: size.width * 0.4,
+              child: FormBuilderTextField(
+                name: 'certification_name_$i',
+                style: style,
+                decoration: InputDecoration(
+                  labelText: translations.generic(translations.certifications.split('s').first, translations.name.toLowerCase()),
+                  hintText: translations.generic(translations.certifications.split('s').first, translations.name.toLowerCase()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 3.0,),
+            SizedBox(
+              width: size.width * 0.4,
+              child: FormBuilderTextField(
+                name: 'certification_number_$i',
+                style: style,
+                decoration: InputDecoration(
+                  labelText: translations.number,
+                  hintText: translations.number,
+                ),
+              ),
+            ),
+            const SizedBox(width: 3.0,),
+            IconButton(
+              onPressed: () {
+                removeCertifications(i, size,translations, style);
+              }, 
+              icon: const Icon(Icons.delete)
+            )
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -321,7 +505,95 @@ class ProductForm extends StatelessWidget {
                   );
                 },
               ),
-              SizedBox(height: size.height * 0.05,),
+              spacer,
+              Text(translations.details, style: style.copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey.shade600) ,),
+              spacer,
+              SizedBox(
+                width: size.width,
+                child: ElevatedButton(
+                  onPressed: () => addDetail(size, translations, style),
+                  child: Text(translations.add(translations.details.toLowerCase()), style: style.copyWith(color: Colors.white),)
+                ),
+              ),
+              spacer,
+              ValueListenableBuilder(
+                valueListenable: details,
+                builder: (context, value, child) {
+                  return Container(
+                    height: size.height * 0.3,
+                    width: size.width,
+                    color: Colors.grey.shade50,
+                    child: 
+                      value.isEmpty 
+                      ? Center(child: Text(translations.no(translations.details.toLowerCase()), style: style.copyWith(color: Colors.black),))
+                      : ListView.builder(
+                        itemCount: details.value.length,
+                        itemBuilder: (context, index) {
+                          return details.value[index];
+                        },
+                      )
+                  );
+                },
+              ),
+              spacer,
+              SizedBox(
+                width: size.width,
+                child: ElevatedButton(
+                  onPressed: (){
+                    
+                  }, 
+                  child: Text(translations.add(translations.certifications.toLowerCase()), style: style.copyWith(color: Colors.white),)
+                ),
+              ),
+              spacer,
+              ValueListenableBuilder(
+                valueListenable: specifications,
+                builder: (context, value, child) {
+                  return Container(
+                    height: size.height * 0.3,
+                    width: size.width,
+                    color: Colors.grey.shade200,
+                    child: 
+                      value.isEmpty 
+                      ? Center(child: Text(translations.no(translations.specifications.toLowerCase()), style: style.copyWith(color: Colors.black),))
+                      : ListView.builder(
+                        itemCount: specifications.value.length,
+                        itemBuilder: (context, index) {
+                          return details.value[index];
+                        },
+                      )
+                  );
+                },
+              ),
+              spacer,
+              SizedBox(
+                width: size.width,
+                child: ElevatedButton(
+                  onPressed: () => addCertification(size, translations, style),
+                  child: Text(translations.add(translations.certifications.toLowerCase()), style: style.copyWith(color: Colors.white),)
+                ),
+              ),
+              spacer,
+              ValueListenableBuilder(
+                valueListenable: certifications,
+                builder: (context, value, child) {
+                  return Container(
+                    height: size.height * 0.3,
+                    width: size.width,
+                    color: Colors.grey.shade200,
+                    child: 
+                      value.isEmpty 
+                      ? Center(child: Text(translations.no(translations.certifications.toLowerCase()), style: style.copyWith(color: Colors.black),))
+                      : ListView.builder(
+                        itemCount: certifications.value.length,
+                        itemBuilder: (context, index) {
+                          return certifications.value[index];
+                        },
+                      )
+                  );
+                },
+              ),
+              SizedBox(height: size.height * 0.03,),
             ],
           ),
         ),

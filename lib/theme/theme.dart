@@ -11,19 +11,23 @@ class AppTheme{
     300: Color(0xff77dbff),
     400: Color(0xff2ecaff),
     500: Color(0xff03b4f4),
+    550: Color(0xff3fe7b6),
     600: Color(0xff0090d1),
     700: Color(0xff0073a9),
     800: Color(0xff01618b),
     900: Color(0xff075073),
     950: Color(0xff032030),
+    1000: Color(0xff003049)
   };
 
-  static Color mainWebColor = const Color(0xff003049);
+  // static Color mainWebColor = const Color(0xff003049);
+
+  // static Color palette[550]! = const Color(0xff3fe7b6);
 
   static ThemeData light = ThemeData.light().copyWith(
     // colorScheme: ColorScheme(
-    //   primary: palette[500]!,
-    //   secondary: palette[500]!,
+    //   primary: palette[1000]!,
+    //   secondary: palette[1000]!,
     //   surface: Colors.white,
     //   error: Colors.red,
     //   onPrimary: Colors.white,
@@ -40,13 +44,17 @@ class AppTheme{
       iconTheme: const IconThemeData(
         color: Colors.black87,
       ),
-      titleTextStyle: ThemeData.light().textTheme.titleLarge
+      titleTextStyle: ThemeData.light().textTheme.titleLarge,
+      centerTitle: true
     ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: palette[550]!,
+      unselectedItemColor: Colors.white,
+      selectedIconTheme: IconThemeData(
+        color: palette[550]!,
+      ),
       elevation: 10.0,
-      backgroundColor: Colors.white,
+      backgroundColor: palette[900],
       
     ),
     textTheme: const TextTheme(
@@ -107,16 +115,16 @@ class AppTheme{
         letterSpacing: 0.1,
       ),
       bodyLarge: TextStyle(
-        // color:Color(0xff263959),
-        color: ThemeMode.dark == ThemeMode.dark ? Colors.white : Color(0xff263959),
+        color:Color(0xff263959),
+        // color: ThemeMode.dark == ThemeMode.dark ? Colors.white : Color(0xff263959),
         fontFamily: 'Roboto',
         fontWeight: FontWeight.w400,
         fontSize: 16,
         letterSpacing: 0.5,
       ),
       bodyMedium: TextStyle(
-        // color:Color(0xff263959),
-        color: ThemeMode.dark == ThemeMode.dark ? Colors.white : Color(0xff263959),
+        color:Color(0xff263959),
+        // color: ThemeMode.dark == ThemeMode.dark ? Colors.white : Color(0xff263959),
         fontFamily: 'Roboto',
         fontWeight: FontWeight.w400,
         fontSize: 14,
@@ -154,6 +162,8 @@ class AppTheme{
       selectionHandleColor: palette[300],
     ),
     inputDecorationTheme: InputDecorationTheme(
+      prefixIconColor: palette[1000],
+      suffixIconColor: palette[1000],
       floatingLabelStyle: ThemeData().textTheme.bodyMedium?.copyWith(color: const Color(0xff263959), fontWeight: FontWeight.w200, fontSize: 14),
       hintStyle: ThemeData().textTheme.bodyMedium?.copyWith(color: Colors.grey.shade500, fontWeight: FontWeight.w200, fontSize: 14),
       labelStyle: ThemeData().textTheme.bodyMedium,
@@ -168,7 +178,7 @@ class AppTheme{
       focusedBorder: OutlineInputBorder( 
         borderRadius: BorderRadius.circular(5.0),
         borderSide: BorderSide(
-          color: palette[500]!,
+          color: palette[1000]!,
         ),
       ),
       focusedErrorBorder: OutlineInputBorder(
@@ -193,11 +203,11 @@ class AppTheme{
           if (states.contains(WidgetState.disabled)){
             return Colors.grey.shade300;
           }
-          return palette[500]!;
+          return palette[1000]!;
         }),
         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5.0),
+            borderRadius: BorderRadius.circular(25.0),
           ),
         ),
       ),
@@ -205,19 +215,19 @@ class AppTheme{
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
         shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0))),
-        side: WidgetStatePropertyAll(BorderSide(color: AppTheme.palette[500]!)),
+        side: WidgetStatePropertyAll(BorderSide(color: AppTheme.palette[1000]!)),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         overlayColor: WidgetStateColor.transparent,
-        foregroundColor: WidgetStateProperty.all<Color>(palette[500]!),
+        foregroundColor: WidgetStateProperty.all<Color>(palette[1000]!),
       ),
     ),
     checkboxTheme: CheckboxThemeData(
       fillColor: WidgetStateProperty.resolveWith((states){
         if (states.contains(WidgetState.selected)){
-          return WidgetStateColor.resolveWith((states) => palette[500]!);
+          return WidgetStateColor.resolveWith((states) => palette[1000]!);
         }
         return WidgetStateColor.resolveWith((states) => Colors.white);
       }),
@@ -245,16 +255,21 @@ class AppTheme{
       ),
     ),
     tabBarTheme: TabBarTheme(
-      labelColor: palette[500],
-      labelStyle: const TextStyle(
+      labelStyle: TextStyle(
         overflow: TextOverflow.ellipsis,
+        fontSize: 12,
+        color: palette[900],
       ),
       tabAlignment: TabAlignment.start,
       splashFactory: NoSplash.splashFactory,
       dividerHeight: 1.0,
-      unselectedLabelColor: Colors.grey,
+      unselectedLabelStyle: TextStyle(
+        overflow: TextOverflow.ellipsis,
+        color: Colors.grey.shade400,
+        fontSize: 12
+      ),
       indicatorSize: TabBarIndicatorSize.label,
-      indicatorColor: palette[400]
+      indicatorColor: palette[550]!
     ),
     dialogTheme: DialogTheme(
       shape: RoundedRectangleBorder(
@@ -268,7 +283,7 @@ class AppTheme{
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith((states){
         if (states.contains(WidgetState.selected)){
-          return palette[500]!;
+          return palette[1000]!;
         }
         return Colors.grey.shade400;
       }),
@@ -276,10 +291,10 @@ class AppTheme{
       visualDensity: VisualDensity.compact
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
-      color: palette[500],
+      color: palette[550]!,
     ),
     bannerTheme: MaterialBannerThemeData(
-      backgroundColor: palette[500]!,
+      backgroundColor: palette[1000]!,
       contentTextStyle: ThemeData().textTheme.bodyMedium,
       padding: const EdgeInsets.all(20.0),
       leadingPadding: const EdgeInsets.all(20.0),
@@ -296,17 +311,45 @@ class AppTheme{
         )
       ),
       secondaryLabelStyle: ThemeData().textTheme.bodyMedium,
-      secondarySelectedColor: palette[500]!,
-      selectedColor: palette[500]!,
+      secondarySelectedColor: palette[1000]!,
+      selectedColor: palette[1000]!,
       labelPadding: const EdgeInsets.only(right: 10.0, top: 10.0, bottom: 10.0),
       elevation: 1.0,
       color: WidgetStateColor.resolveWith((states){
         if (states.contains(WidgetState.selected)){
-          return palette[500]!;
+          return palette[1000]!;
         }
         return Colors.white;
       })
     ),
+    buttonTheme: ButtonThemeData(
+      buttonColor: palette[1000]!,
+      disabledColor: Colors.grey.shade300,
+      splashColor: Colors.transparent,
+      textTheme: ButtonTextTheme.primary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25.0),
+      ),
+    ),
+    expansionTileTheme: ExpansionTileThemeData(
+      iconColor: palette[1000]!,
+      backgroundColor: Colors.white,
+      textColor: palette[1000]!,
+      collapsedBackgroundColor: Colors.white,
+      collapsedIconColor: palette[1000]!,
+      collapsedTextColor: palette[1000]!,
+      // expandedBackgroundColor: Colors.white,
+      // expandedIconColor: palette[1000]!,
+      // expandedTextColor: palette[1000]!,
+      tilePadding: EdgeInsets.zero,
+      // iconTheme: const IconThemeData(
+      //   size: 24.0
+      // ),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: AppTheme.palette[1000],
+      splashColor: Colors.transparent
+    )
   );
 
   static ThemeData dark = ThemeData.dark().copyWith(

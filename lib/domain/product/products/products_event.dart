@@ -130,3 +130,11 @@ class DeleteAdminProductEvent extends ProductsEvent {
   @override
   List<Object> get props => [productId];
 }
+
+class AddFilteredProductsEvent extends ProductsEvent {
+  final SearchMode mode;
+  final int page;
+  const AddFilteredProductsEvent({required this.mode, required this.page});
+  @override
+  List<Object> get props => [mode, page];
+}

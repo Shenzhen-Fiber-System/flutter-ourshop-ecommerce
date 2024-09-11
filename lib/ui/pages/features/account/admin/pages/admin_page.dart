@@ -64,9 +64,16 @@ class AdminPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size  size = MediaQuery.of(context).size;
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: AppTheme.palette[1000],
       appBar: AppBar(
-        title: const Text('Admin Page'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white,),
+          onPressed: () => context.pop(),
+        ),
+        backgroundColor: AppTheme.palette[1000],
+        title: Text(translations!.admin_page, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),),
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -79,7 +86,14 @@ class AdminPage extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: ListTile(
-                title: Text(option.title),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(
+                    color: AppTheme.palette[550]!,
+                    width: 1
+                  )
+                ),
+                title: Text(option.title, style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),),
                 onTap: () => option.onClick(),
               ),
             );
@@ -132,7 +146,12 @@ class AdminOptionPage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () => context.push('/admin/option/products/new', extra: AdminOptions.PRODUCTS),
-            ),
+            )
+          else if (option == AdminOptions.MY_COMPANY)
+            ElevatedButton(
+            onPressed: () => context.push('/admin/option/my-company/WebEditor'),
+            child:  Text(translations!.my_web_Site, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white),)
+          )
         ],
       ),
       body: Builder(
@@ -164,9 +183,8 @@ class AdminOptionPage extends StatelessWidget {
       (option == AdminOptions.MY_COMPANY) 
       ? BlocBuilder<CompanyBloc, CompanyState>(
           builder: (context, state) {
-            return FloatingActionButton(
-              backgroundColor: AppTheme.mainWebColor,
-              onPressed: () {
+            return CustomFloatingActionButton(
+              onClick: (){
                 switch (state.selectedMyCompanyFormIndex) {
                   case 0:
                     if (_companyNameFormKey.currentState!.saveAndValidate() && _generalFormKey.currentState!.saveAndValidate()) {
@@ -194,7 +212,7 @@ class AdminOptionPage extends StatelessWidget {
                     }
                     break;
                 }
-              },
+              }, 
               child: const Icon(Icons.save, color: Colors.white,),
             );
           },

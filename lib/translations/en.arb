@@ -93,7 +93,7 @@
     "full_name":"Full name",
     "add_shipping_address":"Add shipping address",
     "update_shipping_address":"Update shipping address",
-    "add":"Add",
+    "add":"Add {prop}",
     "update":"Update",
     "city":"City",
     "zip_code":"Zip code",
@@ -168,5 +168,14 @@
     "order_status_history": "Order status history",
     "delete_product": "Delete {product}{other_text}",
     "delete_product_description": "Are you sure you want to delete {product} {other_text}?",
-    "product_deleted": "Product deleted successfully"
+    "product_deleted": "Product deleted successfully",
+    "no": "No details {prop}",
+    "especifications": "Especifications",
+    "certifications": "Certifications",
+    "generic":"{prop1} {prop2}",
+    "description":"Description",
+    "number":"Number",
+    "my_web_Site": "My web site",
+    "admin_page": "Admin page"
+
 }

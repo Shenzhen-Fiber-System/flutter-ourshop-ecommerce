@@ -1,7 +1,13 @@
 import '../../pages.dart';
 
 class Cart extends StatelessWidget {
-  const Cart({super.key});
+  const Cart({
+    super.key, 
+    this.canBack = false
+  });
+
+
+  final bool canBack;
 
   @override
   Widget build(BuildContext context) {
@@ -9,15 +15,19 @@ class Cart extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        leading: TextButton(
+        leading: canBack ?  IconButton(
+          icon: const Icon(Icons.arrow_back),
+          // onPressed: () => context.go('/sub-category/${context.read<ProductsBloc>().state.selectedSubCategory.parentCategoryId}'),
+          onPressed: () => context.pop(),
+        ) : TextButton(
           onPressed: () => context.read<ProductsBloc>().selectedCartProductsCount == 0 ? context.read<ProductsBloc>().selectAllCartProducts() : context.read<ProductsBloc>().deselectAllCartProducts(),
-          child: Text('${context.watch<ProductsBloc>().selectedCartProductsCount == 0 ? translations.select_all : translations.deselect_all} ${context.watch<ProductsBloc>().selectedCartProductsCount}', style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[400]),)
+          child: Text('${context.watch<ProductsBloc>().selectedCartProductsCount == 0 ? translations.select_all : translations.deselect_all} ${context.watch<ProductsBloc>().selectedCartProductsCount}', style: theme.textTheme.labelSmall?.copyWith(color: AppTheme.palette[1000]!),)
         ),
-        leadingWidth: 100.0,
-        title: Text(translations.cart, style: theme.textTheme.titleLarge?.copyWith(color: AppTheme.palette[400]),),
+        leadingWidth: canBack ? null : 150,
+        title: Text(translations.cart, style: theme.textTheme.titleLarge?.copyWith(color: AppTheme.palette[1000]),),
         actions: [
           TextButton(
-            child: Text(translations.clear_all, style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[400]),),
+            child: Text(translations.clear_all, style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[1000]),),
             onPressed: () {
               context.read<ProductsBloc>().add(const ClearCart());
             },
@@ -26,6 +36,15 @@ class Cart extends StatelessWidget {
       ),
       body: Column(
         children: [
+          if (canBack)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ElevatedButton(
+                onPressed: () => context.read<ProductsBloc>().selectedCartProductsCount == 0 ? context.read<ProductsBloc>().selectAllCartProducts() : context.read<ProductsBloc>().deselectAllCartProducts(),
+                child: Text('${context.watch<ProductsBloc>().selectedCartProductsCount == 0 ? translations.select_all : translations.deselect_all} ${context.watch<ProductsBloc>().selectedCartProductsCount}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.white),)
+              ),
+            )
+          else const SizedBox.shrink(),
           Expanded(
             child: SizedBox(
               child: BlocBuilder<ProductsBloc, ProductsState>(

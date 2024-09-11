@@ -1,6 +1,3 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers
-
-import 'dart:developer';
 import '../../pages.dart';
 
 class MyAccount extends StatefulWidget {
@@ -35,7 +32,6 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
         _componentAnimationController.forward();
         
       } else if (_translateAnimation.value == 0.0) {
-        log('jshdfs${_avatarButtonTranslation.value}');
         _componentAnimationController.reverse();
       }
     });
@@ -80,7 +76,7 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
     final Size size = MediaQuery.of(context).size;
     final loggedUser = context.watch<UsersBloc>().state.loggedUser;
 
-    final _personalInformationTextTheme = theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500);
+    final personalInformationTextTheme = theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500);
 
 
     void showBottomSheet(BuildContext context) {
@@ -102,32 +98,37 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
       SettignsOptions(
         title: 'Name', 
         mode: SettingsOptionsMode.Name,
-        onClick: () => showBottomSheet(context),
-        data: Text(loggedUser.name.toUpperCase(), style: _personalInformationTextTheme)
+        // onClick: () => showBottomSheet(context),
+        onClick: () => null,
+        data: Text(loggedUser.name.toUpperCase(), style: personalInformationTextTheme)
       ),
       SettignsOptions(
         title: 'Last Name', 
         mode: SettingsOptionsMode.LastName,
-        onClick: () => showBottomSheet(context),
-        data: Text(loggedUser.lastName.toUpperCase(), style: _personalInformationTextTheme)
+        // onClick: () => showBottomSheet(context),
+        onClick: () => null,
+        data: Text(loggedUser.lastName.toUpperCase(), style: personalInformationTextTheme)
       ),
       SettignsOptions(
         title: 'Email', 
         mode: SettingsOptionsMode.Email,
-        onClick: () => showBottomSheet(context),
-        data: Text(loggedUser.email, style: _personalInformationTextTheme)
+        // onClick: () => showBottomSheet(context),
+        onClick: () => null,
+        data: Text(loggedUser.email, style: personalInformationTextTheme)
       ),
       SettignsOptions(
         title: 'Phone', 
         mode: SettingsOptionsMode.Phone,
-        onClick: () => showBottomSheet(context),
-        data: Text('${loggedUser.userPhoneNumberCode} ${loggedUser.userPhoneNumber}', style: _personalInformationTextTheme)
+        // onClick: () => showBottomSheet(context),
+        onClick: () => null,
+        data: Text('${loggedUser.userPhoneNumberCode} ${loggedUser.userPhoneNumber}', style: personalInformationTextTheme)
       ),
       SettignsOptions(
         title: 'Country', 
         mode: SettingsOptionsMode.Phone,
-        onClick: () => showBottomSheet(context),
-        data: Text(loggedUser.userCountryName, style: _personalInformationTextTheme)
+        // onClick: () => showBottomSheet(context),
+        onClick: () => null,
+        data: Text(loggedUser.userCountryName, style: personalInformationTextTheme)
       ),
     ];
 
@@ -135,27 +136,32 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
       SettignsOptions(
         title: 'All orders', 
         mode: SettingsOptionsMode.AllOrders,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
       SettignsOptions(
         title: 'Processing', 
         mode: SettingsOptionsMode.Processing,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
       SettignsOptions(
         title: 'Shipped', 
         mode: SettingsOptionsMode.Shipped,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
       SettignsOptions(
         title: 'Delivered', 
         mode: SettingsOptionsMode.Delivered,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
       SettignsOptions(
         title: 'Cancelled', 
         mode: SettingsOptionsMode.Cancelled,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
       SettignsOptions(
         title: 'Returned', 
@@ -165,22 +171,23 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
     ];
 
     final List<SettignsOptions> settings = [
-      SettignsOptions(
-        title: translations.deliver_to, 
-        mode: SettingsOptionsMode.Deliver,
-        onClick: () => showBottomSheet(context)
-      ),
-      SettignsOptions(
-        title: translations.currency, 
-        mode: SettingsOptionsMode.Currency,
-        onClick: () => showBottomSheet(context)
-      ),
+      // SettignsOptions(
+      //   title: translations.deliver_to, 
+      //   mode: SettingsOptionsMode.Deliver,
+      //   onClick: () => null,
+      // ),
+      // SettignsOptions(
+      //   title: translations.currency, 
+      //   mode: SettingsOptionsMode.Currency,
+      //   onClick: () => null,
+      // ),
       SettignsOptions(
         title: translations.language, 
         mode: SettingsOptionsMode.Language,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
-      if (loggedUser.roles.toLowerCase().split(', ').contains('admin')) 
+      if (loggedUser.roles.toLowerCase().split(', ').contains('seller')) 
         SettignsOptions(
           title: 'Admin', 
           mode: SettingsOptionsMode.Language,
@@ -330,14 +337,28 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
                 child: Autocomplete(
                   initialValue: TextEditingValue.empty,
                   fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
-                    return TextField(
-                      controller: textEditingController,
-                      focusNode: focusNode,
-                      onTapOutside: (event) => focusNode.unfocus(),
-                      style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),
-                      decoration: const InputDecoration(
-                        hintText: 'Search',
-                        border: InputBorder.none,
+                    return ColoredBox(
+                      color: Colors.white,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: TextField(
+                          controller: textEditingController,
+                          focusNode: focusNode,
+                          onTapOutside: (event) => focusNode.unfocus(),
+                          style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[1000]),
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.search, color: Colors.grey.shade700,),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+                            hintText: translations.search,
+                            hintStyle: theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade600),
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                        
+                          ),
+                        ),
                       ),
                     );
                   },
@@ -542,7 +563,7 @@ class _AccountSecction extends StatelessWidget {
               width: size.width,
               child: ElevatedButton(
                 onPressed: () => context.go('/'),
-                child: Text(translations.logout, style: theme.textTheme.bodyMedium,)
+                child: Text(translations.logout, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),)
               ),
             );
 

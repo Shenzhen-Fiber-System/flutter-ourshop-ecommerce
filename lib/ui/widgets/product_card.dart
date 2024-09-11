@@ -293,32 +293,35 @@ class CartCard extends StatelessWidget {
                 //     // trailing: IncreaseDecrease(theme: theme, product: product),
                 //   );
                 // }
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(Helpers.truncateText(product.name, 18), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(product.unitPrice != null ? (product.unitPrice! * product.quantity).toStringAsFixed(2) : '0.00', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black, fontWeight:  FontWeight.w600),),
-                      ],
-                    ), 
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => context.read<ProductsBloc>().addFavoriteProduct(product),
-                          child: Icon(state.favoriteProducts.contains(product) ? Icons.favorite : Icons.favorite_border_outlined, color: state.favoriteProducts.contains(product) ? Colors.red : Colors.grey ,)
-                        ),
-                        const Spacer(),
-                        IncreaseDecrease(theme: theme, product: product),
-                        
-                      ],
-                    )
-                  ],
+                return Padding(
+                  padding: const EdgeInsets.only(left: 5.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(Helpers.truncateText(product.name, 22), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(product.unitPrice != null ? (product.unitPrice! * product.quantity).toStringAsFixed(2) : product.fboPriceEnd!.toStringAsFixed(2), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black, fontWeight:  FontWeight.w600),),
+                        ],
+                      ), 
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => context.read<ProductsBloc>().addFavoriteProduct(product),
+                            child: Icon(state.favoriteProducts.contains(product) ? Icons.favorite : Icons.favorite_border_outlined, color: state.favoriteProducts.contains(product) ? Colors.red : Colors.grey ,)
+                          ),
+                          const Spacer(),
+                          IncreaseDecrease(theme: theme, product: product),
+                          
+                        ],
+                      )
+                    ],
+                  ),
                 );
               },
             ),
@@ -341,12 +344,12 @@ class IncreaseDecrease extends StatelessWidget {
       children: [
         IconButton(
           onPressed: () => context.read<ProductsBloc>().removeCartProduct(product),
-          icon: Icon(Icons.remove_circle_outline, color: AppTheme.palette[500],),
+          icon: Icon(Icons.remove_circle_outline, color: AppTheme.palette[900],),
         ),
-        Text(product.quantity.toString(), style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[700]),),
+        Text(product.quantity.toString(), style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[900]),),
         IconButton(
           onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
-          icon: Icon(Icons.add_circle_outline, color: AppTheme.palette[500]),
+          icon: Icon(Icons.add_circle_outline, color: AppTheme.palette[900]),
         ),
       ],
     );
