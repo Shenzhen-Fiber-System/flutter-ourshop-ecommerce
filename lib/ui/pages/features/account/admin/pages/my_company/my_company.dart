@@ -1,16 +1,14 @@
-import 'dart:developer';
+
 import '../../../../../pages.dart';
 
 class ExpansionPanelItem {
+  final Bank bank;
+  bool isExpanded;
+
   ExpansionPanelItem({
-    required this.header,
-    required this.body,
+    required this.bank,
     this.isExpanded = false,
   });
-
-  String header;
-  Widget body;
-  bool isExpanded;
 }
 
 class MyCompany extends StatefulWidget {
@@ -21,12 +19,14 @@ class MyCompany extends StatefulWidget {
     required this.generalFormKey, 
     required this.businessFormKey, 
     required this.socialMediaFormKey, 
+    required this.bankFormKey
   });
 
   final GlobalKey<FormBuilderState> companyNameFormKey;
   final GlobalKey<FormBuilderState> generalFormKey;
   final GlobalKey<FormBuilderState> businessFormKey;
   final GlobalKey<FormBuilderState> socialMediaFormKey;
+  final GlobalKey<FormBuilderState> bankFormKey;
 
   @override
   State<MyCompany> createState() => _MyCompanyState();
@@ -44,20 +44,14 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
 
   final List<int> qtyProductLandingPage = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
-  final List<String> socialMedias = [
-    'Facebook',
-    'Instagram',
-    'Twitter',
-    'Linkedin',
-    'Pinterest',
-    'Youtube',
-    'Tiktok',
-    'Snapchat',
-    'Whatsapp',
+  final List<Object> accountTypes = [
+    {'id': 'Savings', 'name': 'Savings'},
+    {'id': 'Checking', 'name': 'Checking'},
+    {'id': 'Business', 'name': 'Business'},
   ];
 
   final List<Widget> _socialMediaForms = [];
-  final List<ExpansionPanelItem> _bankPanels = [];
+  late ValueNotifier<List<ExpansionPanelItem>> _bankPanelsNotifier;
 
   late ScrollController _scrollController;
   late FocusNode _focusNodeAddress;
@@ -72,13 +66,15 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
 
   late TabController _tabController;
 
-  Future<void> getCompanyData() async {
-    await context.read<CompanyBloc>().getCompanyById(context.read<UsersBloc>().state.loggedUser.companyId);
-  }
 
   @override
   void initState() {
-    getCompanyData();
+    context.read<CompanyBloc>().add(
+      CompanyByIdEvent(
+        companyId:context.read<UsersBloc>().state.loggedUser.companyId,
+        countryId: context.read<UsersBloc>().state.loggedUser.companyCountryId
+      )
+    );
     _tabController = TabController(length: tabs.length, vsync: this)..addListener(listener);
     _scrollController = ScrollController();
     _focusNodeAddress = FocusNode();
@@ -95,6 +91,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _bankPanelsNotifier.dispose();
     _tabController.dispose();
     _tabController.removeListener(listener);
     _scrollController.dispose();
@@ -116,11 +113,11 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
     }
   }
 
-  @override
-  void deactivate() {
-    context.read<CompanyBloc>().add(const AddUserCompanyEvent(Company(id: '',)));
-    super.deactivate();
-  }
+  // @override
+  // void deactivate() {
+  //   context.read<CompanyBloc>().add(AddUserCompanyEvent(Company(id: '',)));
+  //   super.deactivate();
+  // }
 
   void _addSocialMediaForm() {
     setState(() {
@@ -129,19 +126,29 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
   }
 
   void _addBankPanel() {
-    setState(() {
-      _bankPanels.add(ExpansionPanelItem(
-        header: 'Bank ${_bankPanels.length + 1}',
-        body: _buildBankFormWidget(_bankPanels.length),
-        isExpanded: false,
+    _bankPanelsNotifier.value = List<ExpansionPanelItem>.from(_bankPanelsNotifier.value)
+      ..add(ExpansionPanelItem(
+        bank: const Bank(
+          id: '',
+          companyId: '',
+          bankId: 'New Bank',
+          accountType: '',
+          accountNumber: '',
+          swiftCode: '',
+          address: '',
+          phoneNumber: '',
+          intermediaryBankId: '',
+          showOrder: true,
+          bankCountryId: '',
+          intermediaryBankCountryId: '',
+        ),
+        isExpanded: true,
       ));
-    });
   }
 
   void _removeBankPanel(int index) {
-    setState(() {
-      _bankPanels.removeAt(index);
-    });
+    _bankPanelsNotifier.value = List<ExpansionPanelItem>.from(_bankPanelsNotifier.value)
+      ..removeAt(index);
   }
 
   @override
@@ -164,6 +171,9 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
               child: CircularProgressIndicator.adaptive(),
             );
           }
+          _bankPanelsNotifier = ValueNotifier<List<ExpansionPanelItem>>(
+            state.userCompany.banks.map((bank) => ExpansionPanelItem(bank: bank)).toList(),
+          );
           return SingleChildScrollView(
               controller: _scrollController,
               child: Column(
@@ -201,16 +211,21 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
                             decoration: BoxDecoration(
                               color: Colors.grey.shade300,
                               borderRadius: BorderRadius.circular(5.0),
-                              image: state.selectedLogoPath.isNotEmpty
+                              image: state.selectedLogoPath.isNotEmpty && !state.userCompany.hasProfileImg
                                 ? DecorationImage(
                                     fit: BoxFit.cover,
                                     image: FileImage(File(state.selectedLogoPath),)
                                   ) 
-                                : null
+                                : state.userCompany.hasProfileImg 
+                                  ? DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: CachedNetworkImageProvider('${dotenv.env['PRODUCT_URL']}company/${state.userCompany.id}/profile.png')
+                                    )
+                                  : null
                             ),
                             child: state.logoStatus == CompanyLogoStatus.loading 
                                     ? const Center(child: CircularProgressIndicator.adaptive())
-                                    : state.selectedLogoPath.isNotEmpty 
+                                    : state.selectedLogoPath.isNotEmpty || state.userCompany.hasProfileImg
                                       ? null
                                       : Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
@@ -278,55 +293,64 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
                                 ),
                                 //social media
                                 SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      SizedBox(
-                                        width: size.width,
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            _addSocialMediaForm();
-                                          }, 
-                                          child: Text(translations!.add_social_media, style: theme.textTheme.labelMedium?.copyWith(color: Colors.white),),
+                                  child: FormBuilder(
+                                    key: widget.socialMediaFormKey,
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                          width: size.width,
+                                          child: ElevatedButton(
+                                            onPressed: _addSocialMediaForm,
+                                            child: Text(translations!.add_social_media, style: theme.textTheme.labelMedium?.copyWith(color: Colors.white),),
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 10.0,),
-                                      ..._socialMediaForms
-                                    ],
+                                        const SizedBox(height: 10.0,),
+                                        ..._socialMediaForms
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 // banks
                                 SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      SizedBox(
-                                        width: size.width,
-                                        child: ElevatedButton(
-                                          onPressed: _addBankPanel,
-                                          child: Text('Add Bank', style: theme.textTheme.labelMedium?.copyWith(color: Colors.white),),
+                                  child: FormBuilder(
+                                    key: widget.bankFormKey,
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                          width: size.width,
+                                          child: ElevatedButton(
+                                            onPressed: _addBankPanel,
+                                            child: Text('Add Bank', style: theme.textTheme.labelMedium?.copyWith(color: Colors.white),),
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 10.0,),
-                                      ExpansionPanelList(
-                                        expansionCallback: (int index, bool isExpanded) {
-                                          log('message: $isExpanded');
-                                          setState(() {
-                                            _bankPanels[index].isExpanded = isExpanded;
-                                          });
-                                        },
-                                        children: _bankPanels.map<ExpansionPanel>((ExpansionPanelItem item) {
-                                          return ExpansionPanel(                                            
-                                            headerBuilder: (BuildContext context, bool isExpanded) {
-                                              return ListTile(
-                                                shape: theme.inputDecorationTheme.border?.copyWith(borderSide: BorderSide.none),
-                                                title: Text(item.header, style: theme.textTheme.titleLarge?.copyWith(color: Colors.black, fontWeight: FontWeight.w400),),
-                                              );
-                                            },
-                                            body: item.body,
-                                            isExpanded: item.isExpanded,
-                                          );
-                                        }).toList(),
-                                      )
-                                    ],
+                                        const SizedBox(height: 10.0,),
+                                        ValueListenableBuilder(
+                                          valueListenable: _bankPanelsNotifier,
+                                          builder: (BuildContext context, List<ExpansionPanelItem> value, Widget? child) {
+                                            return ExpansionPanelList(
+                                              elevation: 2.0,
+                                              expansionCallback: (int index, bool isExpanded) {
+                                                _bankPanelsNotifier.value = List<ExpansionPanelItem>.from(_bankPanelsNotifier.value)
+                                                  ..[index].isExpanded = isExpanded;
+                                              },
+                                              children: value.map<ExpansionPanel>((ExpansionPanelItem item) {
+                                                return ExpansionPanel(   
+                                                  backgroundColor: Colors.white,                                         
+                                                  headerBuilder: (BuildContext context, bool isExpanded) {
+                                                    return ListTile(
+                                                      shape: theme.inputDecorationTheme.border?.copyWith(borderSide: BorderSide.none),
+                                                      title: Text( item.bank.id.isEmpty ? 'New bank' : '${translations!.country}:${context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == item.bank.bankCountryId).name} intermediate: ${context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == item.bank.intermediaryBankCountryId).name} type:${item.bank.accountType}', style: theme.textTheme.bodySmall?.copyWith(color: Colors.black, fontWeight: FontWeight.w400),),
+                                                    );
+                                                  },
+                                                  body: _buildBankFormWidget(value.indexOf(item)),
+                                                  isExpanded: item.isExpanded,
+                                                );
+                                              }).toList(),
+                                            );
+                                          },
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 )
                               ],
@@ -361,9 +385,9 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
             validator: FormBuilderValidators.compose([
               FormBuilderValidators.required(),
             ]), 
-            items: socialMedias.map((socialMedia) => DropdownMenuItem(
-              value: socialMedia,
-              child: Text(socialMedia, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
+            items: context.read<CompanyBloc>().state.socialMedias.map((socialMedia) => DropdownMenuItem(
+              value: socialMedia.name,
+              child: Text(socialMedia.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
             )).toList(),
           ),
         ),
@@ -395,35 +419,48 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
   }
 
   Widget _buildBankFormWidget(int index){
+    final Bank bank = _bankPanelsNotifier.value[index].bank;
     final ThemeData theme = Theme.of(context);
     return Column(
       children: [
-        FormBuilderTextField(
-          name: 'bank_name',
+        const SizedBox(height: 3.0,),
+        FormBuilderDropdown(
+          initialValue: context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == bank.bankCountryId).name,
+          name: 'choose_country_first_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
-            labelText: 'Bank Name',
-            hintText: 'Bank Name',
+            labelText: 'Choose country',
+            hintText: 'Choose country',
           ),
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required(),
-          ]),
+          ]), 
+          items: context.read<CountryBloc>().state.countries.map((country) => DropdownMenuItem(
+            value: country.name,
+            child: Text(country.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
+          )).toList(),
         ),
         const SizedBox(height: 10.0,),
-        FormBuilderTextField(
-          name: 'bank_account_number',
+        FormBuilderDropdown(
+          initialValue: context.read<CompanyBloc>().state.banks.firstWhere((bank) => bank.id == bank.id).name,
+          name: 'choose_bank_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
-            labelText: 'Bank Account Number',
-            hintText: 'Bank Account Number',
+            labelText: 'Choose Bank',
+            hintText: 'Bank Bank',
           ),
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required(),
-          ]),
+          ]), 
+          items: context.read<CompanyBloc>().state.banks.map((country) => DropdownMenuItem(
+            value: country.name,
+            child: Text(country.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
+          )).toList(),
         ),
         const SizedBox(height: 10.0,),
-        FormBuilderTextField(
-          name: 'bank_account_name',
+        FormBuilderDropdown(
+          initialValue: bank.accountType.toLowerCase(),
+          name: 'bank_account_type_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
             labelText: 'Bank Account Name',
@@ -431,15 +468,20 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
           ),
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required(),
-          ]),
+          ]), 
+          items: accountTypes.map((accountType) => DropdownMenuItem(
+            value: (accountType as Map<String, String>)['name']!.toLowerCase(),
+            child: Text(accountType['name']!, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
+          )).toList(),
         ),
         const SizedBox(height: 10.0,),
         FormBuilderTextField(
-          name: 'bank_branch',
+          initialValue: bank.accountNumber,
+          name: 'account_number_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
-            labelText: 'Bank Branch',
-            hintText: 'Bank Branch',
+            labelText: 'Account Number',
+            hintText: 'Account Number',
           ),
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required(),
@@ -447,7 +489,34 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
         ),
         const SizedBox(height: 10.0,),
         FormBuilderTextField(
-          name: 'bank_swift_code',
+          initialValue: bank.address,
+          name: 'bank_address_$index',
+          style: theme.textTheme.labelLarge,
+          decoration: const InputDecoration(
+            labelText: 'Bank Address',
+            hintText: 'Bank Address',
+          ),
+          validator: FormBuilderValidators.compose([
+            FormBuilderValidators.required(),
+          ]),
+        ),
+        const SizedBox(height: 10.0,),
+        FormBuilderTextField(
+          initialValue: bank.phoneNumber,
+          name: 'bank_phone_number_$index',
+          style: theme.textTheme.labelLarge,
+          decoration: const InputDecoration(
+            labelText: 'Bank Phone Number',
+            hintText: 'Bank Phone Number',
+          ),
+          validator: FormBuilderValidators.compose([
+            FormBuilderValidators.required(),
+          ]),
+        ),
+        const SizedBox(height: 10.0,),
+        FormBuilderTextField(
+          initialValue: bank.swiftCode,
+          name: 'bank_swift_code_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
             labelText: 'Bank Swift Code',
@@ -456,6 +525,40 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required(),
           ]),
+        ),
+        const SizedBox(height: 10.0,),
+        FormBuilderDropdown(
+          initialValue: context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == bank.bankCountryId).name,
+          name: 'choose_country_second_$index',
+          style: theme.textTheme.labelLarge,
+          decoration: const InputDecoration(
+            labelText: 'Choose country',
+            hintText: 'Choose country',
+          ),
+          validator: FormBuilderValidators.compose([
+            FormBuilderValidators.required(),
+          ]), 
+          items: context.read<CountryBloc>().state.countries.map((country) => DropdownMenuItem(
+            value: country.name,
+            child: Text(country.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
+          )).toList(),
+        ),
+        const SizedBox(height: 10.0,),
+        FormBuilderDropdown(
+          initialValue: context.read<CompanyBloc>().state.banks.firstWhere((bank) => bank.id == bank.id).name,
+          name: 'intermediary_bank_$index',
+          style: theme.textTheme.labelLarge,
+          decoration: const InputDecoration(
+            labelText: 'Intermediary Bank',
+            hintText: 'Intermediary Bank',
+          ),
+          validator: FormBuilderValidators.compose([
+            FormBuilderValidators.required(),
+          ]), 
+          items: context.read<CompanyBloc>().state.banks.map((bank) => DropdownMenuItem(
+            value: bank.name,
+            child: Text(bank.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
+          )).toList(),
         ),
         IconButton(
           onPressed: () => _removeBankPanel(index),
@@ -486,6 +589,7 @@ class _Business extends StatelessWidget {
           children: [
             const SizedBox(height: 10.0,),
             FormBuilderDropdown(
+              initialValue: context.read<ProductsBloc>().state.categories.firstWhere((category) => category.id == context.read<CompanyBloc>().state.userCompany.mainCategoryId).name,
               name: 'main_category',
               style: theme.textTheme.labelLarge,
               decoration: InputDecoration(
@@ -495,7 +599,6 @@ class _Business extends StatelessWidget {
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
               ]), 
-              // initialValue: context.read<ProductsBloc>().state.categories.firstWhere((category) => category.id == state.userCompany.mainCategoryId).name,
               items: context.read<ProductsBloc>().state.categories.map((category) => DropdownMenuItem(
                 value: category.name,
                 child: Text(category.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
@@ -512,7 +615,7 @@ class _Business extends StatelessWidget {
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
               ]), 
-              initialValue:context.watch<CompanyBloc>().state.userCompany.qtyProductLandingPage,
+              initialValue:context.read<CompanyBloc>().state.userCompany.qtyProductLandingPage,
               items: qtyProductLandingPage.map((qty) => DropdownMenuItem(
                 value: qty,
                 child: Text('$qty', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
@@ -522,7 +625,7 @@ class _Business extends StatelessWidget {
             FormBuilderTextField(
               name: 'company_subdomain',
               style: theme.textTheme.labelLarge,
-              initialValue:context.watch<CompanyBloc>().state.userCompany.subdomain,
+              initialValue:context.read<CompanyBloc>().state.userCompany.subdomain,
               decoration: InputDecoration(
                 labelText: 'Subdomain',
                 hintText: 'Subdomain',
@@ -644,7 +747,6 @@ class _GeneralForm extends StatelessWidget {
                 FormBuilderDropdown(
                   focusNode: _focusNodeCountry,
                   name: 'company_country',
-                  // initialValue: state.userCompany.countryId != null ?  context.read<CountryBloc>().state.getCountryById(state.userCompany.countryId!).id : '',
                   initialValue: _getCountry(state, context),
                   style: theme.textTheme.labelLarge,
                   decoration: const InputDecoration(
@@ -667,9 +769,7 @@ class _GeneralForm extends StatelessWidget {
                 const SizedBox(height: 10.0,),
                 FormBuilderTextField(
                   readOnly: true,
-                  // initialValue: state.userCompany.countryId != null ? '+${context.read<CountryBloc>().state.getCountryById(state.userCompany.countryId!).phoneCode.toString()}' : '',
                   controller: _codeController,
-                  // initialValue: _codeController.text,
                   focusNode: _focusNodeCountryCode,
                   onEditingComplete: () => _focusNodeBusinessLine.requestFocus(),
                   textInputAction: TextInputAction.next,
@@ -756,11 +856,8 @@ class _GeneralForm extends StatelessWidget {
     );
   }
     String _getCountry(CompanyState state , BuildContext context) {
-      if(state.userCompany.countryId != null ){
-        _codeController.text = '+${context.read<CountryBloc>().state.getCountryById(state.userCompany.countryId!).numCode}';
-        return context.read<CountryBloc>().state.getCountryById(state.userCompany.countryId!).id;
-      }
-      return '';
+      _codeController.text = '+${context.read<CountryBloc>().state.getCountryById(state.userCompany.countryId!).numCode}';
+      return context.read<CountryBloc>().state.getCountryById(state.userCompany.countryId!).id;
     }
     
 
