@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:webview_flutter/webview_flutter.dart';
-
 import '../../../../../pages.dart';
 
 class WebEditor extends StatefulWidget {
@@ -20,17 +19,11 @@ class _WebEditorState extends State<WebEditor> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
-          onProgress: (int progress) {
-            
-          },
+          onProgress: (int progress) {},
           onPageStarted: (String url) {
-            setJsItem();
-
+            // setJsItem();
           },
-          onPageFinished: (String url) {
-            // getJsItem();
-            
-          },
+          onPageFinished: (String url) {},
           onHttpError: (HttpResponseError error) {},
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
@@ -41,8 +34,7 @@ class _WebEditorState extends State<WebEditor> {
           },
         ),
       )
-      // ..loadRequest(Uri.parse('https://mycompany.ourshop.shop/pages/design')
-      ..loadRequest(Uri.parse('https://mycompany.ourshop.shop/design-flutter')
+      ..loadRequest(Uri.parse('https://mycompany.ourshop.shop/design-flutter?token=${locator<Preferences>().preferences['token']}')
       );
   }
 
@@ -51,9 +43,9 @@ class _WebEditorState extends State<WebEditor> {
     user['token'] = locator<Preferences>().preferences['token'];
     final userjson = jsonEncode(user);
     controller.runJavaScript('''
-      sessionStorage.setItem('decodedToken', '$userjson');
-      sessionStorage.setItem('tokenUser', '{"success":true,"message":"Login successful","data":{"token":"${locator<Preferences>().preferences['token']}","refreshToken":"${locator<Preferences>().preferences['refreshToken']}"}}');
-      console.log('Session storage set!');
+        sessionStorage.setItem('decodedToken', '$userjson');
+        sessionStorage.setItem('tokenUser', '{"success":true,"message":"Login successful","data":{"token":"${locator<Preferences>().preferences['token']}","refreshToken":"${locator<Preferences>().preferences['refreshToken']}"}}');
+        console.log('Session storage set!');
     ''');
   }
 
@@ -63,14 +55,6 @@ class _WebEditorState extends State<WebEditor> {
       const tokenUser = sessionStorage.getItem('tokenUser');
       console.log('Decoded Token:', decodedToken);
       console.log('Token User:', tokenUser);
-    ''');
-  }
-
-  void hideElements() {
-    controller.runJavaScript('''
-      // Ocultar elementos usando selectores CSS
-      document.querySelector('.floating-menu-button ng-star-inserted').style.display = 'none';
-      console.log('Elements hidden!');
     ''');
   }
 

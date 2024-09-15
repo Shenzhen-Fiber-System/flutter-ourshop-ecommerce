@@ -69,7 +69,7 @@ class Cart extends StatelessWidget {
                           return DeleteProductDialog(productName: state.cartProducts[index].name).showAlertDialog(context, translations, theme)
                           .then((value){
                               if (value != null && value) {
-                                context.read<ProductsBloc>().removeCartProduct(state.cartProducts[index]);
+                                // context.read<ProductsBloc>().removeCartProduct(state.cartProducts[index]);
                                 return Future.value(value);
                               }
                               return Future.value(false);
@@ -77,7 +77,7 @@ class Cart extends StatelessWidget {
                           );
                         },
                         onDismissed: (direction) {
-                          context.read<ProductsBloc>().removeCartProduct(state.cartProducts[index]);
+                          // context.read<ProductsBloc>().removeCartProduct(state.cartProducts[index]);
                         },
                         child: CartCard(
                           showCheckBox: true,

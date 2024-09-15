@@ -3,12 +3,12 @@ import '../../pages/pages.dart';
 class CustomFloatingActionButton extends StatelessWidget {
   const CustomFloatingActionButton({
     super.key, 
-    required this.onClick, 
+    this.onClick, 
     required this.child,
     this.type = FloatingActionButtonType.UNKNOWN
   });
 
-  final void Function() onClick;
+  final void Function()? onClick;
   final Widget child;
   final FloatingActionButtonType type;
 

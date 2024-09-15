@@ -533,7 +533,7 @@ class _AccountSecction extends StatelessWidget {
             )
           ];
         } 
-        return context.read<UsersBloc>().state.cards.map((card){
+        return context.watch<UsersBloc>().state.cards.map((card){
           return Column(
             children: [
               RadioListTile(
@@ -542,7 +542,7 @@ class _AccountSecction extends StatelessWidget {
                 onChanged: (value) => context.read<UsersBloc>().addSelectedCard(context.read<UsersBloc>().state.cards.firstWhere((element) => element.id == value)),
                 title: Align(
                   alignment: Alignment.centerRight,
-                    child: Text( Helpers.maskCardNumber(card.cardNumber), style: const TextStyle(color: Colors.black, fontSize: 12.0)
+                    child: Text( card.cardNumber, style: const TextStyle(color: Colors.black, fontSize: 12.0)
                   )
                 ),
                 subtitle: Align(

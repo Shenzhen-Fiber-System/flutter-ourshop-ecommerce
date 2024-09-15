@@ -176,6 +176,12 @@
     "description":"Description",
     "number":"Number",
     "my_web_Site": "My web site",
-    "admin_page": "Admin page"
+    "admin_page": "Admin page",
+    "error": "Error",
+    "error_laoding_image": "Error loading image",
+    "min": "Min {number}",
+    "company_information": "Company information updated",
+    "company_information_error": "Error trying to updated company information"
+
 
 }

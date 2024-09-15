@@ -110,140 +110,216 @@ class FilteredData<T> extends Equatable {
 
 // prodocts
 
-class FilteredProducts extends Equatable {
-  final String id;
-  final String name;
-  final String keyValue;
-  final String productGroupId;
-  final String companyId;
-  final String subCategoryId;
-  final String categoryId;
-  final String categoryName;
-  final String modelNumber;
-  final String productTypeId;
-  final String brandName;
-  final String unitMeasurementId;
-  final dynamic fboPriceStart;  // Estos pueden ser null
-  final dynamic fboPriceEnd;    // Estos pueden ser null
-  final dynamic moqUnit;        // Estos pueden ser null
-  final double stock;
-  final double? packageLength;
-  final double? packageWidth;
-  final double? packageHeight;
-  final double? packageWeight;
-  final double? unitPrice;      // Marcado como nullable
-  final List<Detail> specifications;
-  final List<Detail> details;
-  final List<dynamic> certifications;
-  final String productStatus;
-  final List<FilteredProductMedia> productPhotos;
-  final List<FilteredProductMedia> productVideos;
-  final String? mainPhotoUrl;   // Marcado como nullable
-  final String? mainVideoUrl;   // Marcado como nullable
-  final ProductReviewInfo productReviewInfo;
-  final List<dynamic> priceRanges;
+class FilteredProduct extends Equatable {
+    final String id;
+    final String name;
+    final String keyValue;
+    final String? productGroupId;
+    final String? companyId;
+    final String? subCategoryId;
+    final String? categoryId;
+    final String? categoryName;
+    final String modelNumber;
+    final String? productTypeId;
+    final String brandName;
+    final String? unitMeasurementId;
+    final double? fboPriceStart;
+    final double? fboPriceEnd;
+    final double? moqUnit;
+    final double? stock;
+    final double? packageLength;
+    final double? packageWidth;
+    final double? packageHeight;
+    final double? packageWeight;
+    final double? unitPrice;
+    final List<Certification> specifications;
+    final List<Certification> details;
+    final List<Certification> certifications;
+    final String? productStatus;
+    final List<FilteredProductMedia> productPhotos;
+    final List<FilteredProductMedia> productVideos;
+    final String? mainPhotoUrl;
+    final String? mainVideoUrl;
+    final ProductReviewInfo? productReviewInfo;
+    final List<PriceRange> priceRanges;
+    final bool selected;
+    final int quantity;
 
-  const FilteredProducts({
-    required this.id,
-    required this.name,
-    required this.keyValue,
-    required this.productGroupId,
-    required this.companyId,
-    required this.subCategoryId,
-    required this.categoryId,
-    required this.categoryName,
-    required this.modelNumber,
-    required this.productTypeId,
-    required this.brandName,
-    required this.unitMeasurementId,
-    this.fboPriceStart,
-    this.fboPriceEnd,
-    this.moqUnit,
-    required this.stock,
-    required this.packageLength,
-    required this.packageWidth,
-    required this.packageHeight,
-    required this.packageWeight,
-    this.unitPrice,  // Ahora es nullable
-    required this.specifications,
-    required this.details,
-    required this.certifications,
-    required this.productStatus,
-    required this.productPhotos,
-    required this.productVideos,
-    this.mainPhotoUrl,  // Ahora es nullable
-    this.mainVideoUrl,  // Ahora es nullable
-    required this.productReviewInfo,
-    required this.priceRanges,
-  });
+    const FilteredProduct({
+        required this.id,
+        required this.name,
+        required this.keyValue,
+        required this.productGroupId,
+        required this.companyId,
+        required this.subCategoryId,
+        required this.categoryId,
+        required this.categoryName,
+        required this.modelNumber,
+        required this.productTypeId,
+        required this.brandName,
+        required this.unitMeasurementId,
+        required this.fboPriceStart,
+        required this.fboPriceEnd,
+        required this.moqUnit,
+        required this.stock,
+        required this.packageLength,
+        required this.packageWidth,
+        required this.packageHeight,
+        required this.packageWeight,
+        required this.unitPrice,
+        required this.specifications,
+        required this.details,
+        required this.certifications,
+        required this.productStatus,
+        required this.productPhotos,
+        required this.productVideos,
+        required this.mainPhotoUrl,
+        required this.mainVideoUrl,
+        required this.productReviewInfo,
+        required this.priceRanges,
+        this.selected = false,
+        this.quantity = 0,
+    });
 
-  factory FilteredProducts.fromJson(Map<String, dynamic> json) => FilteredProducts(
-    id: json["id"],
-    name: json["name"],
-    keyValue: json["keyValue"] ?? '',
-    productGroupId: json["productGroupId"],
-    companyId: json["companyId"],
-    subCategoryId: json["subCategoryId"],
-    categoryId: json["categoryId"],
-    categoryName: json["categoryName"],
-    modelNumber: json["modelNumber"],
-    productTypeId: json["productTypeId"],
-    brandName: json["brandName"],
-    unitMeasurementId: json["unitMeasurementId"],
-    fboPriceStart: json["fboPriceStart"],
-    fboPriceEnd: json["fboPriceEnd"],
-    moqUnit: json["moqUnit"],
-    stock: (json["stock"] as num).toDouble(),
-    packageLength: ((json["packageLength"] as num).toDouble()),
-    packageWidth: (json["packageWidth"] as num).toDouble(),
-    packageHeight: (json["packageHeight"] as num).toDouble(),
-    packageWeight: (json["packageWeight"] as num).toDouble(),
-    unitPrice: json["unitPrice"] != null ? (json["unitPrice"] as num).toDouble() : null,
-    specifications: List<Detail>.from(json["specifications"].map((x) => Detail.fromJson(x))),
-    details: List<Detail>.from(json["details"].map((x) => Detail.fromJson(x))),
-    certifications: List<dynamic>.from(json["certifications"].map((x) => x)),
-    productStatus: json["productStatus"],
-    productPhotos: List<FilteredProductMedia>.from(json["productPhotos"].map((x) => FilteredProductMedia.fromJson(x))),
-    productVideos: List<FilteredProductMedia>.from(json["productVideos"].map((x) => FilteredProductMedia.fromJson(x))),
-    mainPhotoUrl: json["mainPhotoUrl"],  // Nullable
-    mainVideoUrl: json["mainVideoUrl"],  // Nullable
-    productReviewInfo: ProductReviewInfo.fromJson(json["productReviewInfo"]),
-    priceRanges: List<dynamic>.from(json["priceRanges"].map((x) => x)),
-  );
+    FilteredProduct copyWith({
+        String? id,
+        String? name,
+        String? keyValue,
+        String? productGroupId,
+        String? companyId,
+        String? subCategoryId,
+        String? categoryId,
+        String? categoryName,
+        String? modelNumber,
+        String? productTypeId,
+        String? brandName,
+        String? unitMeasurementId,
+        double? fboPriceStart,
+        double? fboPriceEnd,
+        double? moqUnit,
+        double? stock,
+        double? packageLength,
+        double? packageWidth,
+        double? packageHeight,
+        double? packageWeight,
+        double? unitPrice,
+        List<Certification>? specifications,
+        List<Certification>? details,
+        List<Certification>? certifications,
+        String? productStatus,
+        List<FilteredProductMedia>? productPhotos,
+        List<FilteredProductMedia>? productVideos,
+        String? mainPhotoUrl,
+        String? mainVideoUrl,
+        ProductReviewInfo? productReviewInfo,
+        List<PriceRange>? priceRanges,
+        bool? selected,
+        int? quantity,
+        List<Review>? reviews,
+    }) => 
+        FilteredProduct(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            keyValue: keyValue ?? this.keyValue,
+            productGroupId: productGroupId ?? this.productGroupId,
+            companyId: companyId ?? this.companyId,
+            subCategoryId: subCategoryId ?? this.subCategoryId,
+            categoryId: categoryId ?? this.categoryId,
+            categoryName: categoryName ?? this.categoryName,
+            modelNumber: modelNumber ?? this.modelNumber,
+            productTypeId: productTypeId ?? this.productTypeId,
+            brandName: brandName ?? this.brandName,
+            unitMeasurementId: unitMeasurementId ?? this.unitMeasurementId,
+            fboPriceStart: fboPriceStart ?? this.fboPriceStart,
+            fboPriceEnd: fboPriceEnd ?? this.fboPriceEnd,
+            moqUnit: moqUnit ?? this.moqUnit,
+            stock: stock ?? this.stock,
+            packageLength: packageLength ?? this.packageLength,
+            packageWidth: packageWidth ?? this.packageWidth,
+            packageHeight: packageHeight ?? this.packageHeight,
+            packageWeight: packageWeight ?? this.packageWeight,
+            unitPrice: unitPrice ?? this.unitPrice,
+            specifications: specifications ?? this.specifications,
+            details: details ?? this.details,
+            certifications: certifications ?? this.certifications,
+            productStatus: productStatus ?? this.productStatus,
+            productPhotos: productPhotos ?? this.productPhotos,
+            productVideos: productVideos ?? this.productVideos,
+            mainPhotoUrl: mainPhotoUrl ?? this.mainPhotoUrl,
+            mainVideoUrl: mainVideoUrl ?? this.mainVideoUrl,
+            productReviewInfo: productReviewInfo ?? this.productReviewInfo,
+            priceRanges: priceRanges ?? this.priceRanges,
+            selected: selected ?? this.selected,
+            quantity: quantity ?? this.quantity,
+        );
 
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "keyValue": keyValue,
-    "productGroupId": productGroupId,
-    "companyId": companyId,
-    "subCategoryId": subCategoryId,
-    "categoryId": categoryId,
-    "categoryName": categoryName,
-    "modelNumber": modelNumber,
-    "productTypeId": productTypeId,
-    "brandName": brandName,
-    "unitMeasurementId": unitMeasurementId,
-    "fboPriceStart": fboPriceStart,
-    "fboPriceEnd": fboPriceEnd,
-    "moqUnit": moqUnit,
-    "stock": stock,
-    "packageLength": packageLength,
-    "packageWidth": packageWidth,
-    "packageHeight": packageHeight,
-    "packageWeight": packageWeight,
-    "unitPrice": unitPrice,
-    "specifications": List<dynamic>.from(specifications.map((x) => x.toJson())),
-    "details": List<dynamic>.from(details.map((x) => x.toJson())),
-    "certifications": List<dynamic>.from(certifications.map((x) => x)),
-    "productStatus": productStatus,
-    "productPhotos": List<dynamic>.from(productPhotos.map((x) => x.toJson())),
-    "productVideos": List<dynamic>.from(productVideos.map((x) => x.toJson())),
-    "mainPhotoUrl": mainPhotoUrl,
-    "mainVideoUrl": mainVideoUrl,
-    "productReviewInfo": productReviewInfo.toJson(),
-    "priceRanges": List<dynamic>.from(priceRanges.map((x) => x)),
-  };
+    factory FilteredProduct.fromJson(Map<String, dynamic> json) => FilteredProduct(
+        id: json["id"],
+        name: json["name"],
+        keyValue: json["keyValue"],
+        productGroupId: json["productGroupId"],
+        companyId: json["companyId"],
+        subCategoryId: json["subCategoryId"],
+        categoryId: json["categoryId"],
+        categoryName: json["categoryName"],
+        modelNumber: json["modelNumber"],
+        productTypeId: json["productTypeId"],
+        brandName: json["brandName"],
+        unitMeasurementId: json["unitMeasurementId"],
+        fboPriceStart: json["fboPriceStart"]?.toDouble(),
+        fboPriceEnd: json["fboPriceEnd"]?.toDouble(),
+        moqUnit: json["moqUnit"],
+        stock: json["stock"],
+        packageLength: json["packageLength"]?.toDouble(),
+        packageWidth: json["packageWidth"]?.toDouble(),
+        packageHeight: json["packageHeight"]?.toDouble(),
+        packageWeight: json["packageWeight"]?.toDouble(),
+        unitPrice: json["unitPrice"]?.toDouble(),
+        specifications: List<Certification>.from(json["specifications"].map((x) => Certification.fromJson(x))),
+        details: List<Certification>.from(json["details"].map((x) => Certification.fromJson(x))),
+        certifications: List<Certification>.from(json["certifications"].map((x) => Certification.fromJson(x))),
+        productStatus: json["productStatus"],
+        productPhotos: List<FilteredProductMedia>.from(json["productPhotos"].map((x) => FilteredProductMedia.fromJson(x))),
+        productVideos: List<FilteredProductMedia>.from(json["productVideos"].map((x) => FilteredProductMedia.fromJson(x))),
+        mainPhotoUrl: json["mainPhotoUrl"],
+        mainVideoUrl: json["mainVideoUrl"],
+        productReviewInfo: json["productReviewInfo"] == null ? null : ProductReviewInfo.fromJson(json["productReviewInfo"]),
+        priceRanges: List<PriceRange>.from(json["priceRanges"].map((x) => PriceRange.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "keyValue": keyValue,
+        "productGroupId": productGroupId,
+        "companyId": companyId,
+        "subCategoryId": subCategoryId,
+        "categoryId": categoryId,
+        "categoryName": categoryName,
+        "modelNumber": modelNumber,
+        "productTypeId": productTypeId,
+        "brandName": brandName,
+        "unitMeasurementId": unitMeasurementId,
+        "fboPriceStart": fboPriceStart,
+        "fboPriceEnd": fboPriceEnd,
+        "moqUnit": moqUnit,
+        "stock": stock,
+        "packageLength": packageLength,
+        "packageWidth": packageWidth,
+        "packageHeight": packageHeight,
+        "packageWeight": packageWeight,
+        "unitPrice": unitPrice,
+        "specifications": List<dynamic>.from(specifications.map((x) => x.toJson())),
+        "details": List<dynamic>.from(details.map((x) => x.toJson())),
+        "certifications": List<dynamic>.from(certifications.map((x) => x.toJson())),
+        "productStatus": productStatus,
+        "productPhotos": List<dynamic>.from(productPhotos.map((x) => x.toJson())),
+        "productVideos": List<dynamic>.from(productVideos.map((x) => x.toJson())),
+        "mainPhotoUrl": mainPhotoUrl,
+        "mainVideoUrl": mainVideoUrl,
+        "productReviewInfo": productReviewInfo?.toJson(),
+        "priceRanges": List<dynamic>.from(priceRanges.map((x) => x.toJson())),
+    };
 
   @override
   List<Object?> get props => [
@@ -278,7 +354,51 @@ class FilteredProducts extends Equatable {
     mainVideoUrl,
     productReviewInfo,
     priceRanges,
+    selected,
+    quantity,
   ];
+}
+
+
+class PriceRange {
+    final String id;
+    final int quantityFrom;
+    final int quantityTo;
+    final double price;
+
+    PriceRange({
+        required this.id,
+        required this.quantityFrom,
+        required this.quantityTo,
+        required this.price,
+    });
+
+    PriceRange copyWith({
+        String? id,
+        int? quantityFrom,
+        int? quantityTo,
+        double? price,
+    }) => 
+        PriceRange(
+            id: id ?? this.id,
+            quantityFrom: quantityFrom ?? this.quantityFrom,
+            quantityTo: quantityTo ?? this.quantityTo,
+            price: price ?? this.price,
+        );
+
+    factory PriceRange.fromJson(Map<String, dynamic> json) => PriceRange(
+        id: json["id"],
+        quantityFrom: json["quantityFrom"],
+        quantityTo: json["quantityTo"],
+        price: json["price"]?.toDouble(),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "quantityFrom": quantityFrom,
+        "quantityTo": quantityTo,
+        "price": price,
+    };
 }
 
 
@@ -375,14 +495,14 @@ class FilteredProductVideoPhoto {
     final String name;
     final String url;
     final int importanceOrder;
-    final dynamic companyName;
+    final String? companyName;
 
     FilteredProductVideoPhoto({
         required this.id,
         required this.name,
         required this.url,
         required this.importanceOrder,
-        required this.companyName,
+        this.companyName,
     });
 
     FilteredProductVideoPhoto copyWith({
@@ -390,7 +510,7 @@ class FilteredProductVideoPhoto {
         String? name,
         String? url,
         int? importanceOrder,
-        dynamic companyName,
+        String? companyName,
     }) => 
         FilteredProductVideoPhoto(
             id: id ?? this.id,
@@ -533,4 +653,47 @@ class FilteredOrders extends Equatable {
         total,
         createdAt,
       ];
+}
+
+// My company - Banks 
+class FilteredBanks extends Equatable {
+    final String id;
+    final String name;
+    final String countryId;
+
+    const FilteredBanks({
+        required this.id,
+        required this.name,
+        required this.countryId,
+    });
+
+    FilteredBanks copyWith({
+        String? id,
+        String? name,
+        String? countryId,
+    }) => 
+      FilteredBanks(
+          id: id ?? this.id,
+          name: name ?? this.name,
+          countryId: countryId ?? this.countryId,
+      );
+
+    factory FilteredBanks.fromJson(Map<String, dynamic> json) => FilteredBanks(
+        id: json["id"],
+        name: json["name"],
+        countryId: json["countryId"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "countryId": countryId,
+    };
+    
+    @override
+    List<Object?> get props => [
+        id,
+        name,
+        countryId,
+    ];
 }

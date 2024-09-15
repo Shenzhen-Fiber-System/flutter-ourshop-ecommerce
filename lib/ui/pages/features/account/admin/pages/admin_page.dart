@@ -1,40 +1,43 @@
-import 'dart:developer';
-
 import '../../../../pages.dart';
 import 'my_company/my_company.dart';
-
-  final AppLocalizations? translations = AppLocalizations.of(AppRoutes.globalContext!);
-
  
   class AdminOption {
     final String title;
-    final Function onClick;
+    final List<String> subCategories;
+    final bool isExpanded;
     
 
     AdminOption({
       required this.title,
-      required this.onClick,
+      this.subCategories = const [],
+      this.isExpanded = false,
     });
 
     static List<AdminOption> options = [
       AdminOption(
-        title: translations!.my_company,
-        onClick: () => AppRoutes.globalContext!.push('/admin/option/my-company', extra: AdminOptions.MY_COMPANY),
+        title: locator<AppLocalizations>().my_company, 
+        subCategories: [
+          'Perfil de compañia',
+          'Web Editor'
+        ],
       ),
       AdminOption(
-        // option: AdminOptions.ORDERS,
-        title: translations!.orders,
-        onClick: () => AppRoutes.globalContext!.push('/admin/option/orders', extra: AdminOptions.ORDERS),
+        title: locator<AppLocalizations>().orders,
+        subCategories: [
+          'Lista de ordenes',
+        ]
       ),
       AdminOption(
-        // option: AdminOptions.PRODUCTS,
-        title: translations!.products,
-        onClick: () => AppRoutes.globalContext!.push('/admin/option/products', extra: AdminOptions.PRODUCTS),
+        title: locator<AppLocalizations>().products,
+        subCategories: [
+          'Incluir productos',
+          'Grupo de paises',
+          'Tarifas de envio',
+          'Ofertas'
+        ]
       ),
       AdminOption(
-        // option: AdminOptions.COMMUNICATION,
-        title: translations!.comunication,
-        onClick: () => print('Communication'),
+        title: locator<AppLocalizations>().comunication,
       ),
     ];
   }
@@ -59,12 +62,18 @@ extension AdminOptionExtension on AdminOptions {
 
 
 class AdminPage extends StatelessWidget {
-  const AdminPage({super.key});
+  AdminPage({super.key});
+
+
+  final ValueNotifier<List<bool>> expanded = ValueNotifier<List<bool>>(
+    List<bool>.generate(AdminOption.options.length, (index) => false),
+  );
 
   @override
   Widget build(BuildContext context) {
     final Size  size = MediaQuery.of(context).size;
     final ThemeData theme = Theme.of(context);
+    final AppLocalizations? translations = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppTheme.palette[1000],
       appBar: AppBar(
@@ -79,25 +88,61 @@ class AdminPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 15.0),
         height: size.height,
         width: size.width,
-        child: ListView.builder(
-          itemCount: AdminOption.options.length,
-          itemBuilder: (context, index) {
-            final AdminOption option = AdminOption.options[index];
-            return Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: ListTile(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: AppTheme.palette[550]!,
-                    width: 1
-                  )
-                ),
-                title: Text(option.title, style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),),
-                onTap: () => option.onClick(),
-              ),
-            );
-          },
+        child: SingleChildScrollView(
+          child: ValueListenableBuilder(
+            valueListenable: expanded,
+            builder: (BuildContext context, List<bool> value, Widget? child) {
+              return ExpansionPanelList(
+                animationDuration: const Duration(milliseconds: 500),
+                expandIconColor: Colors.white,
+                dividerColor: AppTheme.palette[550],
+                elevation: 1,
+                expandedHeaderPadding: EdgeInsets.zero,
+                expansionCallback: (int index, bool isExpanded) {
+                  expanded.value = List<bool>.from(expanded.value)
+                    ..[index] = isExpanded;
+                },
+                children: AdminOption.options.map((AdminOption option) {
+                  return ExpansionPanel(
+                    backgroundColor: AppTheme.palette[950],
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return ListTile(
+                        shape: theme.inputDecorationTheme.border?.copyWith(borderSide: BorderSide.none),
+                        title: Text(option.title, style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w400),),
+                      );
+                    },
+                    body: Column(
+                      children: option.subCategories.map((subCategory) {
+                        return ListTile(
+                          shape: theme.inputDecorationTheme.border?.copyWith(borderSide: BorderSide.none),
+                          title: Text(subCategory, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white)),
+                          onTap: () {
+                            switch (subCategory) {
+                              case 'Perfil de compañia':
+                                context.push('/admin/option/my-company', extra: AdminOptions.MY_COMPANY);
+                                break;
+                              case 'Web Editor':
+                                context.push('/admin/option/my-company/WebEditor');
+                                break;
+                              case 'Lista de ordenes':
+                                context.push('/admin/option/orders', extra: AdminOptions.ORDERS);
+                                break;
+                              case 'Incluir productos':
+                                context.push('/admin/option/products', extra: AdminOptions.PRODUCTS);
+                                break;
+                              default:
+                                break;
+                            }
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    isExpanded: value[AdminOption.options.indexOf(option)],
+                  );
+                }).toList(),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -113,6 +158,7 @@ class AdminOptionPage extends StatelessWidget {
   final GlobalKey<FormBuilderState> _generalFormKey = GlobalKey<FormBuilderState>();
   final GlobalKey<FormBuilderState> _businessFormKey = GlobalKey<FormBuilderState>();
   final GlobalKey<FormBuilderState> _socialMediaFormKey = GlobalKey<FormBuilderState>();
+  final GlobalKey<FormBuilderState> _bankFormKey = GlobalKey<FormBuilderState>();
 
 
   String _getTitle(AdminOptions option, BuildContext context) {
@@ -136,6 +182,7 @@ class AdminOptionPage extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title:  Text(
           _getTitle(option, context), 
@@ -147,11 +194,6 @@ class AdminOptionPage extends StatelessWidget {
               icon: const Icon(Icons.add),
               onPressed: () => context.push('/admin/option/products/new', extra: AdminOptions.PRODUCTS),
             )
-          else if (option == AdminOptions.MY_COMPANY)
-            ElevatedButton(
-            onPressed: () => context.push('/admin/option/my-company/WebEditor'),
-            child:  Text(translations!.my_web_Site, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white),)
-          )
         ],
       ),
       body: Builder(
@@ -163,6 +205,7 @@ class AdminOptionPage extends StatelessWidget {
                 generalFormKey: _generalFormKey,
                 businessFormKey: _businessFormKey,
                 socialMediaFormKey: _socialMediaFormKey,
+                bankFormKey: _bankFormKey,
               );
             case AdminOptions.ORDERS:
               return const AdminOrders();
@@ -184,40 +227,64 @@ class AdminOptionPage extends StatelessWidget {
       ? BlocBuilder<CompanyBloc, CompanyState>(
           builder: (context, state) {
             return CustomFloatingActionButton(
-              onClick: (){
-                switch (state.selectedMyCompanyFormIndex) {
-                  case 0:
-                    if (_companyNameFormKey.currentState!.saveAndValidate() && _generalFormKey.currentState!.saveAndValidate()) {
-                      final Map<String, dynamic> company = _companyNameFormKey.currentState!.value;
-                      final Map<String, dynamic> general = _generalFormKey.currentState!.value;
-                      final Map<String, dynamic> data = {...company, ...general};
-                      log('general: $data');
-                      
+              onClick: state.status == CompanyStateStatus.updating ? null : (){
+
+                if(_companyNameFormKey.currentState!.saveAndValidate() 
+                    && _generalFormKey.currentState!.saveAndValidate() 
+                    && _businessFormKey.currentState!.saveAndValidate()
+                    && _socialMediaFormKey.currentState!.saveAndValidate() 
+                    && _bankFormKey.currentState!.saveAndValidate()
+                  ) {
+                  final Map<String, dynamic> company = _companyNameFormKey.currentState!.value;
+                  final Map<String, dynamic> general = _generalFormKey.currentState!.value;
+                  final Map<String, dynamic> business = _businessFormKey.currentState!.value;
+                  final Map<String, dynamic> socialMedia = _socialMediaFormKey.currentState!.value;
+                  final Map<String, dynamic> banksData = _bankFormKey.currentState!.value;
+              
+                  final List<Map<String, dynamic>> cleanedBanks = [];
+
+                  // Limpiar claves dinámicas de los bancos
+                  banksData.forEach((key, value) {
+                    final bankIndex = key.split('_').last;
+                    if (cleanedBanks.length <= int.parse(bankIndex)) {
+                      cleanedBanks.add({});
                     }
-                    break;
-                  case 1:
-                    if (_companyNameFormKey.currentState!.saveAndValidate() && _businessFormKey.currentState!.saveAndValidate()) {
-                      final Map<String, dynamic> company = _companyNameFormKey.currentState!.value;
-                      final Map<String, dynamic> business = _businessFormKey.currentState!.value;
-                      final Map<String, dynamic> data = {...company, ...business};
-                      log('business: $data');
-                    }
-                    break;
-                  case 2:
-                    if (_companyNameFormKey.currentState!.saveAndValidate() && _socialMediaFormKey.currentState!.saveAndValidate()) {
-                      final Map<String, dynamic> company = _companyNameFormKey.currentState!.value;
-                      final Map<String, dynamic> socialMedia = _businessFormKey.currentState!.value;
-                      final Map<String, dynamic> data = {...company, ...socialMedia};
-                      log('social media: $data');
-                    }
-                    break;
+                    final cleanedKey = key.replaceAll(RegExp(r'_\d+$'), '');
+                    cleanedBanks[int.parse(bankIndex)][cleanedKey] = value;
+                  });
+
+                  // Crear el objeto final
+                  final Map<String, dynamic> data = {
+                    ...company, 
+                    ...general, 
+                    ...business, 
+                    "socialMedias": socialMedia.isNotEmpty ? [socialMedia] : [],
+                    "banks": cleanedBanks
+                  };
+
+                  context.read<CompanyBloc>().add(UpdateCompanyInformationEvent(
+                      companyId: context.read<UsersBloc>().state.loggedUser.companyId, 
+                      uppdatedInfo: data,
+                    ),
+                  );
+
                 }
               }, 
-              child: const Icon(Icons.save, color: Colors.white,),
+              child:state.status == CompanyStateStatus.updating ? const CircularProgressIndicator.adaptive() : const Icon(Icons.save, color: Colors.white,),
             );
           },
         )
       : null
     );
+  }
+  Map<String, dynamic> cleanKeys(Map<String, dynamic> data) {
+    final Map<String, dynamic> cleanedMap = {};
+
+    data.forEach((key, value) {
+      final cleanedKey = key.replaceAll(RegExp(r'_\d+$'), ''); // Remueve "_$index"
+      cleanedMap[cleanedKey] = value;
+    });
+
+    return cleanedMap;
   }
 }

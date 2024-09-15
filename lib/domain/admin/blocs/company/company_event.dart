@@ -60,3 +60,29 @@ class AddSelctedLogoPathEvent extends CompanyEvent {
   @override
   List<Object> get props => [path];
 }
+
+class AddBankEvent extends CompanyEvent {
+  
+  const AddBankEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+class CompanyByIdEvent extends CompanyEvent {
+  final String companyId;
+  final String countryId;
+  const CompanyByIdEvent({required this.companyId, required this.countryId});
+
+  @override
+  List<Object> get props => [companyId, countryId];
+}
+
+class UpdateCompanyInformationEvent extends CompanyEvent {
+  final String companyId;
+  final Map<String, dynamic> uppdatedInfo;
+  const UpdateCompanyInformationEvent({required this.companyId, required this.uppdatedInfo});
+
+  @override
+  List<Object> get props => [companyId, uppdatedInfo];
+}

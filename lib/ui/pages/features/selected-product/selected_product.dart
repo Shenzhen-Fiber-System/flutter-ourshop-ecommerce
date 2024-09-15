@@ -3,7 +3,7 @@ import '../../pages.dart';
 class SelectedProductPage extends StatelessWidget {
   const SelectedProductPage({super.key, required this.product});
 
-  final Product product;
+  final FilteredProduct product;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,12 @@ class SelectedProductPage extends StatelessWidget {
           body: SingleChildScrollView(
             child: Column(
               children: [
-                _Image(size: size, product: product, theme: theme, translations: translations,),
+                _Image(
+                  size: size, 
+                  product: product, 
+                  theme: theme, 
+                  translations: translations,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -67,7 +72,8 @@ class SelectedProductPage extends StatelessWidget {
                           );
                         },
                       ),
-                      onPressed: () => context.read<ProductsBloc>().addFavoriteProduct(product),
+                      // onPressed: () => context.read<ProductsBloc>().addFavoriteProduct(product),
+                      onPressed: () {},
                     ),
                   ],
                 ),
@@ -157,7 +163,7 @@ class SelectedProductPage extends StatelessWidget {
                   SizedBox(
                     width: size.width * 0.4,
                     child: OutlinedButton(
-                      onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
+                      onPressed: () => context.read<ProductsBloc>().add(AddCartProductEvent(product)),
                       child: Row(
                         children: [
                           Icon(Icons.shopping_bag_outlined, color: AppTheme.palette[1000], size: 14,),
@@ -185,8 +191,8 @@ class SelectedProductPage extends StatelessWidget {
   }
 }
 
-class _Image extends StatefulWidget {
-  const _Image({
+class _Image extends StatelessWidget {
+  _Image({
     required this.size,
     required this.product, 
     required this.theme, 
@@ -194,112 +200,84 @@ class _Image extends StatefulWidget {
   });
 
   final Size size;
-  final Product product;
+  final FilteredProduct product;
   final ThemeData theme;
   final AppLocalizations translations;
 
-  @override
-  State<_Image> createState() => _ImageState();
-}
-
-class _ImageState extends State<_Image> {
-
-  late PageController _pageController;
   final ValueNotifier<int> _currentPage = ValueNotifier<int>(0);
-
-  void listener() {
-    _currentPage.value = _pageController.page!.round();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: 0);
-    _pageController.addListener(listener);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _pageController.dispose();
-    _pageController.removeListener(listener);
-  }
+  final CarouselSliderController _controller = CarouselSliderController();
 
   @override
   Widget build(BuildContext context) {
 
-    if (widget.product.photos.isEmpty) Center(child: Icon(Icons.image_not_supported, size: 100.0, color: Colors.grey.shade500,),);
+    if (product.productPhotos.isEmpty) Center(child: Icon(Icons.image_not_supported, size: 100.0, color: Colors.grey.shade500,),);
 
     return SizedBox(
-      height: widget.size.height * 0.4,
-      width: widget.size.width,
+      height: size.height * 0.4,
+      width: size.width,
       child: Column(
         children: [
           Expanded(
             child:
-             widget.product.photos.isNotEmpty ?
-             PageView.builder(
-              controller: _pageController,
-              itemCount: widget.product.photos.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Hero(
-                      tag: widget.product.id,
-                      child: CachedNetworkImage(
-                        imageUrl: '${dotenv.env['PRODUCT_URL']}${widget.product.photos[index].url}'
-                      )
+             product.productPhotos.isNotEmpty ?
+              CarouselSlider(
+                carouselController: _controller,
+                options: CarouselOptions(
+                  height: size.height * 0.4,
+                  viewportFraction: 1.0,
+                  enableInfiniteScroll: false,
+                  onPageChanged: (index, reason) {
+                    _currentPage.value = index;
+                  },
+                ),
+                items: product.productPhotos.map((photo) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: ProductImage(
+                        product: product, 
+                      ),
                     ),
-                  ),
-                );
-              },
-            ) 
+                  );
+                }).toList(),
+              )
             : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Icon(Icons.image_not_supported, size: 100.0, color: Colors.grey.shade500,),
-                Text(widget.translations.no_image, style: widget.theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500)),
+                Text(translations.no_image, style: theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500)),
               ],
             )
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 5.0),
-            child: Stack(
+          if (product.productPhotos.isNotEmpty)
+            Stack(
               children: [
-                ValueListenableBuilder<int>(
-                  valueListenable: _currentPage,
-                  builder: (BuildContext context, int value, Widget? child) {
-                    return Align(
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        height: 30,
-                        width: 75,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                for (int i = 0; i < widget.product.photos.length; i++)
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                                    height: 10.0,
-                                    width: 10.0,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: value == i ? AppTheme.palette[1000] : AppTheme.palette[700],
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ],
+                Align(
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: product.productPhotos.asMap().entries.map((entry) {
+                      return GestureDetector(
+                        onTap: () => _controller.animateToPage(entry.key),
+                        child: ValueListenableBuilder(
+                          valueListenable: _currentPage,
+                          builder: (BuildContext context, value,  child) {
+                            return Container(
+                            width: 12.0,
+                            height: 12.0,
+                            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: value == entry.key ? AppTheme.palette[1000] : AppTheme.palette[700]
+                              ),
+                            );
+                          },
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    }).toList(),
+                  ),
                 ),
                 Align(
                   alignment: Alignment.centerRight,
@@ -316,15 +294,15 @@ class _ImageState extends State<_Image> {
                       child: ValueListenableBuilder(
                         valueListenable: _currentPage,
                         builder: (BuildContext context, value, Widget? child) {
-                          return Text('${value + 1}/${widget.product.photos.length}', style: widget.theme.textTheme.labelSmall?.copyWith(fontSize: 10.0, color: Colors.white),);
+                          return Text('${value + 1}/${product.productPhotos.length}', style: theme.textTheme.labelSmall?.copyWith(fontSize: 10.0, color: Colors.white),);
                         },
                       )
                     ),
-                  ),
-                )
-              ],
-            ),
-          ),
+                  )
+                ),
+              ]
+            )
+          else const SizedBox.shrink()
         ],
       )
     );

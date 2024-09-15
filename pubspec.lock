@@ -141,10 +141,10 @@ packages:
     dependency: "direct main"
     description:
       name: cupertino_icons
-      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
+      sha256: d57953e10f9f8327ce64a508a355f0b1ec902193f66288e8cb5070e7c47eeb2d
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.8"
+    version: "1.0.6"
   dart_jsonwebtoken:
     dependency: "direct main"
     description:
@@ -165,10 +165,10 @@ packages:
     dependency: "direct main"
     description:
       name: dio
-      sha256: "0dfb6b6a1979dac1c1245e17cef824d7b452ea29bd33d3467269f9bef3715fb0"
+      sha256: e17f6b3097b8c51b72c74c9f071a605c47bcc8893839bd66732457a5ebe73714
       url: "https://pub.dev"
     source: hosted
-    version: "5.6.0"
+    version: "5.5.0+1"
   dio_web_adapter:
     dependency: transitive
     description:
@@ -713,10 +713,10 @@ packages:
     dependency: "direct main"
     description:
       name: shared_preferences
-      sha256: "746e5369a43170c25816cc472ee016d3a66bc13fcf430c0bc41ad7b4b2922051"
+      sha256: c3f888ba2d659f3e75f4686112cc1e71f46177f74452d40d8307edc332296ead
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.2"
+    version: "2.3.0"
   shared_preferences_android:
     dependency: transitive
     description:
@@ -854,10 +854,10 @@ packages:
     dependency: "direct main"
     description:
       name: toastification
-      sha256: "441adf261f03b82db7067cba349756f70e9e2c0b7276bcba856210742f85f394"
+      sha256: ffd10916d4cd0e8b944f3df334c7892ef55cdc7c1875b1c7b007780b9f5fc756
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.0"
+    version: "2.1.0"
   typed_data:
     dependency: transitive
     description:

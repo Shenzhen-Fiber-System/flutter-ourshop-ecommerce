@@ -45,7 +45,7 @@ class Category extends Equatable {
     final String parentCategoryId;
     final List<Category>? subCategories;
     final int? level;
-    final List<Product> products;
+    final List<FilteredProduct> products;
 
     const Category({
         required this.id,
@@ -76,7 +76,7 @@ class Category extends Equatable {
         String? parentCategoryId,
         List<Category>? subCategories,
         int? level,
-        List<Product>? products,
+        List<FilteredProduct>? products,
     }) => 
       Category(
           id: id ?? this.id,

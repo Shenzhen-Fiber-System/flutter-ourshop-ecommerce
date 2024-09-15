@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../ui/pages/pages.dart';
 
 class Observable extends BlocObserver {
@@ -19,8 +21,8 @@ class Observable extends BlocObserver {
     } else if (bloc is CompanyBloc) {
       final currentState = change.currentState as CompanyState;
       final nextState = change.nextState as CompanyState;
-      if (currentState.companies.length != nextState.companies.length) {
-        // log('Companies changed to ${nextState.companies.length}');
+      if (currentState.socialMedias.length != nextState.socialMedias.length) {
+        log('social medias ${nextState.socialMedias.length}');
       }
     } else if (bloc is UsersBloc) {
       final currentState = change.currentState as UsersState;
@@ -29,6 +31,14 @@ class Observable extends BlocObserver {
         // log('User changed to ${nextState.loggedUser}');
       }
     } else if (bloc is ProductsBloc){
+      final currentState = change.currentState as ProductsState;
+      final nextState = change.nextState as ProductsState;
+      if (currentState.filteredProductsSuggestions != nextState.filteredProductsSuggestions) {
+        log('Products changed to ${nextState.filteredProductsSuggestions.length}');
+      }
+      if (currentState.categories != nextState.categories) {
+        log('categories changed to ${nextState.categories.length}');
+      }
       
     } else if (bloc is OrdersBloc){
       final currentState = change.currentState as OrdersState;

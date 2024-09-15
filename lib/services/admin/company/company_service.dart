@@ -27,7 +27,7 @@ class CompanyService {
           return company.data;
         }
       } on DioException catch (e) {
-        log('${e.response?.data}');
+        log('getCompanyById -> ${e.response?.statusCode}');
         ErrorHandler(e);
       }
     }
@@ -55,6 +55,32 @@ class CompanyService {
             foregroundColor: Colors.white,
             backgroundColor: Colors.green.shade500,
           ).showToast(AppRoutes.globalContext!);
+        }
+        return response.data;
+      } on DioException catch (e) {
+        log('${e.response?.data}');
+        ErrorHandler(e);
+      }
+    }
+
+    Future<dynamic> getBanksByCompany (Map<String,dynamic> filteredParams) async {
+      try {
+        final response = await dio.post('/banks/filtered-page', data: filteredParams);
+        final banks = FilteredResponse<FilteredBanks>.fromJson(response.data, (json) => FilteredBanks.fromJson(json));
+        return banks.data;
+      } on DioException catch (e) {
+        log('getBanksByCompany -> ${e.response?.data}');
+        ErrorHandler(e);
+      }
+    }
+
+
+    Future<dynamic> updateCompanyInformation(String companyId, Map<String, dynamic> body) async {
+      try {
+        final response = await dio.put('/companies/$companyId', data: body);
+        final resp = CompanyResponse.fromJson(response.data);
+        if (resp.success && resp.data is Company) {
+          return resp.data;
         }
         return response.data;
       } on DioException catch (e) {

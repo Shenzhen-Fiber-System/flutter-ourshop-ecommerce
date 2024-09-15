@@ -35,7 +35,7 @@ class UsersState extends Equatable {
         PaymentMethod(
           id: "1",
           type: CardType.VISA,
-          cardNumber: "4234 5678 1234 5678",
+          cardNumber: "4234567812345678",
           expirationDate: "12/23",
           cvv: "123"
         ),

@@ -20,22 +20,7 @@ class AppTheme{
     1000: Color(0xff003049)
   };
 
-  // static Color mainWebColor = const Color(0xff003049);
-
-  // static Color palette[550]! = const Color(0xff3fe7b6);
-
   static ThemeData light = ThemeData.light().copyWith(
-    // colorScheme: ColorScheme(
-    //   primary: palette[1000]!,
-    //   secondary: palette[1000]!,
-    //   surface: Colors.white,
-    //   error: Colors.red,
-    //   onPrimary: Colors.white,
-    //   onSecondary: Colors.white,
-    //   onSurface: Colors.black,
-    //   onError: Colors.white,
-    //   brightness: Brightness.light,
-    // ),
     primaryColor: Colors.black87,
     scaffoldBackgroundColor: Colors.white,
     appBarTheme: AppBarTheme(
@@ -116,7 +101,6 @@ class AppTheme{
       ),
       bodyLarge: TextStyle(
         color:Color(0xff263959),
-        // color: ThemeMode.dark == ThemeMode.dark ? Colors.white : Color(0xff263959),
         fontFamily: 'Roboto',
         fontWeight: FontWeight.w400,
         fontSize: 16,
@@ -124,7 +108,6 @@ class AppTheme{
       ),
       bodyMedium: TextStyle(
         color:Color(0xff263959),
-        // color: ThemeMode.dark == ThemeMode.dark ? Colors.white : Color(0xff263959),
         fontFamily: 'Roboto',
         fontWeight: FontWeight.w400,
         fontSize: 14,
@@ -349,7 +332,7 @@ class AppTheme{
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: AppTheme.palette[1000],
       splashColor: Colors.transparent
-    )
+    ),
   );
 
   static ThemeData dark = ThemeData.dark().copyWith(

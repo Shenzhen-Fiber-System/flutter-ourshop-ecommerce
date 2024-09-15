@@ -96,8 +96,6 @@ class SubCategoryList extends StatelessWidget {
       return Center(child: Text(translations.no_sub_categories_found, style: theme.textTheme.titleMedium?.copyWith(color: Colors.black)));
     }
     return SizedBox(
-      // margin: const EdgeInsets.only(top: 10.0),
-      // height: height ?? size.height * 0.20,
       width: width ?? size.width,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,

@@ -68,7 +68,7 @@ class AppRoutes {
       GoRoute(
         path: '/selected-product',
         builder: (context, state) {
-          final Product product = state.extra as Product;
+          final FilteredProduct product = state.extra as FilteredProduct;
           return SelectedProductPage(product: product);
         },
       ),
@@ -92,7 +92,7 @@ class AppRoutes {
       ),
       GoRoute(
         path: '/admin',
-        builder: (context, state) => const AdminPage(),
+        builder: (context, state) => AdminPage(),
         routes: [
           GoRoute(
             path: 'option/my-company',
@@ -141,7 +141,7 @@ class AppRoutes {
               GoRoute(
                 path: 'detail',
                 builder: (context, state) {
-                  final FilteredProducts product = state.extra as FilteredProducts;
+                  final FilteredProduct product = state.extra as FilteredProduct;
                   return AdminProductDetail(product: product,);
                 },
               ),

@@ -15,10 +15,9 @@ class AddProductsStatesEvent extends ProductsEvent {
 }
 
 class AddCategoriesEvent extends ProductsEvent {
-  final List<Category> categories;
-  const AddCategoriesEvent(this.categories);
+  const AddCategoriesEvent();
   @override
-  List<Object> get props => [categories];
+  List<Object> get props => [];
 }
 
 class AddProductsEvent extends ProductsEvent {
@@ -36,21 +35,21 @@ class ChangeGridCountEvent extends ProductsEvent {
 }
 
 class AddFavoriteProductEvent extends ProductsEvent {
-  final Product product;
+  final FilteredProduct product;
   const AddFavoriteProductEvent(this.product);
   @override
   List<Object> get props => [product];
 }
 
 class AddCartProductEvent extends ProductsEvent {
-  final Product product;
+  final FilteredProduct product;
   const AddCartProductEvent(this.product);
   @override
   List<Object> get props => [product];
 }
 
 class RemoveCartProductEvent extends ProductsEvent {
-  final Product product;
+  final FilteredProduct product;
   const RemoveCartProductEvent(this.product);
   @override
   List<Object> get props => [product];
@@ -75,7 +74,7 @@ class DeselectAllCartProductsEvent extends ProductsEvent {
 }
 
 class SelectOrDeselectCartProductEvent extends ProductsEvent {
-  final Product product;
+  final FilteredProduct product;
   const SelectOrDeselectCartProductEvent({required this.product});
   @override
   List<Object> get props => [product];
@@ -103,7 +102,7 @@ class AddSelectedSubCategoryEvent extends ProductsEvent {
 }
 
 class AddSubCategoryProductsEvent extends ProductsEvent {
-  final List<Product> subCategoryProducts;
+  final List<FilteredProduct> subCategoryProducts;
   const AddSubCategoryProductsEvent({required this.subCategoryProducts});
   @override
   List<Object> get props => [subCategoryProducts];
@@ -131,10 +130,18 @@ class DeleteAdminProductEvent extends ProductsEvent {
   List<Object> get props => [productId];
 }
 
-class AddFilteredProductsEvent extends ProductsEvent {
-  final SearchMode mode;
+class AddFilteredProductsSuggestionsEvent extends ProductsEvent {
+  final FilteredResponseMode mode;
   final int page;
-  const AddFilteredProductsEvent({required this.mode, required this.page});
+  const AddFilteredProductsSuggestionsEvent({required this.mode, required this.page});
   @override
   List<Object> get props => [mode, page];
+}
+
+class AddFilteredProductsEvent extends ProductsEvent {
+  final FilteredResponseMode mode;
+  final int page;
+  const AddFilteredProductsEvent({required this.page, required this.mode});
+  @override
+  List<Object> get props => [page];
 }

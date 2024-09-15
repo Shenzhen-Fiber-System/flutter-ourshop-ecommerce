@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 
@@ -14,7 +16,7 @@ class ProductCard extends StatelessWidget {
 
   final double height;
   final double width;
-  final Product product;
+  final FilteredProduct product;
   final ThemeData theme;
   final AppLocalizations translations;
 
@@ -46,10 +48,7 @@ class ProductCard extends StatelessWidget {
             Expanded(
               child: ClipRRect(
                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(5.0), topRight: Radius.circular(5.0)),
-                child: Hero(
-                  tag: product.id,
-                  child: ProductImage(product: product, translations: translations, theme: theme),
-                ),
+                child: ProductImage(product: product),
               ),
             ),
             Padding(
@@ -61,17 +60,19 @@ class ProductCard extends StatelessWidget {
                     style: theme.textTheme.labelMedium?.copyWith(color: Colors.black, fontWeight: FontWeight.w400),
                   ),
                   const SizedBox(height: 5.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Text('${product.productReviewInfo?.ratingAvg.toStringAsFixed(1)}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
-                      ),
-                      RaitingBarWidget(product: product),
-                    ],
-                  ),
+                  if (product.productReviewInfo != null) 
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Text('${product.productReviewInfo?.ratingAvg.toStringAsFixed(1)}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
+                        ),
+                        RaitingBarWidget(product: product),
+                      ],
+                    )
+                  else const SizedBox.shrink(),
                   if (product.productReviewInfo?.summary != null && product.productReviewInfo!.summary.isNotEmpty)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -82,7 +83,7 @@ class ProductCard extends StatelessWidget {
                   )
                   else const SizedBox.shrink(),
                   const SizedBox(height: 2.0),
-                  _SendAnimatedWidget(translations: translations, theme: theme),
+                  SendAnimatedWidget(translations: translations, theme: theme),
                   Row(
                     children: [
                       Text(
@@ -95,7 +96,8 @@ class ProductCard extends StatelessWidget {
                           backgroundColor: const WidgetStatePropertyAll(Color(0xff003049)),
                           fixedSize: const WidgetStatePropertyAll( Size(10.0, 10.0)),
                         ),
-                        onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
+                        // onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
+                        onPressed: () {},
                         icon: const Icon(
                           Icons.add_shopping_cart_rounded,
                           color: Colors.white,
@@ -113,8 +115,8 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
-class _SendAnimatedWidget extends StatefulWidget {
-  const _SendAnimatedWidget({
+class SendAnimatedWidget extends StatefulWidget {
+  const SendAnimatedWidget({super.key, 
     required this.translations,
     required this.theme,
   });
@@ -123,10 +125,10 @@ class _SendAnimatedWidget extends StatefulWidget {
   final ThemeData theme;
 
   @override
-  State<_SendAnimatedWidget> createState() => _SendAnimatedWidgetState();
+  State<SendAnimatedWidget> createState() => _SendAnimatedWidgetState();
 }
 
-class _SendAnimatedWidgetState extends State<_SendAnimatedWidget> with TickerProviderStateMixin {
+class _SendAnimatedWidgetState extends State<SendAnimatedWidget> with TickerProviderStateMixin {
 
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -180,38 +182,57 @@ class ProductImage extends StatelessWidget {
   const ProductImage({
     super.key,
     required this.product,
-    required this.translations,
-    required this.theme,
   });
 
-  final Product product;
-  final AppLocalizations translations;
-  final ThemeData theme;
+  final FilteredProduct product;
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final TextStyle? style = theme.textTheme.bodyMedium?.copyWith(color: Colors.black);
+    final AppLocalizations translations = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: CachedNetworkImage(
-        imageUrl: product.photos.isNotEmpty ? '${dotenv.env['PRODUCT_URL']}${product.photos.first.url}' : 'https://placehold.co/600x400',
-        placeholder: (context, url) => const Center(child: CircularProgressIndicator.adaptive()),
-        errorWidget: (context, url, error) => Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(Icons.image_not_supported, size: 50.0, color: Colors.grey.shade500,),
-            Text(translations.no_image, style: theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500)),
-          ],
-        ),
-        imageBuilder: (context, imageProvider) => AnimatedOpacity(
-          opacity: 1,
-          duration: const Duration(seconds: 1),
-          curve: Curves.easeOut,
-          child: Image(
-            image: imageProvider,
-            fit: BoxFit.cover,
-          ),
-        ),
+        key: ValueKey<String>(product.id),
+        cacheKey: product.id,
+        fit: BoxFit.cover,
+        filterQuality: FilterQuality.high,
+        errorWidget: (context, url, error) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+                const Icon(Icons.error),
+              Text(translations.error_laoding_image, style: style,),
+            ],
+          );
+        },
+        imageBuilder: (context, imageProvider) {
+          return Image(image: imageProvider, fit: BoxFit.cover);
+        },
+        errorListener: (value) {
+          log('value: $value');
+        },
+        placeholderFadeInDuration: const Duration(milliseconds: 500),
+        fadeInDuration: const Duration(milliseconds: 500),
+        fadeOutDuration: const Duration(milliseconds: 500),
+        fadeInCurve: Curves.easeIn,
+        fadeOutCurve: Curves.easeOut,
+        progressIndicatorBuilder: (context, url, progress) {
+          return Center(
+            child: CircularProgressIndicator.adaptive(
+              value: progress.progress,
+              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.palette[1000]!),
+            )
+          );
+        },
+        imageUrl: 
+        product.mainPhotoUrl != null 
+          ? '${dotenv.env['PRODUCT_URL']}${product.mainPhotoUrl}' 
+          : product.productPhotos.isNotEmpty 
+            ? '${dotenv.env['PRODUCT_URL']}${product.productPhotos.first.photo?.url}' 
+            : 'https://via.placeholder.com/150',
       ),
     );
   }
@@ -228,7 +249,7 @@ class CartCard extends StatelessWidget {
     this.showFavoriteButton = false
   });
 
-  final Product product;
+  final FilteredProduct product;
   final double? height;
   final double? width;
   final bool? showCheckBox;
@@ -239,7 +260,6 @@ class CartCard extends StatelessWidget {
 
     final ThemeData theme = Theme.of(context);
     final Size size = MediaQuery.of(context).size;
-    final AppLocalizations translations = AppLocalizations.of(context)!;
     return Container(
       height: height ?? MediaQuery.of(context).size.height * 0.15,
       width: width ?? MediaQuery.of(context).size.width,
@@ -269,7 +289,8 @@ class CartCard extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Checkbox(
                 value: product.selected, 
-                onChanged: (value) => context.read<ProductsBloc>().selectOrDeselectCartProduct(product)
+                // onChanged: (value) => context.read<ProductsBloc>().selectOrDeselectCartProduct(product)
+                onChanged: (value) {}
                 
               ),
             )
@@ -277,7 +298,7 @@ class CartCard extends StatelessWidget {
           SizedBox(
             width: size.width * 0.3,
             height: size.height,
-            child: ProductImage(product: product, translations: translations, theme: theme),
+            child: ProductImage(product: product),
           ),
           Expanded(
             child:  BlocBuilder<ProductsBloc, ProductsState>(
@@ -312,11 +333,13 @@ class CartCard extends StatelessWidget {
                       Row(
                         children: [
                           GestureDetector(
-                            onTap: () => context.read<ProductsBloc>().addFavoriteProduct(product),
+                            // onTap: () => context.read<ProductsBloc>().addFavoriteProduct(product),
+                            onTap: () {},
                             child: Icon(state.favoriteProducts.contains(product) ? Icons.favorite : Icons.favorite_border_outlined, color: state.favoriteProducts.contains(product) ? Colors.red : Colors.grey ,)
                           ),
                           const Spacer(),
-                          IncreaseDecrease(theme: theme, product: product),
+                          //TODO add increase decrease
+                          // IncreaseDecrease(theme: theme, product: product),
                           
                         ],
                       )
@@ -343,12 +366,14 @@ class IncreaseDecrease extends StatelessWidget {
     return Row(
       children: [
         IconButton(
-          onPressed: () => context.read<ProductsBloc>().removeCartProduct(product),
+          // onPressed: () => context.read<ProductsBloc>().removeCartProduct(product),
+          onPressed: () {},
           icon: Icon(Icons.remove_circle_outline, color: AppTheme.palette[900],),
         ),
         Text(product.quantity.toString(), style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[900]),),
         IconButton(
-          onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
+          // onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
+          onPressed: () {},
           icon: Icon(Icons.add_circle_outline, color: AppTheme.palette[900]),
         ),
       ],

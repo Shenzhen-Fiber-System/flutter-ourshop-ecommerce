@@ -30,55 +30,103 @@ class Search extends SearchDelegate{
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    return  SearchSuggestions(query: query,);
+  }
+}
+
+
+class SearchSuggestions extends StatefulWidget {
+  const SearchSuggestions({super.key, required this.query});
+
+
+  final String query;
+
+  @override
+  State<SearchSuggestions> createState() => _SearchSuggestionsState();
+}
+
+class _SearchSuggestionsState extends State<SearchSuggestions> {
+
+
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    fetchFilteredProducts();
+    _scrollController = ScrollController()..addListener(listener);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(listener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+
+  void listener() {
+    final double threshold = _scrollController.position.maxScrollExtent * 0.1;
+    if (_scrollController.position.pixels >= threshold && 
+        context.read<ProductsBloc>().state.hasMore && 
+        context.read<ProductsBloc>().state.productsStates != ProductsStates.loadingMore) {
+      fetchFilteredProducts();
+    }
+  }
+
+  void fetchFilteredProducts() {
+    context.read<ProductsBloc>().add(AddFilteredProductsSuggestionsEvent(
+        mode: FilteredResponseMode.suggestions,
+        page: context.read<ProductsBloc>().state.currentPage + 1,
+      )
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Size size = MediaQuery.of(context).size;
     final AppLocalizations translations = AppLocalizations.of(context)!;
     final TextStyle? style = theme.textTheme.bodyMedium?.copyWith(color: Colors.black);
-    //TODO implement search suggestions products
-    return Center(child: Text('Suggestions', style: style,));
-    // return SizedBox(
-    //   height: size.height,
-    //   width: size.width,
-    //   child: FutureBuilder<List<Product>>(
-    //     future: context.read<ProductsBloc>().getAllProducts(),
-    //     builder: (BuildContext context, AsyncSnapshot<List<Product>> snapshot) {
-    //       if (snapshot.connectionState == ConnectionState.waiting) {
-    //         return const Center(child: CircularProgressIndicator());
-    //       }
 
-    //       if (!snapshot.hasData){
-    //         return Center(child: Text('No data', style: style,));
-    //       }
+    return SizedBox(
+      height: size.height,
+      width: size.width,
+      child: BlocBuilder<ProductsBloc, ProductsState>(
+        builder: (context, state) {
+          if (state.productsStates == ProductsStates.loading) {
+            return const Center(child: CircularProgressIndicator.adaptive());
+          }
+          if (state.productsStates == ProductsStates.error) {
+            return Center(child: Text(translations.error, style: style,));
+          }
 
-    //       if (snapshot.data!.isEmpty) {
-    //         return Center(child: Text('No data', style: style,));
-    //       }
-
-    //       if (snapshot.hasError) {
-    //         log(snapshot.error.toString());
-    //         return Center(child: Text('Error', style: style,));
-    //       }
-
-    //       return GridView.builder(
-    //         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-    //           crossAxisCount: 2,
-    //           crossAxisSpacing: 10,
-    //           mainAxisSpacing: 10,
-    //           childAspectRatio: 0.7
-    //         ),
-    //         itemBuilder: (context, index) {
-    //           // return ProductCard(
-    //           //   product: ,
-    //           //   height: size.height,
-    //           //   width: size.width, 
-    //           //   theme: theme, 
-    //           //   translations: translations,
-    //           // );
-    //           return Text('suggestions', style: style,);
-    //         },
-    //       );
-    //     },
-    //   ),
-    // );
+          return GridView.builder(
+            controller: _scrollController,
+              itemCount:state.hasMore
+                      ? state.filteredProductsSuggestions.length + 1
+                      : state.filteredProductsSuggestions.length,
+              itemBuilder: (context, index) {
+                if (index == state.filteredProductsSuggestions.length) {
+                  return const Center(child: CircularProgressIndicator.adaptive());
+                }
+                final FilteredProduct product = state.filteredProductsSuggestions[index];
+                return ProductCard(
+                  height: size.height, 
+                  width: size.width, 
+                  product: product, 
+                  theme: theme, 
+                  translations: translations
+                );
+              }, gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.6
+              ),
+            );
+        },
+      )
+    );
   }
 }

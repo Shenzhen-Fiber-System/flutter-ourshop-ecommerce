@@ -8,7 +8,7 @@ enum AdminProductMode{
 class AdminProductDetail extends StatelessWidget {
   AdminProductDetail({super.key, required this.product});
 
-  final FilteredProducts product;
+  final FilteredProduct product;
   final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
 
   @override

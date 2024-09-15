@@ -52,7 +52,7 @@ class ProductService {
   Future<dynamic> filteredAdminProducts(Map<String, dynamic> filteredParamenters) async {
     try {
       final response = await dio.post('/products/filtered-page', data: filteredParamenters);
-      final filteredProducts = FilteredResponse<FilteredProducts>.fromJson(response.data, (json) => FilteredProducts.fromJson(json));
+      final filteredProducts = FilteredResponse<FilteredProduct>.fromJson(response.data, (json) => FilteredProduct.fromJson(json));
       return filteredProducts.data;
     } on DioException catch (e) {
       ErrorHandler(e);
@@ -63,7 +63,7 @@ class ProductService {
     try {
       await dio.delete('/products/$productId');
       SuccessToast(
-        title: translations!.product_deleted,
+        title: locator<AppLocalizations>().product_deleted,
         style: ToastificationStyle.flatColored,
         foregroundColor: Colors.white,
         backgroundColor: Colors.green.shade500,
@@ -78,7 +78,7 @@ class ProductService {
   Future<dynamic> filteredProducts(Map<String, dynamic> filteredParamenters) async {
     try {
       final response = await dio.post('/products/filtered-page', data: filteredParamenters);
-      final filteredProducts = FilteredResponse<FilteredProducts>.fromJson(response.data, (json) => FilteredProducts.fromJson(json));
+      final filteredProducts = FilteredResponse<FilteredProduct>.fromJson(response.data, (json) => FilteredProduct.fromJson(json));
       return filteredProducts.data;
     } on DioException catch (e) {
       ErrorHandler(e);

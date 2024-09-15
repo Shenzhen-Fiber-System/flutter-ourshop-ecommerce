@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../../../pages.dart';
 
 enum SectionType {
@@ -14,7 +12,7 @@ class Section extends StatelessWidget {
   final ThemeData theme;
   final AppLocalizations translations;
   final SectionType type;
-  final Product? product;
+  final FilteredProduct? product;
 
   const Section({
     super.key,
@@ -56,47 +54,69 @@ class Section extends StatelessWidget {
               ),
             ),
           )
-        else if (type == SectionType.custom && product!.reviews!.isNotEmpty)  
+        else if (type == SectionType.custom)
           Container(
             color: Colors.grey.shade50,
             height: size.height * 0.30,
             width: double.infinity,
-            child: ListView.separated(
-              itemCount: product!.reviews!.length,
-              itemBuilder: (context, index) {
-                final Review review = product!.reviews![index];
-                return ListTile(
-                  titleTextStyle: theme.textTheme.labelMedium?.copyWith(color: Colors.black, fontWeight: FontWeight.w600),
-                  shape: theme.listTileTheme.copyWith(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0))
-                  ).shape,
-                  title: Row(
-                    children: [
-                      const Icon(Icons.person, color: Colors.black, size: 18),
-                      Text(
-                        review.fullName,
-                        style: theme.textTheme.titleSmall?.copyWith(
+            child: FutureBuilder<List<Review>?>(
+              future: context.read<ProductsBloc>().getProductReviews(product!.id),
+              builder: (BuildContext context, AsyncSnapshot<List<Review>?> snapshot) {
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator.adaptive());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text(translations.error, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black),));
+                }
+
+                if(!snapshot.hasData) {
+                  return const Center(child: Text('No reviews', style: TextStyle(color: Colors.black),));
+                }
+
+                if(snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No reviews', style: TextStyle(color: Colors.black),));
+                }
+
+                return ListView.separated(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    final Review review = snapshot.data![index];
+                    return ListTile(
+                      titleTextStyle: theme.textTheme.labelMedium?.copyWith(color: Colors.black, fontWeight: FontWeight.w600),
+                      shape: theme.listTileTheme.copyWith(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0))
+                      ).shape,
+                      title: Row(
+                        children: [
+                          const Icon(Icons.person, color: Colors.black, size: 18),
+                          Text(
+                            review.fullName,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: const Color(0xff5d5f61),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const Spacer(),
+                          RaitingBarWidget(product: product!,)
+                        ],
+                      ),
+                      subtitle: Text(
+                        review.content,
+                        style: theme.textTheme.labelMedium?.copyWith(
                           color: const Color(0xff5d5f61),
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
-                      const Spacer(),
-                      RaitingBarWidget(product: product!,)
-                    ],
-                  ),
-                  subtitle: Text(
-                    review.content,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: const Color(0xff5d5f61),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
+                    );
+                  }, 
+                  separatorBuilder: (context ,index) =>  const Divider(indent: 10, endIndent: 20,), 
                 );
-              }, 
-              separatorBuilder: (context ,index) =>  const Divider(indent: 10, endIndent: 20,), 
+              },
             ),
           )
-        else if (type == SectionType.videos)
+        else if (type == SectionType.videos && product!.productVideos.isNotEmpty)
           VideoProductSection(product: product!, theme: theme)
         else const SizedBox.shrink(),
         const SizedBox(height: 10.0),
@@ -106,66 +126,106 @@ class Section extends StatelessWidget {
 }
 
 class VideoProductSection extends StatelessWidget {
-  const VideoProductSection({
+  VideoProductSection({
     super.key,
     required this.product,
     required this.theme,
   });
 
-  final Product product;
+  final FilteredProduct product;
   final ThemeData theme;
+
+  final ValueNotifier<int> _currentPage = ValueNotifier<int>(0);
+  final CarouselSliderController _controller = CarouselSliderController();
 
   String getMainUrl (dynamic link) {
 
     if(link is String && link.isNotEmpty) {
       return '${dotenv.env['PRODUCT_URL']}$link';
     }
-    return product.videos.isNotEmpty ? '${dotenv.env['PRODUCT_URL']}${product.videos.first.url}' :  'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4';
+    return product.productVideos.isNotEmpty ? '${dotenv.env['PRODUCT_URL']}${product.productVideos.first.video!.url}' :  'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4';
   }
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10.0),
       child: Column(
         children: [
-          Video(url: getMainUrl(product.mainVideoUrl), height: 250, width: double.infinity),
+          Video(url: getMainUrl(product.mainVideoUrl), height: 250, width: size.width),
           const SizedBox(height: 10.0),
-          ListVideos(videos: product.videos),
+          ListVideos(
+            videos: product.productVideos,
+            controller: _controller,
+            currentPage: _currentPage,
+          ),
+          ValueListenableBuilder(
+            valueListenable: _currentPage, 
+            builder: (context, value, child) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: product.productVideos.asMap().entries.map((entry) {
+                  return GestureDetector(
+                    onTap: () => _controller.animateToPage(entry.key),
+                    child: Container(
+                      width: 12.0,
+                      height: 12.0,
+                      margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: value == entry.key ? AppTheme.palette[1000] : AppTheme.palette[700]
+                      ),
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          )
         ],
       ),
     );
   }
 }
 
-class ListVideos extends StatefulWidget {
+class ListVideos extends StatelessWidget {
   const ListVideos({
     super.key,
-    required this.videos,
+    required this.videos, 
+    required this.controller, 
+    required this.currentPage,
   });
 
-  final List<Photo> videos;
+  final List<FilteredProductMedia> videos;
+  final CarouselSliderController controller;
+  final ValueNotifier<int> currentPage;
 
-  @override
-  State<ListVideos> createState() => _ListVideosState();
-}
-
-class _ListVideosState extends State<ListVideos> {
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return SizedBox(
       height: 150,
-      width: double.infinity,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: widget.videos.length,
-        itemBuilder: (BuildContext context, int index) {
-          final Photo videos = widget.videos[index];
-          log('url: ${videos.url}');
-          return Video(url: '${dotenv.env['PRODUCT_URL']}${videos.url}', height: 150, width: double.infinity);
-        },
-      ),
+      width: size.width,
+      // child: ListView.builder(
+      //   scrollDirection: Axis.horizontal,
+      //   itemCount: widget.videos.length,
+      //   itemBuilder: (BuildContext context, int index) {
+      //     final FilteredProductMedia video = widget.videos[index];
+      //     return Video(url: '${dotenv.env['PRODUCT_URL']}${video.video?.url}', height: 150, width: size.width * 0.60);
+      //   },
+      // ),
+      child: CarouselSlider(
+        options: CarouselOptions(
+          height: size.height * 0.4,
+          viewportFraction: 1.0,
+          enableInfiniteScroll: false,
+          onPageChanged: (index, reason) {
+            currentPage.value = index;
+          },
+        ),
+        items: videos.map((video) => Video(url: '${dotenv.env['PRODUCT_URL']}${video.video?.url}', height: 150, width: size.width * 0.60)).toList(),
+      )
     );
   }
 }
@@ -209,10 +269,9 @@ class _VideoState extends State<Video> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     return SizedBox(
-      height: size.height * 0.25,
-      width: size.width,
+      height: widget.height,
+      width: widget.width,
       child: ClipRRect(
           borderRadius: BorderRadius.circular(5.0),
           child: FlickVideoPlayer(

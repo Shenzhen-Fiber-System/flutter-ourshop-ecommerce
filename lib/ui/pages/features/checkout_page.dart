@@ -31,7 +31,7 @@ class CheckoutPage extends StatelessWidget {
                 return ListView.builder(
                   itemCount: state.cartProducts.length,
                   itemBuilder: (context, index) {
-                    final Product product = state.cartProducts[index];
+                    final FilteredProduct product = state.cartProducts[index];
                     return CartCard(
                       product: product
                     );

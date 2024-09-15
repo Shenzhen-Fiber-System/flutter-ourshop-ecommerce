@@ -1,10 +1,11 @@
-
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 GetIt locator = GetIt.instance;
 
 Future<void> initializeServiceLocator() async {
 
+
+  locator.registerLazySingleton<AppLocalizations>(() => AppLocalizations.of(AppRoutes.globalContext!)!);
   locator.registerLazySingleton(() => Preferences());
   locator.registerLazySingleton(() => ImagePicker());
   // get preferences
@@ -32,8 +33,9 @@ Future<void> admin(Dio instance) async {
   final RolesBloc rolesBloc = locator.registerSingleton(RolesBloc(roleServices));
 
   final CompanyService companyService = locator.registerSingleton(CompanyService(dio: instance));
+  final SocialMediaService socialMediaService = locator.registerSingleton(SocialMediaService(dio: instance));
 
-  final CompanyBloc companyBloc = locator.registerSingleton(CompanyBloc(companyService));
+  locator.registerSingleton(CompanyBloc(companyService, socialMediaService));
 
   final CountryService countryService = locator.registerSingleton(CountryService(dio: instance));
   final CountryBloc countryBloc = locator.registerSingleton(CountryBloc(countryService));
@@ -42,8 +44,11 @@ Future<void> admin(Dio instance) async {
   
   // get roles...
   await rolesBloc.getRoles();
+
   // get companies...
-  await companyBloc.getCompanies();
+
+  // await companyBloc.getCompanies();
+
   // get countries...
   await countryBloc.fetchCountries();
 }
@@ -51,7 +56,7 @@ Future<void> admin(Dio instance) async {
 Future<void> product(Dio instance) async {
   final ProductService productService = locator.registerSingleton(ProductService(dio: instance));
   final CategoryService categoryService = locator.registerSingleton(CategoryService(dio: instance));
-  locator.registerSingleton(ProductsBloc(productService, categoryService ,locator<GeneralBloc>()));
+  locator.registerSingleton(ProductsBloc(productService, categoryService));
 }
 
 Future<void> order(Dio instance) async {

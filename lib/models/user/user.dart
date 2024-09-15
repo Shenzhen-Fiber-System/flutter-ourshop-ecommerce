@@ -210,7 +210,7 @@ class PaymentMethod extends Equatable{
   factory PaymentMethod.fromJson(Map<String, dynamic> json) => PaymentMethod(
     id: json["id"],
     type: json["type"],
-    cardNumber: json["cardNumber"],
+    cardNumber: Helpers.maskCardNumber(json["cardNumber"]),
     expirationDate: json["expirationDate"],
     cvv: json["cvv"],
     isDefault: json["isDefault"],

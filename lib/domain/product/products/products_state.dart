@@ -9,9 +9,13 @@ enum ProductsStates{
   loadingMore
 }
 
-enum SearchMode{
+enum FilteredResponseMode{
   suggestions,
   results,
+  filteredProducts,
+  generalCategoryProducts,
+  subCategoryProducts
+
 }
 
 class ProductsState extends Equatable {
@@ -20,36 +24,40 @@ class ProductsState extends Equatable {
   final List<Category> categories;
   final List<Product> products;
   final int gridCount;
-  final List<Product> favoriteProducts;
-  final List<Product> cartProducts;
+  final List<FilteredProduct> favoriteProducts;
+  final List<FilteredProduct> cartProducts;
   final String selectedParentCategory;
   final Category selectedSubCategory;
   final List<String> categoryHeaderImages;
-  final List<Product> subCategoryProducts;
+  final List<FilteredProduct> subCategoryProducts;
   final List<Category> subCategories;
-  final List<FilteredProducts> adminProducts;
-  final List<FilteredProducts> suggestions;
-  final List<FilteredProducts> filteredProducts;
+  final List<FilteredProduct> adminProducts;
+  final List<FilteredProduct> suggestions;
+  final List<FilteredProduct> filteredProductsSuggestions;
   final int currentPage;
   final bool hasMore;
+  final bool parentCategoryLoaded;
 
   const ProductsState({
     this.productsStates = ProductsStates.initial,
-    this.categories = const [],
+    this.categories = const [
+      Category(id: 'all', name: 'All', description: '', parentCategoryId: '', subCategories: [])
+    ],
     this.products = const [],
     this.gridCount = 2,
     this.favoriteProducts = const [],
     this.cartProducts = const [],
-    this.selectedParentCategory = '',
+    this.selectedParentCategory = 'all',
     this.categoryHeaderImages = const [],
     this.selectedSubCategory = const Category(id: '', name: '', description: '', parentCategoryId: ''),
     this.subCategoryProducts = const [],
     this.subCategories = const [],
     this.adminProducts = const [],
-    this.currentPage = 1,
+    this.currentPage = 0,
     this.hasMore = true,
     this.suggestions = const [],
-    this.filteredProducts = const []
+    this.filteredProductsSuggestions = const [],
+    this.parentCategoryLoaded = false
   });
 
   ProductsState copyWith({
@@ -57,18 +65,19 @@ class ProductsState extends Equatable {
     List<Category>? categories,
     List<Product>? products,
     int? gridCount,
-    List<Product>? favoriteProducts,
-    List<Product>? cartProducts,
+    List<FilteredProduct>? favoriteProducts,
+    List<FilteredProduct>? cartProducts,
     String? selectedParentCategory,
     List<String>? categoryHeaderImages,
     Category? selectedSubCategory,
-    List<Product>? subCategoryProducts,
+    List<FilteredProduct>? subCategoryProducts,
     List<Category>? subCategories,
-    List<FilteredProducts>? adminProducts,
+    List<FilteredProduct>? adminProducts,
     int? currentPage,
     bool? hasMore,
-    List<FilteredProducts>? suggestions,
-    List<FilteredProducts>? filteredProducts
+    List<FilteredProduct>? suggestions,
+    List<FilteredProduct>? filteredProductsSuggestions,
+    bool? parentCategoryLoaded
   }) {
     return ProductsState(
       productsStates: productsStates ?? this.productsStates,
@@ -86,7 +95,8 @@ class ProductsState extends Equatable {
       currentPage: currentPage ?? this.currentPage,
       hasMore: hasMore ?? this.hasMore,
       suggestions: suggestions ?? this.suggestions,
-      filteredProducts: filteredProducts ?? this.filteredProducts
+      filteredProductsSuggestions: filteredProductsSuggestions ?? this.filteredProductsSuggestions,
+      parentCategoryLoaded: parentCategoryLoaded ?? this.parentCategoryLoaded
     );
   }
   
@@ -107,6 +117,7 @@ class ProductsState extends Equatable {
     currentPage,
     hasMore,
     suggestions,
-    filteredProducts
+    filteredProductsSuggestions,
+    parentCategoryLoaded
   ];
 }

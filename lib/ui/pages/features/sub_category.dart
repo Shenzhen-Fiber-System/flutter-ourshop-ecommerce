@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../pages.dart';
 
 class SubCategoryPage extends StatefulWidget {
@@ -16,14 +14,14 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
 
   @override
   void initState() {
-    fetchData().then((_) => log('fetchData completed'));
+    // fetchData().then((_) => log('fetchData completed'));
     super.initState();
   }
 
 
-  Future<void> fetchData() async {
-    await context.read<ProductsBloc>().fetchSubCategoriesWithProducts(widget.categoryId);
-  }
+  // Future<void> fetchData() async {
+  //   await context.read<ProductsBloc>().fetchSubCategoriesWithProducts(widget.categoryId);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -147,17 +145,18 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                   SliverAnimatedGrid(
                     initialItemCount: state.subCategoryProducts.length,
                     itemBuilder: (context, index, animation) {
-                      final Product product = state.subCategoryProducts[index];
-                      return FadeTransition(
-                        opacity: animation,
-                        child: ProductCard(
-                          height: size.height * 0.35, 
-                          width: size.width * 0.35,
-                          theme: theme,
-                          translations: translations, 
-                          product: product,
-                        ),
-                      );
+                      return Text('$index');
+                      // final Product product = state.subCategoryProducts[index];
+                      // return FadeTransition(
+                      //   opacity: animation,
+                      //   child: ProductCard(
+                      //     height: size.height * 0.35, 
+                      //     width: size.width * 0.35,
+                      //     theme: theme,
+                      //     translations: translations, 
+                      //     product: product,
+                      //   ),
+                      // );
                     }, 
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,

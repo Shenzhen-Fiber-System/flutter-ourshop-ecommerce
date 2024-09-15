@@ -78,7 +78,7 @@ class _AdminProductsState extends State<AdminProducts> {
                 if (index >= state.adminProducts.length && state.hasMore) {
                   return const Center(child: CircularProgressIndicator.adaptive());
                 }
-                final FilteredProducts product = state.adminProducts[index];
+                final FilteredProduct product = state.adminProducts[index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5.0),
                   child: Row(

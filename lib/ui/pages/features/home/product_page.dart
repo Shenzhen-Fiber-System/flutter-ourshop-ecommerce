@@ -12,14 +12,15 @@ class ProductsPage extends StatefulWidget {
 
 class _ProductsPageState extends State<ProductsPage> {
 
-  Future<void> fetchData() async {
-    await context.read<ProductsBloc>().getCategories();
-  }
+  // Future<void> fetchData() async {
+  //   await context.read<ProductsBloc>().getCategories();
+  // }
 
   @override
   void initState() {     
+    // fetchData();
+    context.read<ProductsBloc>().add(const AddCategoriesEvent());
     super.initState();
-    fetchData();
   }
 
   @override
@@ -28,9 +29,10 @@ class _ProductsPageState extends State<ProductsPage> {
     final AppLocalizations translations = AppLocalizations.of(context)!;
     final ThemeData theme = Theme.of(context);
     return BlocBuilder<ProductsBloc, ProductsState>(
+      buildWhen: (previous, current) => previous.categories != current.categories || previous.productsStates != current.productsStates || previous.selectedParentCategory != current.selectedParentCategory || previous.parentCategoryLoaded != current.parentCategoryLoaded,
       builder: (context, state) {
 
-        if (state.productsStates == ProductsStates.loading)  return const Center(child: CircularProgressIndicator.adaptive());
+        if (!state.parentCategoryLoaded)  return const Center(child: CircularProgressIndicator.adaptive());
 
         if (state.productsStates == ProductsStates.error) return Center(child: Text('Something went wrong!', style: theme.textTheme.bodyMedium?.copyWith(color: AppTheme.palette[1000]),));
 
@@ -43,14 +45,16 @@ class _ProductsPageState extends State<ProductsPage> {
               appBar: AppBar(
                 backgroundColor: AppTheme.palette[900],
                 leadingWidth: size.width * 0.25,
-                leading: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => showSearch(context: context, delegate: Search()),
-                      icon: const Icon(Icons.search, color: Colors.white,)
-                    ),
-                    Text(translations.search, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),)
-                  ],
+                leading: FittedBox(
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => showSearch(context: context, delegate: Search()),
+                        icon: const Icon(Icons.search, color: Colors.white,)
+                      ),
+                      Text(translations.search, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),)
+                    ],
+                  ),
                 ),
                 centerTitle: true,
                 title: Image.asset('assets/logos/logo_ourshop_1.png', height: 150, width: 150,),
@@ -59,11 +63,11 @@ class _ProductsPageState extends State<ProductsPage> {
                   labelStyle: theme.tabBarTheme.unselectedLabelStyle?.copyWith(color: Colors.white),
                   isScrollable: true,
                   indicatorSize: TabBarIndicatorSize.label,
-                  onTap: (index) => context.read<ProductsBloc>().addSelectedCategory(state.categories[index].id),
+                  onTap: (index) => context.read<ProductsBloc>().add(AddSelectedParentCategoryEvent(selectedParentCategory: state.categories[index].id,)),
                   tabs: state.categories.map((category,) => Tab(
-                    
-                    text: Helpers.truncateText(category.name, 25), 
-                  )).toList(),
+                      text: Helpers.truncateText(category.name, 25), 
+                    )
+                  ).toList(),
                 ),
               ),
               body: SizedBox(
@@ -71,49 +75,81 @@ class _ProductsPageState extends State<ProductsPage> {
                 width: size.width,
                 child: TabBarView(
                   children: state.categories.map((category) {
-                    return CustomScrollView(
-                    key: UniqueKey(),
-                    slivers: [
-                      SliverAppBar(
-                          automaticallyImplyLeading: false,
-                          expandedHeight: size.height * 0.10,
-                          flexibleSpace: FlexibleSpaceBar(
-                            stretchModes: const [StretchMode.zoomBackground],
-                            background: SubCategoryList(
-                              category: category, 
-                              size: size, 
-                              translations: translations, 
-                              theme: theme,
-                              onTap: (selectedSubCategory) {
-                                if (selectedSubCategory != null) {
-                                  context.go('/sub-category/${selectedSubCategory.id}',);
-                                }
-                              },
-                            ),
-                          ),
-                      ),
-                    SliverGrid.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: state.gridCount,
-                        crossAxisSpacing: 5.0,
-                        mainAxisSpacing: 5.0,
-                        childAspectRatio: 0.7
-                      ),
-                      itemCount: category.products.length,
-                      itemBuilder: (context, index) {
-                        if (category.products.isEmpty) return Text('No Products Found', style: theme.textTheme.titleMedium?.copyWith(color: Colors.black),);
-                        final Product product = category.products[index];
-                        return ProductCard(
-                          height: size.height * 0.25, 
-                          width: size.width * 0.45,
-                          theme: theme,
-                          translations: translations, 
-                          product: product,
+
+                    switch (category.id) {
+                      case "all":  
+                        return Container(
+                          color: Colors.amber,
+                          height: size.height,
+                          width: size.width,
+                          child: Text('TODO, OFERTAS DEL DIA ETC...', style: theme.textTheme.titleMedium?.copyWith(color: Colors.black),)
                         );
-                      },
-                    )
-                    ],
-                  );
+                      default:
+                        return CustomScrollView(
+                        key: UniqueKey(),
+                        slivers: [
+                          SliverAppBar(
+                              automaticallyImplyLeading: false,
+                              expandedHeight: size.height * 0.10,
+                              flexibleSpace: FlexibleSpaceBar(
+                                stretchModes: const [StretchMode.zoomBackground],
+                                background: SubCategoryList(
+                                  category: category, 
+                                  size: size, 
+                                  translations: translations, 
+                                  theme: theme,
+                                  onTap: (selectedSubCategory) {
+                                    if (selectedSubCategory != null) {
+                                      context.go('/sub-category/${selectedSubCategory.id}',);
+                                    }
+                                  },
+                                ),
+                              ),
+                          ),
+                          if (state.productsStates == ProductsStates.loading)
+                            const SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: Center(
+                                child: CircularProgressIndicator.adaptive(),
+                              ),
+                            )
+                          else if (category.products.isEmpty)
+                            SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: Center(
+                                child: Text(
+                                  'No Products Found for this category',
+                                  style: theme.textTheme.titleMedium?.copyWith(color: Colors.grey.shade500),
+                                ),
+                              ),
+                            )
+                          else
+                            SliverGrid.builder(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: 0.6
+                              ),
+                              itemCount: category.products.length,
+                              itemBuilder: (context, index) {
+                                if (category.products.isEmpty) return Text('No Products Found', style: theme.textTheme.titleMedium?.copyWith(color: Colors.grey.shade500),);
+                                if (index == state.filteredProductsSuggestions.length) {
+                                  return const Center(child: CircularProgressIndicator.adaptive());
+                                }
+                                final FilteredProduct product = category.products[index];
+                                return ProductCard(
+                                  height: size.height, 
+                                  width: size.width, 
+                                  product: product, 
+                                  theme: theme, 
+                                  translations: translations
+                                );
+                              },
+                            )
+                        ],
+                      );
+                    }
                   }
                   ).toList(),
                 ),

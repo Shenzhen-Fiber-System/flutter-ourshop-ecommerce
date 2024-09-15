@@ -7,7 +7,7 @@ class RaitingBarWidget extends StatelessWidget {
     this.size,
   });
 
-  final Product product;
+  final FilteredProduct product;
   final double? size;
 
   @override

@@ -1,6 +1,14 @@
 
 import '../../../../../pages.dart';
 
+enum BanKAccountType {
+  Savings('SAVINGS'),
+  Current('CURRENT');
+
+  final String value;
+  const BanKAccountType(this.value);
+}
+
 class ExpansionPanelItem {
   final Bank bank;
   bool isExpanded;
@@ -35,23 +43,22 @@ class MyCompany extends StatefulWidget {
 class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
 
   final List<String> tabs = [
-    translations!.general,
-    translations!.business,
-    translations!.social_media,
-    translations!.banks
+    locator<AppLocalizations>().general,
+    locator<AppLocalizations>().business,
+    locator<AppLocalizations>().social_media,
+    locator<AppLocalizations>().banks
   ];
 
 
   final List<int> qtyProductLandingPage = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
-  final List<Object> accountTypes = [
-    {'id': 'Savings', 'name': 'Savings'},
-    {'id': 'Checking', 'name': 'Checking'},
-    {'id': 'Business', 'name': 'Business'},
+  final List<BanKAccountType> accountTypes = [
+    BanKAccountType.Savings,
+    BanKAccountType.Current
   ];
 
   final List<Widget> _socialMediaForms = [];
-  late ValueNotifier<List<ExpansionPanelItem>> _bankPanelsNotifier;
+  final ValueNotifier<List<ExpansionPanelItem>> _bankPanelsNotifier = ValueNotifier<List<ExpansionPanelItem>>([]);
 
   late ScrollController _scrollController;
   late FocusNode _focusNodeAddress;
@@ -128,17 +135,17 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
   void _addBankPanel() {
     _bankPanelsNotifier.value = List<ExpansionPanelItem>.from(_bankPanelsNotifier.value)
       ..add(ExpansionPanelItem(
-        bank: const Bank(
+        bank: Bank(
           id: '',
-          companyId: '',
-          bankId: 'New Bank',
+          companyId: context.read<CompanyBloc>().state.userCompany.id,
+          bankId: '',
           accountType: '',
           accountNumber: '',
           swiftCode: '',
           address: '',
           phoneNumber: '',
           intermediaryBankId: '',
-          showOrder: true,
+          // showOrder: true,
           bankCountryId: '',
           intermediaryBankCountryId: '',
         ),
@@ -155,6 +162,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     final ThemeData theme = Theme.of(context);
+    final AppLocalizations? translations = AppLocalizations.of(context);
     return SizedBox(
       height: size.height,
       width: size.width,
@@ -171,9 +179,14 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
               child: CircularProgressIndicator.adaptive(),
             );
           }
-          _bankPanelsNotifier = ValueNotifier<List<ExpansionPanelItem>>(
-            state.userCompany.banks.map((bank) => ExpansionPanelItem(bank: bank)).toList(),
-          );
+          if (state.status == CompanyStateStatus.error) {
+            return  Center(
+              child: Text('Error loading company information', style: theme.textTheme.bodyLarge?.copyWith(color: Colors.red),),
+            );
+          }
+          if(state.userCompany.banks.isNotEmpty) {
+            _bankPanelsNotifier.value = state.userCompany.banks.map((bank) => ExpansionPanelItem(bank: bank)).toList();
+          }
           return SingleChildScrollView(
               controller: _scrollController,
               child: Column(
@@ -182,7 +195,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
                     alignment: Alignment.centerLeft,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 5.0, top: 10.0),
-                      child: Text(translations!.update_prop(translations!.company), style: theme.textTheme.titleLarge,),
+                      child: Text(translations!.update_prop(translations.company), style: theme.textTheme.titleLarge,),
                     )
                   ),
                   const SizedBox(height: 10.0,),
@@ -193,12 +206,12 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
                       child: Column(
                         children: [
                           FormBuilderTextField(
-                            name: 'company_name',
+                            name: 'name',
                             initialValue: state.userCompany.name,
                             style: theme.textTheme.labelLarge?.copyWith(color: Colors.black),
                             decoration: InputDecoration(
-                              labelText: translations!.company_name,
-                              hintText: translations!.company_name,
+                              labelText: translations.company_name,
+                              hintText: translations.company_name,
                             ),
                             validator: FormBuilderValidators.compose([
                               FormBuilderValidators.required(),
@@ -232,21 +245,20 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           const Icon(Icons.image, size: 50.0, color: Colors.grey,),
-                                          Text(translations!.company_logo_dimension, style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey.shade700),),
-                                          Text(translations!.supported_formats , style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey.shade700),),
+                                          Text(translations.company_logo_dimension, style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey.shade700),),
+                                          Text(translations.supported_formats , style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey.shade700),),
                                         ],
                                       )
                           ),
                           ElevatedButton(
-                            style: theme.elevatedButtonTheme.style?.copyWith(backgroundColor: WidgetStateProperty.all(AppTheme.palette[1000])),
-                            onPressed: state.logoStatus == CompanyLogoStatus.loading ? null : () => context.read<CompanyBloc>().chooseCompanyLogo(), 
+                            onPressed: state.logoStatus == CompanyLogoStatus.loading || state.status == CompanyStateStatus.updating ? null : () => context.read<CompanyBloc>().chooseCompanyLogo(), 
                             child:  Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 const Icon(Icons.upload, color: Colors.white,),
                                 const SizedBox(width: 10.0,),
-                                Text(translations!.upload_logo, style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),),
+                                Text(translations.upload_logo, style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),),
                               ],
                             ),
                           )
@@ -270,8 +282,8 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
                             tabs: tabs.map((tab) => Tab(text: tab)).toList(),
                           ),
                           Expanded(
-                            child: TabBarView(
-                              controller: _tabController,
+                            child: IndexedStack(
+                              index: _tabController.index,
                               children: [
                                 _GeneralForm(
                                   focusNodeAddress: _focusNodeAddress, 
@@ -301,7 +313,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
                                           width: size.width,
                                           child: ElevatedButton(
                                             onPressed: _addSocialMediaForm,
-                                            child: Text(translations!.add_social_media, style: theme.textTheme.labelMedium?.copyWith(color: Colors.white),),
+                                            child: Text(translations.add_social_media, style: theme.textTheme.labelMedium?.copyWith(color: Colors.white),),
                                           ),
                                         ),
                                         const SizedBox(height: 10.0,),
@@ -339,7 +351,12 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
                                                   headerBuilder: (BuildContext context, bool isExpanded) {
                                                     return ListTile(
                                                       shape: theme.inputDecorationTheme.border?.copyWith(borderSide: BorderSide.none),
-                                                      title: Text( item.bank.id.isEmpty ? 'New bank' : '${translations!.country}:${context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == item.bank.bankCountryId).name} intermediate: ${context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == item.bank.intermediaryBankCountryId).name} type:${item.bank.accountType}', style: theme.textTheme.bodySmall?.copyWith(color: Colors.black, fontWeight: FontWeight.w400),),
+                                                      title: Text(
+                                                        item.bank.id.isEmpty 
+                                                          ? 'New bank' 
+                                                          : '${translations.country}: ${item.bank.bankCountryId.isNotEmpty ? context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == item.bank.bankCountryId, orElse: () => const Country(id: '', name: 'Unknown', iso: '', iso3: '', numCode: 0, phoneCode: 0, flagUrl: '')).name : 'Unknown'} intermediate: ${item.bank.intermediaryBankId.isNotEmpty ? context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == item.bank.intermediaryBankCountryId, orElse: () => const Country(id: '', name: 'Unknown', iso: '', iso3: '', numCode: 0, phoneCode: 0, flagUrl: '')).name : 'Unknown'} type: ${item.bank.accountType}',
+                                                        style: theme.textTheme.bodySmall?.copyWith(color: Colors.black, fontWeight: FontWeight.w400),
+                                                      ),
                                                     );
                                                   },
                                                   body: _buildBankFormWidget(value.indexOf(item)),
@@ -425,8 +442,11 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
       children: [
         const SizedBox(height: 3.0,),
         FormBuilderDropdown(
-          initialValue: context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == bank.bankCountryId).name,
-          name: 'choose_country_first_$index',
+          initialValue: context.read<CountryBloc>().state.countries.firstWhere(
+              (country) => country.id == bank.bankCountryId,
+              orElse: () => const Country(id: '', name: 'Unknown', iso: '', iso3: '', numCode: 0, phoneCode: 0, flagUrl: ''),
+            ).id,
+          name: 'countryId_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
             labelText: 'Choose country',
@@ -436,14 +456,14 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
             FormBuilderValidators.required(),
           ]), 
           items: context.read<CountryBloc>().state.countries.map((country) => DropdownMenuItem(
-            value: country.name,
+            value: country.id,
             child: Text(country.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
           )).toList(),
         ),
         const SizedBox(height: 10.0,),
         FormBuilderDropdown(
-          initialValue: context.read<CompanyBloc>().state.banks.firstWhere((bank) => bank.id == bank.id).name,
-          name: 'choose_bank_$index',
+          initialValue: context.read<CompanyBloc>().state.banks.firstWhere((bank) => bank.id == bank.id).id,
+          name: 'bankId_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
             labelText: 'Choose Bank',
@@ -453,31 +473,31 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
             FormBuilderValidators.required(),
           ]), 
           items: context.read<CompanyBloc>().state.banks.map((country) => DropdownMenuItem(
-            value: country.name,
+            value: country.id,
             child: Text(country.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
           )).toList(),
         ),
         const SizedBox(height: 10.0,),
         FormBuilderDropdown(
-          initialValue: bank.accountType.toLowerCase(),
-          name: 'bank_account_type_$index',
+          initialValue: bank.accountType,
+          name: 'accountType_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
-            labelText: 'Bank Account Name',
-            hintText: 'Bank Account Name',
+            labelText: 'Bank Account type',
+            hintText: 'Bank Account type',
           ),
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required(),
           ]), 
           items: accountTypes.map((accountType) => DropdownMenuItem(
-            value: (accountType as Map<String, String>)['name']!.toLowerCase(),
-            child: Text(accountType['name']!, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
+            value: accountType.value,
+            child: Text( accountType.value, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
           )).toList(),
         ),
         const SizedBox(height: 10.0,),
         FormBuilderTextField(
           initialValue: bank.accountNumber,
-          name: 'account_number_$index',
+          name: 'accountNumber_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
             labelText: 'Account Number',
@@ -490,7 +510,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
         const SizedBox(height: 10.0,),
         FormBuilderTextField(
           initialValue: bank.address,
-          name: 'bank_address_$index',
+          name: 'address_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
             labelText: 'Bank Address',
@@ -503,7 +523,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
         const SizedBox(height: 10.0,),
         FormBuilderTextField(
           initialValue: bank.phoneNumber,
-          name: 'bank_phone_number_$index',
+          name: 'phoneNumber_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
             labelText: 'Bank Phone Number',
@@ -516,7 +536,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
         const SizedBox(height: 10.0,),
         FormBuilderTextField(
           initialValue: bank.swiftCode,
-          name: 'bank_swift_code_$index',
+          name: 'swiftCode_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
             labelText: 'Bank Swift Code',
@@ -528,8 +548,11 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
         ),
         const SizedBox(height: 10.0,),
         FormBuilderDropdown(
-          initialValue: context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == bank.bankCountryId).name,
-          name: 'choose_country_second_$index',
+          initialValue: context.read<CountryBloc>().state.countries.firstWhere(
+              (country) => country.id == bank.intermediaryBankCountryId,
+              orElse: () => const Country(id: '', name: 'Unknown', iso: '', iso3: '', numCode: 0, phoneCode: 0, flagUrl: ''),
+            ).id,
+          name: 'intermediaryBankCountryId_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
             labelText: 'Choose country',
@@ -539,14 +562,14 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
             FormBuilderValidators.required(),
           ]), 
           items: context.read<CountryBloc>().state.countries.map((country) => DropdownMenuItem(
-            value: country.name,
+            value: country.id,
             child: Text(country.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
           )).toList(),
         ),
         const SizedBox(height: 10.0,),
         FormBuilderDropdown(
-          initialValue: context.read<CompanyBloc>().state.banks.firstWhere((bank) => bank.id == bank.id).name,
-          name: 'intermediary_bank_$index',
+          initialValue: context.read<CompanyBloc>().state.banks.firstWhere((bank) => bank.id == bank.id).id,
+          name: 'intermediaryBankId_$index',
           style: theme.textTheme.labelLarge,
           decoration: const InputDecoration(
             labelText: 'Intermediary Bank',
@@ -556,7 +579,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
             FormBuilderValidators.required(),
           ]), 
           items: context.read<CompanyBloc>().state.banks.map((bank) => DropdownMenuItem(
-            value: bank.name,
+            value: bank.id,
             child: Text(bank.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
           )).toList(),
         ),
@@ -582,6 +605,7 @@ class _Business extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations translations = AppLocalizations.of(context)!; 
     return SingleChildScrollView(
       child: FormBuilder(
         key: businessKey,
@@ -589,28 +613,28 @@ class _Business extends StatelessWidget {
           children: [
             const SizedBox(height: 10.0,),
             FormBuilderDropdown(
-              initialValue: context.read<ProductsBloc>().state.categories.firstWhere((category) => category.id == context.read<CompanyBloc>().state.userCompany.mainCategoryId).name,
-              name: 'main_category',
+              initialValue: context.read<ProductsBloc>().state.categories.firstWhere((category) => category.id == context.read<CompanyBloc>().state.userCompany.mainCategoryId, orElse: () => const Category(id: '', name: '', description: '', parentCategoryId: ''),).id,
+              name: 'mainCategoryId',
               style: theme.textTheme.labelLarge,
               decoration: InputDecoration(
-                labelText: translations!.main_category,
-                hintText: translations!.main_category,
+                labelText: translations.main_category,
+                hintText: translations.main_category,
               ),
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
               ]), 
               items: context.read<ProductsBloc>().state.categories.map((category) => DropdownMenuItem(
-                value: category.name,
+                value: category.id,
                 child: Text(category.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
               )).toList(),
             ),
             const SizedBox(height: 10.0,),
             FormBuilderDropdown(
-              name: 'qty_landing_page',
+              name: 'qtyProductLandingPage',
               style: theme.textTheme.labelLarge,
               decoration: InputDecoration(
-                labelText: translations!.products_landing_page,
-                hintText: translations!.products_landing_page,
+                labelText: translations.products_landing_page,
+                hintText: translations.products_landing_page,
               ),
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
@@ -623,7 +647,7 @@ class _Business extends StatelessWidget {
             ),
             const SizedBox(height: 10.0,),
             FormBuilderTextField(
-              name: 'company_subdomain',
+              name: 'subdomain',
               style: theme.textTheme.labelLarge,
               initialValue:context.read<CompanyBloc>().state.userCompany.subdomain,
               decoration: InputDecoration(
@@ -699,7 +723,7 @@ class _GeneralForm extends StatelessWidget {
                   focusNode: _focusNodeAddress,
                   onEditingComplete: () => _focusNodePhone.requestFocus(),
                   textInputAction: TextInputAction.next,
-                  name: 'company_address',
+                  name: 'address',
                   style: theme.textTheme.labelLarge,
                   decoration: const InputDecoration(
                     labelText: 'Address',
@@ -715,7 +739,7 @@ class _GeneralForm extends StatelessWidget {
                   focusNode: _focusNodePhone,
                   onEditingComplete: () => _focusNodeEmail.requestFocus(),
                   textInputAction: TextInputAction.next,
-                  name: 'company_phone', 
+                  name: 'phoneNumber', 
                   style: theme.textTheme.labelLarge,
                   decoration: const InputDecoration(
                     labelText: 'Phone',
@@ -731,7 +755,7 @@ class _GeneralForm extends StatelessWidget {
                   focusNode: _focusNodeEmail,
                   onEditingComplete: () => _focusNodeCountry.requestFocus(),
                   textInputAction: TextInputAction.next,
-                  name: "company_email", 
+                  name: "email", 
                   style: theme.textTheme.labelLarge,
                   decoration: const InputDecoration(
                     labelText: 'Email',
@@ -746,7 +770,7 @@ class _GeneralForm extends StatelessWidget {
                 const SizedBox(height: 10.0,),
                 FormBuilderDropdown(
                   focusNode: _focusNodeCountry,
-                  name: 'company_country',
+                  name: 'countryId',
                   initialValue: _getCountry(state, context),
                   style: theme.textTheme.labelLarge,
                   decoration: const InputDecoration(
@@ -773,7 +797,7 @@ class _GeneralForm extends StatelessWidget {
                   focusNode: _focusNodeCountryCode,
                   onEditingComplete: () => _focusNodeBusinessLine.requestFocus(),
                   textInputAction: TextInputAction.next,
-                  name: 'company_country_code',
+                  name: 'phoneNumberCode',
                   style: theme.textTheme.labelLarge,
                   decoration: const InputDecoration(
                     labelText: 'Country Code',
@@ -790,7 +814,7 @@ class _GeneralForm extends StatelessWidget {
                   focusNode: _focusNodeBusinessLine,
                   onEditingComplete: () => _focusNodeTotalEmployees.requestFocus(),
                   textInputAction: TextInputAction.next,
-                  name: 'company_business_line',
+                  name: 'advantages',
                   style: theme.textTheme.labelLarge,
                   decoration: const InputDecoration(
                     labelText: 'Business Line',
@@ -806,7 +830,7 @@ class _GeneralForm extends StatelessWidget {
                   focusNode: _focusNodeTotalEmployees,
                   onEditingComplete: () => _focusNodeWebsite.requestFocus(),
                   textInputAction: TextInputAction.next,
-                  name: 'company_office_size',
+                  name: 'totalEmployee',
                   style: theme.textTheme.labelLarge,
                   decoration: const InputDecoration(
                     labelText: 'Office Size',
@@ -823,7 +847,7 @@ class _GeneralForm extends StatelessWidget {
                   focusNode: _focusNodeWebsite,
                   onEditingComplete: () => _focusNodeLegalOwner.requestFocus(),
                   textInputAction: TextInputAction.next,
-                  name: 'company_website',
+                  name: 'websiteUrl',
                   style: theme.textTheme.labelLarge,
                   decoration: const InputDecoration(
                     labelText: 'Website',
@@ -838,7 +862,7 @@ class _GeneralForm extends StatelessWidget {
                   initialValue: state.userCompany.legalOwner,
                   focusNode: _focusNodeLegalOwner,
                   textInputAction: TextInputAction.done,
-                  name: 'company_legal_owner',
+                  name: 'legalOwner',
                   style: theme.textTheme.labelLarge,
                   decoration: const InputDecoration(
                     labelText: 'Legal Owner',

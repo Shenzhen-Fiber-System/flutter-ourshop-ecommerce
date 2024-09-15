@@ -22,7 +22,7 @@ class _AdminOrdersState extends State<AdminOrders> {
   }
 
   void _scrollListener() async {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent && context.read<OrdersBloc>().state.hasMore && context.read<OrdersBloc>().state.ordersStatus != OrdersStatus.loadingMore) {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && context.read<OrdersBloc>().state.hasMore && context.read<OrdersBloc>().state.ordersStatus != OrdersStatus.loadingMore) {
       if (context.read<OrdersBloc>().state.ordersStatus != OrdersStatus.loadingMore) {
         await context.read<OrdersBloc>().getFilteredAdminOrders(context.read<OrdersBloc>().state.currentPage + 1);
       }

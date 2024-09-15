@@ -1,7 +1,7 @@
 part of 'company_bloc.dart';
 
 
-enum CompanyStateStatus { initial, loading, loaded, error }
+enum CompanyStateStatus { initial, loading, loaded, error, updating, updated }
 
 enum CompanyLogoStatus { initial, loading, loaded, error }
 
@@ -12,10 +12,12 @@ class CompanyState extends Equatable {
   final int selectedMyCompanyFormIndex;
   final CompanyLogoStatus logoStatus;
   final String selectedLogoPath;
+  final List<FilteredBanks> banks;
+  final List<SocialMedia> socialMedias;
   const CompanyState({
     this.companies = const [],
     this.status = CompanyStateStatus.initial,
-    this.userCompany = const Company(
+    this.userCompany =  const Company(
       id: '',
       name: '',
       address: '',
@@ -30,11 +32,28 @@ class CompanyState extends Equatable {
       officeSize: 0,
       advantages: '',
       subdomain: '',
-      email: '',
+      email: '', 
+      phoneNumberCode: '', 
+      country:  Country(
+        id: '', 
+        name: '', 
+        iso: '', 
+        iso3: '', 
+        numCode: 0, 
+        phoneCode: 0, 
+        flagUrl: '',
+      ), 
+      qtyProductLandingPage: null, 
+      socialMedias: [], 
+      banks: [], 
+      whatsappNumber: null, 
+      hasProfileImg: false,
     ),
     this.selectedMyCompanyFormIndex = 0,
     this.logoStatus = CompanyLogoStatus.initial,
     this.selectedLogoPath = '',
+    this.banks = const [],
+    this.socialMedias = const [],
   });
 
   CompanyState copyWith({
@@ -44,6 +63,8 @@ class CompanyState extends Equatable {
     int? selectedMyCompanyFormIndex,
     CompanyLogoStatus? logoStatus,
     String? selectedLogoPath,
+    List<FilteredBanks>? banks,
+    List<SocialMedia>? socialMedias,
   }) {
     return CompanyState(
       companies: companies ?? this.companies,
@@ -52,6 +73,8 @@ class CompanyState extends Equatable {
       selectedMyCompanyFormIndex: selectedMyCompanyFormIndex ?? this.selectedMyCompanyFormIndex,
       logoStatus: logoStatus ?? this.logoStatus,
       selectedLogoPath: selectedLogoPath ?? this.selectedLogoPath,
+      banks: banks ?? this.banks,
+      socialMedias: socialMedias ?? this.socialMedias,
     );
   }
   
@@ -63,5 +86,7 @@ class CompanyState extends Equatable {
     selectedMyCompanyFormIndex,
     logoStatus,
     selectedLogoPath,
+    banks,
+    socialMedias,
   ];
 }
