@@ -17,23 +17,23 @@ import 'my_company/my_company.dart';
       AdminOption(
         title: locator<AppLocalizations>().my_company, 
         subCategories: [
-          'Perfil de compañia',
-          'Web Editor'
+          locator<AppLocalizations>().company_profile,
+          locator<AppLocalizations>().web_editor,
         ],
       ),
       AdminOption(
         title: locator<AppLocalizations>().orders,
         subCategories: [
-          'Lista de ordenes',
+          locator<AppLocalizations>().orders_list,
         ]
       ),
       AdminOption(
         title: locator<AppLocalizations>().products,
         subCategories: [
-          'Incluir productos',
-          'Grupo de paises',
-          'Tarifas de envio',
-          'Ofertas'
+          locator<AppLocalizations>().include_products,
+          locator<AppLocalizations>().countries_group,
+          locator<AppLocalizations>().shipping_cost,
+          locator<AppLocalizations>().offers,
         ]
       ),
       AdminOption(
@@ -117,21 +117,16 @@ class AdminPage extends StatelessWidget {
                           shape: theme.inputDecorationTheme.border?.copyWith(borderSide: BorderSide.none),
                           title: Text(subCategory, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white)),
                           onTap: () {
-                            switch (subCategory) {
-                              case 'Perfil de compañia':
-                                context.push('/admin/option/my-company', extra: AdminOptions.MY_COMPANY);
-                                break;
-                              case 'Web Editor':
-                                context.push('/admin/option/my-company/WebEditor');
-                                break;
-                              case 'Lista de ordenes':
-                                context.push('/admin/option/orders', extra: AdminOptions.ORDERS);
-                                break;
-                              case 'Incluir productos':
-                                context.push('/admin/option/products', extra: AdminOptions.PRODUCTS);
-                                break;
-                              default:
-                                break;
+                            if (subCategory == locator<AppLocalizations>().company_profile) {
+                              context.push('/admin/option/my-company', extra: AdminOptions.MY_COMPANY);
+                            } else if (subCategory == locator<AppLocalizations>().web_editor) {
+                              context.push('/admin/option/my-company/WebEditor');
+                            } else if (subCategory == locator<AppLocalizations>().orders_list) {
+                              context.push('/admin/option/orders', extra: AdminOptions.ORDERS);
+                            } else if (subCategory == locator<AppLocalizations>().include_products) {
+                              context.push('/admin/option/products', extra: AdminOptions.PRODUCTS);
+                            } else if (subCategory == locator<AppLocalizations>().countries_group) {
+                              context.push('/admin/option/products/countries-groups');
                             }
                           },
                         );

@@ -12,7 +12,7 @@ final Map<String, dynamic> filteredParamenters = {
   "searchFields": [],
   "sortOrders": [],
   "page": 1,
-  "pageSize": 100,
+  "pageSize": 10,
   "searchString": ""
 };
 
@@ -34,6 +34,8 @@ class CompanyBloc extends Bloc<CompanyEvent, CompanyState> {
       try {
         emit(state.copyWith(status: CompanyStateStatus.loading, banks: []));
         filteredParamenters['uuids'].add({"fieldName":"country.id", "value":event.countryId});
+        // to fetch 100 banks per request
+        filteredParamenters['pageSize'] = 100;
         final dynamic company = await _companyService.getCompanyById(event.companyId);
         final dynamic socialMedias = await _socialMediaService.getSocialMedias();
         final dynamic banks = await _companyService.getBanksByCompany(filteredParamenters);

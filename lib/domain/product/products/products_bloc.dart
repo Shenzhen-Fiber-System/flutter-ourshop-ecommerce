@@ -5,7 +5,6 @@ import 'package:ourshop_ecommerce/models/models.dart';
 import '../../../ui/pages/pages.dart';
 part 'products_event.dart';
 part 'products_state.dart';
-
 class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 
   final ProductService _productService;
@@ -21,8 +20,8 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   super(const ProductsState()) {
     on<AddProductsStatesEvent>((event, emit)=> emit(state.copyWith(productsStates: event.productsState)));
     on<AddCategoriesEvent>((event, emit) async  {
-      emit(state.copyWith(productsStates: ProductsStates.loading));
       try {  
+        emit(state.copyWith(productsStates: ProductsStates.loading));
         final dynamic categories = await _productService.getCategories();
         if (categories is List<Category> && categories.isNotEmpty) {
           emit(state.copyWith(
@@ -73,24 +72,12 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     on<AddSubCategoriesEvent>((event, emit) => emit(state.copyWith(subCategories: event.subCategories)));
     on<AddAdminProductsEvent>((event, emit) async {
       try {
-      
         emit(state.copyWith(
           productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
         ));
-
-        final Map<String, dynamic> filteredParamenters = {
-          "uuids": [ {
-              "fieldName":"company.id", 
-              "value":event.uuid
-            }
-          ],
-          "searchFields": [],
-          "sortOrders": [],
-          "page": event.page,
-          "pageSize": 10,
-          "searchString": ""
-        };
-        
+        filteredParamenters['uuids'].add({"fieldName":"company.id", "value":event.uuid});
+        filteredParamenters['page'] = event.page;
+        filteredParamenters['pageSize'] = 10;
         final adminProducts = await _productService.filteredAdminProducts(filteredParamenters);
         if(adminProducts is FilteredData){
           final List<FilteredProduct> updatedList = List.from(state.adminProducts);
@@ -120,33 +107,14 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     });
     on<AddFilteredProductsSuggestionsEvent>((event, emit) async {
 
-      emit(state.copyWith(
-        productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
-      ));
-
-      log('event: ${event.page}');
-
-      final Map<String, dynamic> filteredParamenters = {
-        "uuids": [],
-        "searchFields": [],
-        "sortOrders": [],
-        "page": event.page,
-        "pageSize": 10,
-        "searchString": ""
-      };
-
-      if (event.mode == FilteredResponseMode.suggestions){
-        filteredParamenters["uuids"] = [
-          {
-            "fieldName":"products", 
-            "value":'""'
-          }
-        ];
-      }
-
-      log('fetching filtered products for ${state.categories.firstWhere((element) => element.id == state.selectedParentCategory).name} : ${state.selectedParentCategory}');
-
+      
       try {
+        emit(state.copyWith(
+          productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
+        ));
+        filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
+        filteredParamenters['page'] = event.page;
+        filteredParamenters['pageSize'] = 10;
         final response = await  _productService.filteredProducts(filteredParamenters);
         if (response is FilteredData){
           final List<FilteredProduct> updatedSuggestionsList = List.from(state.filteredProductsSuggestions);
@@ -165,31 +133,14 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       }
     });
     on<AddFilteredProductsEvent>((event, emit) async{
-
-      emit(state.copyWith(
-        productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
-      ));
-
-      final Map<String, dynamic> filteredParamenters = {
-        "uuids": [],
-        "searchFields": [],
-        "sortOrders": [],
-        "page": event.page,
-        "pageSize": 10,
-        "searchString": ""
-      };
-
       try {
-
-        filteredParamenters["uuids"] = [
-          {
-            // "fieldName":"category.id",
-            // "value": event.mode == FilteredResponseMode.subCategoryProducts ? state.selectedSubCategory.id : state.selectedParentCategory
-            "fieldName":"",
-            "value": ""
-          }
-        ];
-
+        emit(state.copyWith(
+          productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
+        ));
+        // filteredParamenters['uuids'].add({"fieldName":"category.id", "value":event.mode == FilteredResponseMode.subCategoryProducts ? state.selectedSubCategory.id : state.selectedParentCategory});
+        filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
+        filteredParamenters['page'] = event.page;
+        filteredParamenters['pageSize'] = 10;
         final dynamic response =  await _productService.filteredProducts(filteredParamenters);
 
         if (response is FilteredData) {
@@ -220,6 +171,33 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       }
         
       
+    });
+    on<AddFilteredCountriesGrupoEvent>((event, emit) async {
+
+      try {
+        emit(state.copyWith(
+          productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
+        ));
+
+        filteredParamenters['uuids'].add({"fieldName":"company.id", "value":event.companyId});
+        filteredParamenters['page'] = event.page;
+        filteredParamenters['pageSize'] = 10;
+        final response = await _productService.filteredCountriesGroup(filteredParamenters);
+        if (response is FilteredData<FilteredGroupCountries>) {
+          final List<FilteredGroupCountries> updatedGroupCountries = List.from(state.groupCountries);
+          updatedGroupCountries.addAll(response.content);
+          emit(state.copyWith(
+              groupCountries: updatedGroupCountries,
+              currentPage: response.page,
+              hasMore: response.page < response.totalPages,
+              productsStates: ProductsStates.loaded
+            )
+          );
+        }
+        emit(state.copyWith(productsStates: ProductsStates.loaded));
+      } catch (e) {
+        emit(state.copyWith(productsStates: ProductsStates.error));
+      }
     });
   }
 

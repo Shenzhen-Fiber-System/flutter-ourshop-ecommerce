@@ -85,5 +85,16 @@ class ProductService {
     }
   }
 
+  Future<dynamic> filteredCountriesGroup(Map<String, dynamic> filteredParams) async {
+    try {
+      final response = await dio.post('/country-groups/filtered-page', data: filteredParams);
+      final countriesGroup = FilteredResponse<FilteredGroupCountries>.fromJson(response.data, (json) => FilteredGroupCountries.fromJson(json));
+      return countriesGroup.data;
+    } on DioException catch (e) {
+      log('filteredCountriesGroup: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
+
 
 }

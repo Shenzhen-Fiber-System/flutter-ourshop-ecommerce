@@ -145,3 +145,11 @@ class AddFilteredProductsEvent extends ProductsEvent {
   @override
   List<Object> get props => [page];
 }
+
+class AddFilteredCountriesGrupoEvent extends ProductsEvent {
+  final int page;
+  final String companyId;
+  const AddFilteredCountriesGrupoEvent({required this.page, required this.companyId});
+  @override
+  List<Object> get props => [page, companyId];
+}

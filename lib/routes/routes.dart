@@ -1,7 +1,5 @@
 import 'dart:developer';
 
-import 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/new_admin_product.dart';
-
 import '../ui/pages/pages.dart';
 
 class AppRoutes {
@@ -145,6 +143,12 @@ class AppRoutes {
                   return AdminProductDetail(product: product,);
                 },
               ),
+              GoRoute(
+                path: 'countries-groups',
+                builder: (context, state) {
+                  return const CountryGroupPage();
+                },
+              )
             ]
           )
         ]

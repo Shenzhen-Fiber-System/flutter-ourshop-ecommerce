@@ -37,6 +37,7 @@ class ProductsState extends Equatable {
   final int currentPage;
   final bool hasMore;
   final bool parentCategoryLoaded;
+  final List<FilteredGroupCountries> groupCountries;
 
   const ProductsState({
     this.productsStates = ProductsStates.initial,
@@ -57,7 +58,8 @@ class ProductsState extends Equatable {
     this.hasMore = true,
     this.suggestions = const [],
     this.filteredProductsSuggestions = const [],
-    this.parentCategoryLoaded = false
+    this.parentCategoryLoaded = false,
+    this.groupCountries = const []
   });
 
   ProductsState copyWith({
@@ -77,7 +79,8 @@ class ProductsState extends Equatable {
     bool? hasMore,
     List<FilteredProduct>? suggestions,
     List<FilteredProduct>? filteredProductsSuggestions,
-    bool? parentCategoryLoaded
+    bool? parentCategoryLoaded,
+    List<FilteredGroupCountries>? groupCountries
   }) {
     return ProductsState(
       productsStates: productsStates ?? this.productsStates,
@@ -96,7 +99,8 @@ class ProductsState extends Equatable {
       hasMore: hasMore ?? this.hasMore,
       suggestions: suggestions ?? this.suggestions,
       filteredProductsSuggestions: filteredProductsSuggestions ?? this.filteredProductsSuggestions,
-      parentCategoryLoaded: parentCategoryLoaded ?? this.parentCategoryLoaded
+      parentCategoryLoaded: parentCategoryLoaded ?? this.parentCategoryLoaded,
+      groupCountries: groupCountries ?? this.groupCountries
     );
   }
   
@@ -118,6 +122,7 @@ class ProductsState extends Equatable {
     hasMore,
     suggestions,
     filteredProductsSuggestions,
-    parentCategoryLoaded
+    parentCategoryLoaded,
+    groupCountries
   ];
 }

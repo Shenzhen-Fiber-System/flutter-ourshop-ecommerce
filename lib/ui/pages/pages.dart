@@ -19,6 +19,9 @@ export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/orders/a
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/products.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/product_detail.dart';
 
+export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/countries_group_page.dart';
+export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/new_admin_product.dart';
+
 
 
 

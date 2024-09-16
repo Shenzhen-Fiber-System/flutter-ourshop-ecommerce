@@ -537,7 +537,55 @@ class FilteredProductVideoPhoto {
     };
 }
 
+class FilteredGroupCountries extends Equatable {
+    final String id;
+    final String name;
+    final dynamic countriesIds;
+    final List<Country> countries;
 
+    const FilteredGroupCountries({
+        required this.id,
+        required this.name,
+        required this.countriesIds,
+        required this.countries,
+    });
+
+    FilteredGroupCountries copyWith({
+        String? id,
+        String? name,
+        dynamic countriesIds,
+        List<Country>? countries,
+    }) => 
+        FilteredGroupCountries(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            countriesIds: countriesIds ?? this.countriesIds,
+            countries: countries ?? this.countries,
+        );
+
+    factory FilteredGroupCountries.fromJson(Map<String, dynamic> json) => FilteredGroupCountries(
+        id: json["id"],
+        name: json["name"],
+        countriesIds: json["countriesIds"],
+        countries: List<Country>.from(json["countries"].map((x) => Country.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "countriesIds": countriesIds,
+        "countries": List<dynamic>.from(countries.map((x) => x.toJson())),
+    };
+    
+    @override
+    
+    List<Object?> get props => [
+        id,
+        name,
+        countriesIds,
+        countries,
+    ];
+}
 
 //Orders
 

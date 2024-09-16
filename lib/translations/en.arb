@@ -181,7 +181,14 @@
     "error_laoding_image": "Error loading image",
     "min": "Min {number}",
     "company_information": "Company information updated",
-    "company_information_error": "Error trying to updated company information"
-
-
+    "company_information_error": "Error trying to updated company information",
+    "include_products": "Include products",
+    "countries_group": "Countries group",
+    "no_coutnries_group": "No countries group yet",
+    "shipping_cost": "Shipping cost",
+    "offers": "Offers",
+    "orders_list": "Orders list",
+    "company_profile": "Company profile",
+    "web_editor": "Web editor",
+    "countries": "Countries"
 }
