@@ -23,7 +23,11 @@ class _AdminProductsState extends State<AdminProducts> {
   }
 
   void fetchAdminProducts() {
-    context.read<ProductsBloc>().add(AddAdminProductsEvent(uuid: context.read<UsersBloc>().state.loggedUser.companyId, page: 1));
+    context.read<ProductsBloc>().add(AddAdminProductsEvent(
+        uuid: context.read<UsersBloc>().state.loggedUser.companyId, 
+        page: 1
+      )
+    );
   }
 
   void _scrollListener() {
@@ -49,6 +53,7 @@ class _AdminProductsState extends State<AdminProducts> {
     final ThemeData theme = Theme.of(context);
     final TextStyle style = theme.textTheme.bodyLarge!.copyWith(color: Colors.black);
     final Size size = MediaQuery.of(context).size;
+    final AppLocalizations translations = AppLocalizations.of(context)!;
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.all(10),
@@ -62,11 +67,11 @@ class _AdminProductsState extends State<AdminProducts> {
             }
 
             if (state.productsStates == ProductsStates.error) {
-              return Center(child: Text('Error', style: theme.textTheme.bodyLarge?.copyWith(color: Colors.black)));
+              return Center(child: Text(translations.error, style: theme.textTheme.bodyLarge?.copyWith(color: Colors.black)));
             }
 
             if (state.adminProducts.isEmpty) {
-              return Center(child: Text('No products found', style: theme.textTheme.bodyLarge?.copyWith(color: Colors.black)));
+              return Center(child: Text(translations.no_products_found, style: theme.textTheme.bodyLarge?.copyWith(color: Colors.black)));
             }
 
             return ListView.builder(

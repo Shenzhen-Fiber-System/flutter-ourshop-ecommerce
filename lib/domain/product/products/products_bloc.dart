@@ -199,6 +199,40 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         emit(state.copyWith(productsStates: ProductsStates.error));
       }
     });
+    on<AddSubCategoriesNewProductEvent>((event, emit) async {
+      try {
+        // fetch the subcategories of the selected category for add new products but we fetch all necessary data for this form
+        emit(state.copyWith(productsStates: ProductsStates.loading));
+        final dynamic subCategories = await _categoryService.getSubCategoriesByCategory(event.categoryId);
+        final dynamic productGroups = await _productService.getProductGroups();
+        final dynamic productTypes = await _productService.getProductsType();
+        final dynamic unitMeasurements = await _productService.getUnitMeasurement();
+        if (subCategories is List<Category>) {
+          emit(state.copyWith(subCategoriesNewProduct: subCategories, productsStates: ProductsStates.loaded));
+        }
+        if (productGroups is List<ProductGroup>) {
+          emit(state.copyWith(productGroups: productGroups));
+        }
+        if (productTypes is List<ProductType>) {
+          emit(state.copyWith(productTypes: productTypes));
+        }
+        if (unitMeasurements is List<UnitMeasurement>) {
+          emit(state.copyWith(unitMeasurements: unitMeasurements));
+        }
+      } catch (e) {
+        log('error: ${e.toString()}');
+      }
+    });
+    on<AddNewProductEvent>((event, emit) async {
+      try {
+        emit(state.copyWith(productsStates: ProductsStates.adding));
+        await _productService.addNewProduct(event.form);
+        emit(state.copyWith(productsStates: ProductsStates.added));
+      } catch (e) {
+        log('error: ${e.toString()}');
+        emit(state.copyWith(productsStates: ProductsStates.error));
+      }
+    });
   }
 
   FutureOr<void> _addSubCategoryProductsEvent(event, emit) {

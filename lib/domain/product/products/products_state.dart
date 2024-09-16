@@ -6,7 +6,11 @@ enum ProductsStates{
   loading,
   loaded,
   error,
-  loadingMore
+  loadingMore,
+  uploading,
+  uploaded,
+  adding,
+  added,
 }
 
 enum FilteredResponseMode{
@@ -38,6 +42,10 @@ class ProductsState extends Equatable {
   final bool hasMore;
   final bool parentCategoryLoaded;
   final List<FilteredGroupCountries> groupCountries;
+  final List<Category> subCategoriesNewProduct;
+  final List<ProductGroup> productGroups;
+  final List<ProductType> productTypes;
+  final List<UnitMeasurement> unitMeasurements;
 
   const ProductsState({
     this.productsStates = ProductsStates.initial,
@@ -59,7 +67,11 @@ class ProductsState extends Equatable {
     this.suggestions = const [],
     this.filteredProductsSuggestions = const [],
     this.parentCategoryLoaded = false,
-    this.groupCountries = const []
+    this.groupCountries = const [],
+    this.subCategoriesNewProduct = const [],
+    this.productGroups = const [],
+    this.productTypes = const [],
+    this.unitMeasurements = const []
   });
 
   ProductsState copyWith({
@@ -80,7 +92,11 @@ class ProductsState extends Equatable {
     List<FilteredProduct>? suggestions,
     List<FilteredProduct>? filteredProductsSuggestions,
     bool? parentCategoryLoaded,
-    List<FilteredGroupCountries>? groupCountries
+    List<FilteredGroupCountries>? groupCountries,
+    List<Category>? subCategoriesNewProduct,
+    List<ProductGroup>? productGroups,
+    List<ProductType>? productTypes,
+    List<UnitMeasurement>? unitMeasurements
   }) {
     return ProductsState(
       productsStates: productsStates ?? this.productsStates,
@@ -100,7 +116,11 @@ class ProductsState extends Equatable {
       suggestions: suggestions ?? this.suggestions,
       filteredProductsSuggestions: filteredProductsSuggestions ?? this.filteredProductsSuggestions,
       parentCategoryLoaded: parentCategoryLoaded ?? this.parentCategoryLoaded,
-      groupCountries: groupCountries ?? this.groupCountries
+      groupCountries: groupCountries ?? this.groupCountries,
+      subCategoriesNewProduct: subCategoriesNewProduct ?? this.subCategoriesNewProduct,
+      productGroups: productGroups ?? this.productGroups,
+      productTypes: productTypes ?? this.productTypes,
+      unitMeasurements: unitMeasurements ?? this.unitMeasurements
     );
   }
   
@@ -123,6 +143,10 @@ class ProductsState extends Equatable {
     suggestions,
     filteredProductsSuggestions,
     parentCategoryLoaded,
-    groupCountries
+    groupCountries,
+    subCategoriesNewProduct,
+    productGroups,
+    productTypes,
+    unitMeasurements
   ];
 }

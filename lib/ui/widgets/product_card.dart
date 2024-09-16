@@ -302,18 +302,7 @@ class CartCard extends StatelessWidget {
           ),
           Expanded(
             child:  BlocBuilder<ProductsBloc, ProductsState>(
-              builder: (_, state) {
-                // if (!showFavoriteButton!){
-                //   return ListTile(
-                //     shape: const RoundedRectangleBorder(
-                //       side: BorderSide.none
-                //     ),
-                //     title: Text(Helpers.truncateText(product.name, 18), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),),
-                //     // title: const Text('data'),
-                //     subtitle: Text('\$${product.unitPrice?.toStringAsFixed(2) ?? 0.00}', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black, fontWeight:  FontWeight.w600),),
-                //     // trailing: IncreaseDecrease(theme: theme, product: product),
-                //   );
-                // }
+              builder: (_, state) {                
                 return Padding(
                   padding: const EdgeInsets.only(left: 5.0),
                   child: Column(

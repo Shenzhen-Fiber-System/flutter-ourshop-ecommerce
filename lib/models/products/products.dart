@@ -22,7 +22,6 @@ class ProductResponse extends Equatable {
         "message": message,
         "data": List<dynamic>.from(data.map((x) => x.toJson())),
     };
-    
     @override
     List<Object?> get props => [
       success, 
@@ -539,8 +538,228 @@ class Review extends Equatable {
       ];
 }
 
+class ProductGroupsResponse {
+    final bool success;
+    final String message;
+    final List<ProductGroup> data;
 
-// FILTERED PRODUCTS --- WE NEED TO REFACTOR THIS
+    ProductGroupsResponse({
+        required this.success,
+        required this.message,
+        required this.data,
+    });
+
+    ProductGroupsResponse copyWith({
+        bool? success,
+        String? message,
+        List<ProductGroup>? data,
+    }) => 
+        ProductGroupsResponse(
+            success: success ?? this.success,
+            message: message ?? this.message,
+            data: data ?? this.data,
+        );
+
+    factory ProductGroupsResponse.fromJson(Map<String, dynamic> json) => ProductGroupsResponse(
+        success: json["success"],
+        message: json["message"],
+        data: List<ProductGroup>.from(json["data"].map((x) => ProductGroup.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "success": success,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
+}
+
+class ProductGroup {
+    final String id;
+    final String name;
+    final dynamic description;
+    final String companyId;
+
+    ProductGroup({
+        required this.id,
+        required this.name,
+        required this.description,
+        required this.companyId,
+    });
+
+    ProductGroup copyWith({
+        String? id,
+        String? name,
+        dynamic description,
+        String? companyId,
+    }) => 
+        ProductGroup(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            description: description ?? this.description,
+            companyId: companyId ?? this.companyId,
+        );
+
+    factory ProductGroup.fromJson(Map<String, dynamic> json) => ProductGroup(
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+        companyId: json["companyId"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "description": description,
+        "companyId": companyId,
+    };
+}
+
+class ProductTypeResponse {
+    final bool success;
+    final String message;
+    final List<ProductType> data;
+
+    ProductTypeResponse({
+        required this.success,
+        required this.message,
+        required this.data,
+    });
+
+    ProductTypeResponse copyWith({
+        bool? success,
+        String? message,
+        List<ProductType>? data,
+    }) => 
+        ProductTypeResponse(
+            success: success ?? this.success,
+            message: message ?? this.message,
+            data: data ?? this.data,
+        );
+
+    factory ProductTypeResponse.fromJson(Map<String, dynamic> json) => ProductTypeResponse(
+        success: json["success"],
+        message: json["message"],
+        data: List<ProductType>.from(json["data"].map((x) => ProductType.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "success": success,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
+}
+
+class ProductType {
+    final String id;
+    final String name;
+    final dynamic description;
+    final String companyId;
+
+    ProductType({
+        required this.id,
+        required this.name,
+        required this.description,
+        required this.companyId,
+    });
+
+    ProductType copyWith({
+        String? id,
+        String? name,
+        dynamic description,
+        String? companyId,
+    }) => 
+        ProductType(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            description: description ?? this.description,
+            companyId: companyId ?? this.companyId,
+        );
+
+    factory ProductType.fromJson(Map<String, dynamic> json) => ProductType(
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+        companyId: json["companyId"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "description": description,
+        "companyId": companyId,
+    };
+}
+
+
+class UnitMeasurementResponse {
+    final bool success;
+    final String message;
+    final List<UnitMeasurement> data;
+
+    UnitMeasurementResponse({
+        required this.success,
+        required this.message,
+        required this.data,
+    });
+
+    UnitMeasurementResponse copyWith({
+        bool? success,
+        String? message,
+        List<UnitMeasurement>? data,
+    }) => 
+        UnitMeasurementResponse(
+            success: success ?? this.success,
+            message: message ?? this.message,
+            data: data ?? this.data,
+        );
+
+    factory UnitMeasurementResponse.fromJson(Map<String, dynamic> json) => UnitMeasurementResponse(
+        success: json["success"],
+        message: json["message"],
+        data: List<UnitMeasurement>.from(json["data"].map((x) => UnitMeasurement.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "success": success,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
+}
+
+class UnitMeasurement {
+    final String id;
+    final String name;
+    final String description;
+
+    UnitMeasurement({
+        required this.id,
+        required this.name,
+        required this.description,
+    });
+
+    UnitMeasurement copyWith({
+        String? id,
+        String? name,
+        String? description,
+    }) => 
+        UnitMeasurement(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            description: description ?? this.description,
+        );
+
+    factory UnitMeasurement.fromJson(Map<String, dynamic> json) => UnitMeasurement(
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "description": description,
+    };
+}
 
 
 

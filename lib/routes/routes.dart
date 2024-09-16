@@ -133,7 +133,7 @@ class AppRoutes {
               GoRoute(
                 path: 'new',
                 builder: (context, state) {
-                  return NewAdminProduct();
+                  return const NewAdminProduct();
                 },
               ),
               GoRoute(

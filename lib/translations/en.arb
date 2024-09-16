@@ -147,6 +147,7 @@
     "key_value": "Key value",
     "unit_price": "Unit price {price}",
     "price_range": "Price range",
+    "price_by_quantity": "Price by quantity",
     "inventory": "Inventory",
     "package_dimensions": "Package dimensions",
     "package_length": "Package length",
@@ -190,5 +191,14 @@
     "orders_list": "Orders list",
     "company_profile": "Company profile",
     "web_editor": "Web editor",
-    "countries": "Countries"
+    "countries": "Countries",
+    "no_products_found": "No products found",
+    "range": "Range",
+    "selected_photos_error":"you should select at least one photo",
+    "files":"Files",
+    "no_selected":"No {prop} selected",
+    "from": "From",
+    "specification": "Specification",
+    "detail": "Detail",
+    "product_added": "Product added successfully"
 }

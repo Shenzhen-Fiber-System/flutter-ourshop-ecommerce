@@ -96,5 +96,52 @@ class ProductService {
     }
   }
 
+  Future<dynamic> getProductGroups() async {
+    try {
+      final response = await dio.get('/product-groups');      
+      final productGroups = ProductGroupsResponse.fromJson(response.data);
+      return productGroups.data;
+    } on DioException catch (e) {
+      log('error productGroups: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
 
+  Future<dynamic> getProductsType() async {
+    try {
+      final response = await dio.get('/product-types');
+      final productTypes = ProductTypeResponse.fromJson(response.data);
+      return productTypes.data;
+    } on DioException catch (e) {
+      ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> getUnitMeasurement() async {
+    try {
+      final response = await dio.get('/unit-measurements');
+      final unitMeasurements = UnitMeasurementResponse.fromJson(response.data);
+      return unitMeasurements.data;
+    } on DioException catch (e) {
+      ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> addNewProduct(FormData formData) async {
+    try {
+      final response = await dio.post('/products', data: formData, options: Options(contentType: 'multipart/form-data'));
+      if (response.data['success'] == true) {
+        SuccessToast(
+          title: locator<AppLocalizations>().product_added,
+          style: ToastificationStyle.flatColored,
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.green.shade500,
+        )
+        .showToast(AppRoutes.globalContext!);
+      }
+    } on DioException catch (e) {
+      log('error addNewProduct: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
 }

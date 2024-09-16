@@ -33,12 +33,20 @@ class Observable extends BlocObserver {
     } else if (bloc is ProductsBloc){
       final currentState = change.currentState as ProductsState;
       final nextState = change.nextState as ProductsState;
-      if (currentState.filteredProductsSuggestions != nextState.filteredProductsSuggestions) {
-        log('Products changed to ${nextState.filteredProductsSuggestions.length}');
+      if(currentState.subCategoriesNewProduct != nextState.subCategoriesNewProduct) {
+        log('subCategoriesNewProduct: ${nextState.subCategoriesNewProduct.length}');
       }
-      if (currentState.categories != nextState.categories) {
-        log('categories changed to ${nextState.categories.length}');
+      if(currentState.productGroups != nextState.productGroups) {
+        log('productGroups: ${nextState.productGroups.length}');
       }
+      if(currentState.productTypes != nextState.productTypes) {
+        log('productTypes: ${nextState.productTypes.length}');
+      }
+      if(currentState.unitMeasurements != nextState.unitMeasurements) {
+        log('unitMeasurements: ${nextState.unitMeasurements.length}');
+      }
+      
+      
       
     } else if (bloc is OrdersBloc){
       final currentState = change.currentState as OrdersState;

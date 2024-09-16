@@ -153,3 +153,17 @@ class AddFilteredCountriesGrupoEvent extends ProductsEvent {
   @override
   List<Object> get props => [page, companyId];
 }
+
+class AddSubCategoriesNewProductEvent extends ProductsEvent {
+  final String categoryId;
+  const AddSubCategoriesNewProductEvent({required this.categoryId});
+  @override
+  List<Object> get props => [categoryId];
+}
+
+class AddNewProductEvent extends ProductsEvent {
+  final FormData form;
+  const AddNewProductEvent({required this.form});
+  @override
+  List<Object> get props => [form];
+}
