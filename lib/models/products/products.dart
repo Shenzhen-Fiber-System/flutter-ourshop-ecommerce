@@ -761,5 +761,81 @@ class UnitMeasurement {
     };
 }
 
+class CountryGroupResponse {
+    final bool success;
+    final String message;
+    final List<CountryGroup> data;
+
+    CountryGroupResponse({
+        required this.success,
+        required this.message,
+        required this.data,
+    });
+
+    CountryGroupResponse copyWith({
+        bool? success,
+        String? message,
+        List<CountryGroup>? data,
+    }) => 
+        CountryGroupResponse(
+            success: success ?? this.success,
+            message: message ?? this.message,
+            data: data ?? this.data,
+        );
+
+    factory CountryGroupResponse.fromJson(Map<String, dynamic> json) => CountryGroupResponse(
+        success: json["success"],
+        message: json["message"],
+        data: List<CountryGroup>.from(json["data"].map((x) => CountryGroup.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "success": success,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
+}
+
+class CountryGroup {
+    final String id;
+    final String name;
+    final List<String> countriesIds;
+    final List<Country> countries;
+
+    CountryGroup({
+        required this.id,
+        required this.name,
+        this.countriesIds = const [],
+        required this.countries,
+    });
+
+    CountryGroup copyWith({
+        String? id,
+        String? name,
+        // dynamic countriesIds,
+        List<Country>? countries,
+    }) => 
+        CountryGroup(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            // countriesIds: countriesIds ?? this.countriesIds,
+            countries: countries ?? this.countries,
+        );
+
+    factory CountryGroup.fromJson(Map<String, dynamic> json) => CountryGroup(
+        id: json["id"],
+        name: json["name"],
+        // countriesIds: json["countriesIds"],
+        countries: List<Country>.from(json["countries"].map((x) => Country.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "countriesIds": countriesIds,
+        "countries": List<dynamic>.from(countries.map((x) => x.toJson())),
+    };
+}
+
 
 

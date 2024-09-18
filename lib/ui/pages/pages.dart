@@ -1,4 +1,5 @@
 // pages
+export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/shipping_rates.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/orders/admin_order_detail.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/my_company/web_editor.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/checkout_page.dart';
@@ -21,7 +22,6 @@ export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products
 
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/countries_group_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/new_admin_product.dart';
-
 
 
 

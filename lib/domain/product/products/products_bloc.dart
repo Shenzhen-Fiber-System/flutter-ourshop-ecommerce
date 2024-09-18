@@ -57,10 +57,11 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         ));
 
         // Llama al evento para cargar los productos de la categoría seleccionada
-        add(AddFilteredProductsEvent(
-          page: state.currentPage + 1, // Iniciamos en la primera página
-          mode: FilteredResponseMode.generalCategoryProducts,
-        ));
+        // add(AddFilteredProductsEvent(
+        //   page: state.currentPage + 1,
+        //   mode: FilteredResponseMode.generalCategoryProducts,
+        //   categoryId: event.selectedParentCategory,
+        // ));
     });
     on<AddSelectedSubCategoryEvent>((event,emit) => emit(state.copyWith(selectedSubCategory: event.selectedSubCategory)));
     on<SelectAllCartProductsEvent>(_selectAllCartProducts);
@@ -106,14 +107,13 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         }
     });
     on<AddFilteredProductsSuggestionsEvent>((event, emit) async {
-
-      
       try {
+        log('page: ${event.page}');
         emit(state.copyWith(
           productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
         ));
         filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
-        filteredParamenters['page'] = event.page;
+        filteredParamenters['page'] = event.page == 0 ? 1 : event.page;
         filteredParamenters['pageSize'] = 10;
         final response = await  _productService.filteredProducts(filteredParamenters);
         if (response is FilteredData){
@@ -121,6 +121,34 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
           updatedSuggestionsList.addAll(response.content as List<FilteredProduct>);
           emit(state.copyWith(
               filteredProductsSuggestions: updatedSuggestionsList,
+              currentPage: event.page,
+              hasMore: response.page < response.totalPages,
+              productsStates: ProductsStates.loaded
+            )
+          );
+        }
+        emit(state.copyWith(productsStates: ProductsStates.loaded));
+      } catch (e) {
+        emit(state.copyWith(productsStates: ProductsStates.error));
+      }
+    });
+    on<AddFilteredBuildResultsEvent>((event, emit) async {
+      try {
+        log('page: ${event.page}');
+        emit(state.copyWith(
+          productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
+        ));
+        filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
+        filteredParamenters['searchFields'].add({"fieldName":"name", "value":""});
+        filteredParamenters['page'] = event.page == 0 ? 1 : event.page;
+        filteredParamenters['pageSize'] = 10;
+        filteredParamenters['searchString'] = event.query;
+        final response = await  _productService.filteredProducts(filteredParamenters);
+        if (response is FilteredData){
+          final List<FilteredProduct> updatedBuildResultList = List.from(state.filteredBuildResults);
+          updatedBuildResultList.addAll(response.content as List<FilteredProduct>);
+          emit(state.copyWith(
+              filteredBuildResults: updatedBuildResultList,
               currentPage: response.page,
               hasMore: response.page < response.totalPages,
               productsStates: ProductsStates.loaded
@@ -132,32 +160,58 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         emit(state.copyWith(productsStates: ProductsStates.error));
       }
     });
+    on<ResetStatesEvent>((event, emit) => emit(state.copyWith(
+         currentPage: 0, 
+         filteredBuildResults: [], 
+         filteredProductsSuggestions: [],
+         
+       )
+      )
+    );
     on<AddFilteredProductsEvent>((event, emit) async{
       try {
+        // Emitir el estado de carga dependiendo de si es la primera página o una adicional
         emit(state.copyWith(
           productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
         ));
-        // filteredParamenters['uuids'].add({"fieldName":"category.id", "value":event.mode == FilteredResponseMode.subCategoryProducts ? state.selectedSubCategory.id : state.selectedParentCategory});
+
+        // Configurar los parámetros filtrados, como uuids, page y pageSize
+        filteredParamenters['uuids'] = [];
         filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
         filteredParamenters['page'] = event.page;
         filteredParamenters['pageSize'] = 10;
+
+        // Llamada al servicio para obtener los productos filtrados
         final dynamic response =  await _productService.filteredProducts(filteredParamenters);
 
         if (response is FilteredData) {
+          // Obtener la categoría actual, ya sea la principal o la subcategoría
           final Category currentCategory = event.mode == FilteredResponseMode.generalCategoryProducts
               ? state.categories.firstWhere((element) => element.id == state.selectedParentCategory)
               : state.subCategories.firstWhere((element) => element.id == state.selectedSubCategory.id);
 
+          // Obtener el índice de la categoría actual en la lista de categorías
           final int index = state.categories.indexWhere((category) => category.id == currentCategory.id);
 
-          // Copia la categoría actualizada con los nuevos productos
-          final updatedCategory = currentCategory.copyWith(products: response.content as List<FilteredProduct>);
-          
-          // Crea una nueva lista de categorías con la categoría actualizada
-          final updatedCategories = List<Category>.from(state.categories)..[index] = updatedCategory;
+          // Actualizar la lista de productos de la categoría agregando los productos nuevos
+          final List<FilteredProduct> updatedCategoryProducts = List<FilteredProduct>.from(currentCategory.products)
+            ..addAll(response.content as List<FilteredProduct>);
 
+          // Crear una categoría actualizada con los nuevos productos
+          final Category updatedCategory = currentCategory.copyWith(products: updatedCategoryProducts);
+
+          // Actualizar la lista de categorías en el estado del Bloc
+          final List<Category> updatedCategories = List<Category>.from(state.categories)
+            ..[index] = updatedCategory;
+
+          // Determinar si es la última página
+          final bool isLastPage = response.page >= response.totalPages;
+
+          // Emitir el nuevo estado con la lista de categorías actualizada y si hay más páginas
           emit(state.copyWith(
             categories: updatedCategories,
+            currentPage: event.page,
+            hasMore: !isLastPage, // Si es la última página, no hay más páginas
             productsStates: ProductsStates.loaded,
           ));
         } else {
@@ -169,6 +223,49 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         log('catch filtered products error: ${e.toString()}');
         emit(state.copyWith(productsStates: ProductsStates.error));
       }
+      // try {
+      //   log('page: ${event.page}');
+      //   emit(state.copyWith(
+      //     productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
+      //   ));
+      //   filteredParamenters['uuids'] = [];
+      //   // filteredParamenters['uuids'].add({"fieldName":"category.id", "value":event.mode == FilteredResponseMode.subCategoryProducts ? state.selectedSubCategory.id : state.selectedParentCategory});
+      //   filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
+      //   filteredParamenters['page'] = event.page;
+      //   // filteredParamenters['page'] = event.page == 0 ? 1 : event.page;
+      //   filteredParamenters['pageSize'] = 10;
+      //   final dynamic response =  await _productService.filteredProducts(filteredParamenters);
+
+      //   if (response is FilteredData) {
+      //     final Category currentCategory = event.mode == FilteredResponseMode.generalCategoryProducts
+      //         ? state.categories.firstWhere((element) => element.id == state.selectedParentCategory)
+      //         : state.subCategories.firstWhere((element) => element.id == state.selectedSubCategory.id);
+
+      //     final int index = state.categories.indexWhere((category) => category.id == currentCategory.id);
+
+      //     // Copia la categoría actualizada con los nuevos productos
+      //     final updatedCategoryProducts = List<FilteredProduct>.from(currentCategory.products);
+      //     updatedCategoryProducts.addAll(response.content as List<FilteredProduct>);
+      //     final updatedCategory = currentCategory.copyWith(products: updatedCategoryProducts);
+          
+      //     // Crea una nueva lista de categorías con la categoría actualizada
+      //     final updatedCategories = List<Category>.from(state.categories)..[index] = updatedCategory;
+
+      //     emit(state.copyWith(
+      //       categories: updatedCategories,
+      //       currentPage: event.page,
+      //       hasMore: response.page < response.totalPages,  
+      //       productsStates: ProductsStates.loaded,
+      //     ));
+      //   } else {
+      //     log('else filtered products error: ');
+      //     emit(state.copyWith(productsStates: ProductsStates.error));
+      //   }
+      
+      // } catch (e) {
+      //   log('catch filtered products error: ${e.toString()}');
+      //   emit(state.copyWith(productsStates: ProductsStates.error));
+      // }
         
       
     });
@@ -196,6 +293,26 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         }
         emit(state.copyWith(productsStates: ProductsStates.loaded));
       } catch (e) {
+        emit(state.copyWith(productsStates: ProductsStates.error));
+      }
+    });
+    on<AddNewCountryGroupEvent>((event,emit) async {
+      try {  
+        emit(state.copyWith(productsStates: ProductsStates.adding));
+        await _productService.addNewCountryGroup(event.body);
+        emit(state.copyWith(productsStates: ProductsStates.added));
+      } catch (e) {
+        log('error: ${e.toString()}');
+        emit(state.copyWith(productsStates: ProductsStates.error));
+      }
+    });
+    on<UpdateCountryGroupEvent>((event, emit) async {
+      try {
+        emit(state.copyWith(productsStates: ProductsStates.updating));
+        await _productService.updateCountryGroupById(event.countryGroupId, event.body);
+        emit(state.copyWith(productsStates: ProductsStates.updated));
+      } catch (e) {
+        log('error: ${e.toString()}');
         emit(state.copyWith(productsStates: ProductsStates.error));
       }
     });
@@ -227,6 +344,55 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       try {
         emit(state.copyWith(productsStates: ProductsStates.adding));
         await _productService.addNewProduct(event.form);
+        emit(state.copyWith(productsStates: ProductsStates.added));
+      } catch (e) {
+        log('error: ${e.toString()}');
+        emit(state.copyWith(productsStates: ProductsStates.error));
+      }
+    });
+    on<AddShippingRatesEvent>((event, emit) async {
+      try {
+        emit(state.copyWith(
+          productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
+        ));
+        filteredParamenters['uuids'].add({"fieldName":"company.id", "value":event.companyId});
+        filteredParamenters['page'] = event.page;
+        final dynamic shippingRates = await _productService.getShippingRates(filteredParamenters);
+        if (shippingRates is FilteredData<FilteredShippingRate>) {
+          final List<FilteredShippingRate> updatedShippingRates = List.from(state.shippingRates);
+          updatedShippingRates.addAll(shippingRates.content);
+          emit(state.copyWith(
+              shippingRates: updatedShippingRates,
+              currentPage: shippingRates.page,
+              hasMore: shippingRates.page < shippingRates.totalPages,
+              productsStates: ProductsStates.loaded
+            )
+          );
+        }
+      } catch (e) {
+        log('error: ${e.toString()}');
+        emit(state.copyWith(productsStates: ProductsStates.error));
+      }
+    });
+    on<AddCountryGroupsByCompanyEvent>((event, emit) async {
+      try {
+        emit(state.copyWith(productsStates: ProductsStates.loading));
+        final dynamic countryGroups = await _productService.getCountryGroupsByCompany(event.companyId);
+        if (countryGroups is List<CountryGroup>) {
+          emit(state.copyWith(
+            countryGroupsByCompany: countryGroups,
+            productsStates: ProductsStates.loaded
+          ));
+        }
+      } catch (e) {
+        log('error: ${e.toString()}');
+        emit(state.copyWith(productsStates: ProductsStates.error));
+      }
+    });
+    on<AddShippingRateEvent>((event, emit) async {
+      try {
+        emit(state.copyWith(productsStates: ProductsStates.adding));
+        await _productService.addNewShippingRate(event.body);
         emit(state.copyWith(productsStates: ProductsStates.added));
       } catch (e) {
         log('error: ${e.toString()}');
@@ -296,9 +462,6 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     }
     emit(state.copyWith(favoriteProducts: favoriteProducts));
   }
-
-
-
 
   // Future<void> getProducts() async {
   //   add(const AddProductsStatesEvent(productsState: ProductsStates.loading));

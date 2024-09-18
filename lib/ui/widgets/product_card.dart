@@ -91,18 +91,29 @@ class ProductCard extends StatelessWidget {
                         style: theme.textTheme.labelMedium?.copyWith(color: Colors.black, fontWeight: FontWeight.w600),
                       ),
                       const Spacer(),
-                      IconButton.filled(
-                        style: theme.textButtonTheme.style?.copyWith(
-                          backgroundColor: const WidgetStatePropertyAll(Color(0xff003049)),
-                          fixedSize: const WidgetStatePropertyAll( Size(10.0, 10.0)),
+                      GestureDetector(
+                        onTap: (){},
+                        child:  CircleAvatar(
+                          maxRadius: 18,
+                          backgroundColor: AppTheme.palette[1000],
+                          child: const Icon(
+                            Icons.add_shopping_cart_rounded,
+                            color: Colors.white,
+                            size: 15,
+                          ),
                         ),
-                        // onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.add_shopping_cart_rounded,
-                          color: Colors.white,
-                        ),
-                      ),
+                      )
+                      // IconButton.filled(
+                      //   style: theme.textButtonTheme.style?.copyWith(
+                      //     backgroundColor: const WidgetStatePropertyAll(Color(0xff003049)),
+                      //     fixedSize: const WidgetStatePropertyAll( Size(10.0, 10.0)),
+                      //   ),
+                      //   onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
+                      //   icon: const Icon(
+                      //     Icons.add_shopping_cart_rounded,
+                      //     color: Colors.white,
+                      //   ),
+                      // ),
                     ],
                   ),
                   Text('(min 1)', style: theme.textTheme.labelSmall,),

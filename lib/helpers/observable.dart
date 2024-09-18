@@ -45,6 +45,9 @@ class Observable extends BlocObserver {
       if(currentState.unitMeasurements != nextState.unitMeasurements) {
         log('unitMeasurements: ${nextState.unitMeasurements.length}');
       }
+      if(currentState.filteredBuildResults != nextState.filteredBuildResults) {
+        log('filteredBuildResults: ${nextState.filteredBuildResults.length}');
+      }
       
       
       

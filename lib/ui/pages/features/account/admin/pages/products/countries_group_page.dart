@@ -1,7 +1,11 @@
-
-import 'dart:developer';
-
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
+
+
+enum CountryGroupPageMode{
+  EDIT,
+  ADD,
+  SHOW
+}
 
 class CountryGroupPage extends StatefulWidget {
   const CountryGroupPage({super.key});
@@ -44,119 +48,76 @@ class _CountryGroupPageState extends State<CountryGroupPage> {
     ));
   }
 
-
-  final ValueNotifier<bool> _edit = ValueNotifier<bool>(false);
+  final ValueNotifier<CountryGroupPageMode> mode = ValueNotifier<CountryGroupPageMode>(CountryGroupPageMode.SHOW);
   final ValueNotifier<FilteredGroupCountries> selectedFilteredCountry = ValueNotifier<FilteredGroupCountries>(const FilteredGroupCountries(name: '', countries: [], id: '', countriesIds: null));
   final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
-
-  
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations translations = AppLocalizations.of(context)!;
     final ThemeData theme = Theme.of(context);
     final Size size = MediaQuery.of(context).size;
-
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${translations.countries_group} ${context.watch<ProductsBloc>().state.groupCountries.length}', style: theme.textTheme.titleLarge),
-      ),
-      body: ValueListenableBuilder<bool>(
-        valueListenable: _edit,
-        builder: (BuildContext context, value, Widget? child) {
-          if(value){
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: FormBuilder(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10,),
-                    FormBuilderTextField(
-                      initialValue: selectedFilteredCountry.value.name,
-                      name: "name",
-                      decoration: InputDecoration(
-                        labelText: translations.name,
-                        hintText: translations.name,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                      ),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(),
-                      ]),
-                    ),
-                    const SizedBox(height: 10,),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(translations.countries, style: theme.textTheme.titleMedium),
-                    ),
-                    const SizedBox(height: 10,),
-                    FormBuilderDropdown(
-                      name: "include_country", 
-                      decoration: InputDecoration(
-                        labelText: translations.choose_country,
-                        hintText: translations.choose_country,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                      ),
-                      items: context.read<CountryBloc>().state.countries.map((Country country) => DropdownMenuItem(
-                        value: country.id,
-                        child: Text(country.name),
-                      )).toList(),
-                      onChanged: (String? countryId) {
-                        if (countryId != null) {
-                          final Country selectedCountry = context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == countryId,);
-                          final updatedCountries = List<Country>.from(selectedFilteredCountry.value.countries);
-                          if (!updatedCountries.contains(selectedCountry)) {
-                            updatedCountries.add(selectedCountry);
-                            selectedFilteredCountry.value = selectedFilteredCountry.value.copyWith(countries: updatedCountries,);
-                          }
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 10,),
-                    Expanded(
-                      child: ValueListenableBuilder(
-                        valueListenable: selectedFilteredCountry,
-                        builder: (BuildContext context, value, Widget? child) {
-                          return ListView.builder(
-                            itemCount: value.countries.length,
-                            itemBuilder: (context, index) {
-                              final Country country = value.countries[index];
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 5.0),
-                                child: ListTile(
-                                  title: Text(country.name),
-                                  trailing: IconButton(
-                                    onPressed: () {
-                                      final updatedCountries = List<Country>.from(value.countries);
-                                      updatedCountries.removeAt(index);
-                                      selectedFilteredCountry.value = value.copyWith(
-                                        countries: updatedCountries,
-                                      );
-                                    },
-                                    icon: const Icon(Icons.delete),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                )
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60.0),
+        child: ValueListenableBuilder(
+          valueListenable: mode,
+          builder: (BuildContext context, value, Widget? child) {
+            return AppBar(
+              leading: IconButton(
+                onPressed:(){
+                  if (value == CountryGroupPageMode.EDIT || value == CountryGroupPageMode.ADD) {
+                    mode.value = CountryGroupPageMode.SHOW;
+                    return;
+                  }
+                  context.pop();
+                }, 
+                icon: const Icon(Icons.arrow_back)
               ),
+              title: Text('${translations.countries_group} ${context.watch<ProductsBloc>().state.groupCountries.length}', style: theme.textTheme.titleLarge),
+              actions: [
+                if (value == CountryGroupPageMode.SHOW)
+                  IconButton(
+                    onPressed: () {
+                      selectedFilteredCountry.value = const FilteredGroupCountries(name: '', countries: [], id: '', countriesIds: null);
+                      mode.value = CountryGroupPageMode.ADD;
+                    },
+                    icon: const Icon(Icons.add),
+                  )
+              ],
             );
+          },
+        ),
+      ),
+      body: ValueListenableBuilder<CountryGroupPageMode>(
+        valueListenable: mode,
+        builder: (BuildContext context, value, Widget? child) {
+          switch (value) {
+            case CountryGroupPageMode.EDIT:
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: CountryGroupForm(
+                  formKey: _formKey, 
+                  selectedFilteredCountry: selectedFilteredCountry, 
+                  mode: CountryGroupPageMode.EDIT,
+                ),
+              );
+            case CountryGroupPageMode.ADD:
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: CountryGroupForm(
+                  formKey: _formKey, 
+                  selectedFilteredCountry: selectedFilteredCountry,
+                  mode: CountryGroupPageMode.ADD,
+                ),
+              );
+            default:
+              return child!;
           }
-          return child!;
         },
         child: BlocBuilder<ProductsBloc, ProductsState>(
           builder: (context, state) {
-            if (state.productsStates == ProductsStates.loading) {
+            if (state.productsStates == ProductsStates.loading || state.productsStates == ProductsStates.updating) {
               return const Center(
                 child: CircularProgressIndicator.adaptive(),
               );
@@ -213,7 +174,7 @@ class _CountryGroupPageState extends State<CountryGroupPage> {
                             IconButton(
                               onPressed: () {
                                 selectedFilteredCountry.value = groupCountry;
-                                _edit.value = !_edit.value;
+                                mode.value = CountryGroupPageMode.EDIT;
                               },
                               icon: const Icon(Icons.edit)
                             ),
@@ -250,26 +211,145 @@ class _CountryGroupPageState extends State<CountryGroupPage> {
         ),
       ),
       floatingActionButton: ValueListenableBuilder(
-        valueListenable: selectedFilteredCountry,
+        valueListenable: mode,
         builder: (BuildContext context, value, Widget? child) {
-          if(value.id.isEmpty){
+          if(value == CountryGroupPageMode.SHOW) {
             return const SizedBox.shrink();
           }
-          return child!;
+          return BlocBuilder<ProductsBloc, ProductsState>(
+            buildWhen: (previous, current) => previous.productsStates != current.productsStates,
+            builder: (context, state) {
+              return FloatingActionButton(
+                onPressed:state.productsStates == ProductsStates.updating ? null : () {
+                  if (_formKey.currentState!.saveAndValidate()) {
+                    final Map<String, dynamic> data = {};
+                    // data['id'] = selectedFilteredCountry.value.id;
+                    data['name'] = _formKey.currentState!.value['name'];
+                    // data['countries'] = selectedFilteredCountry.value.countries;
+                    data['countries'] = selectedFilteredCountry.value.countriesIds;
+                    if (value == CountryGroupPageMode.EDIT) {
+                      context.read<ProductsBloc>().add(UpdateCountryGroupEvent(
+                          countryGroupId: selectedFilteredCountry.value.id,
+                          body: data
+                        )
+                      );
+                    }
+                    context.read<ProductsBloc>().add(AddNewCountryGroupEvent(body: data));
+                  }
+                  mode.value = CountryGroupPageMode.SHOW;
+                },
+                child: state.productsStates == ProductsStates.updating ? CircularProgressIndicator.adaptive(backgroundColor: AppTheme.palette[550],) : const Icon(Icons.save, color: Colors.white,),
+              );
+            },
+          );
         },
-        child: FloatingActionButton(
-          child: const Icon(Icons.save, color: Colors.white,),
-          onPressed: () {
-            if (_formKey.currentState!.saveAndValidate()) {
-              final Map<String, dynamic> data = {};
-              data['name'] = _formKey.currentState!.value['name'];
-              data['countries'] = selectedFilteredCountry.value.countries;
-              log('ready to save : $data');
-            }
-            // _edit.value = !_edit.value;
-          },
-        ),
       ),
+    );
+  }
+}
+
+class CountryGroupForm extends StatelessWidget {
+  const CountryGroupForm({
+    super.key,
+    required GlobalKey<FormBuilderState> formKey,
+    required this.selectedFilteredCountry,
+    required this.mode,
+  }) : _formKey = formKey;
+
+  final GlobalKey<FormBuilderState> _formKey;
+  final ValueNotifier<FilteredGroupCountries> selectedFilteredCountry;
+  final CountryGroupPageMode mode;
+
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations translations = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    return FormBuilder(
+      key: _formKey,
+      child: Column(
+        children: [
+          const SizedBox(height: 10,),
+          FormBuilderTextField(
+            initialValue: mode == CountryGroupPageMode.ADD ? '' : selectedFilteredCountry.value.name,
+            name: "name",
+            decoration: InputDecoration(
+              labelText: translations.name,
+              hintText: translations.name,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+            ),
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(),
+            ]),
+          ),
+          const SizedBox(height: 10,),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(translations.countries, style: theme.textTheme.titleMedium),
+          ),
+          const SizedBox(height: 10,),
+          FormBuilderDropdown(
+            name: "include_country", 
+            decoration: InputDecoration(
+              labelText: translations.choose_country,
+              hintText: translations.choose_country,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+            ),
+            items: context.read<CountryBloc>().state.countries.map((Country country) => DropdownMenuItem(
+              value: country.id,
+              child: Text(country.name),
+            )).toList(),
+            onChanged: (String? countryId) {
+              if (countryId != null) {
+                final Country selectedCountry = context.read<CountryBloc>().state.countries.firstWhere((country) => country.id == countryId,);
+                final updatedCountries = List<Country>.from(selectedFilteredCountry.value.countries);
+                if (!updatedCountries.contains(selectedCountry)) {
+                  updatedCountries.add(selectedCountry);
+                  selectedFilteredCountry.value = selectedFilteredCountry.value.copyWith(
+                    countries: updatedCountries, 
+                    countriesIds: updatedCountries.map((country) => country.id).toList()
+                  );
+                }
+              }
+            },
+          ),
+          const SizedBox(height: 10,),
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable: selectedFilteredCountry,
+              builder: (BuildContext context, value, Widget? child) {
+                return ListView.builder(
+                  itemCount: value.countries.length,
+                  itemBuilder: (context, index) {
+                    final Country country = value.countries[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 5.0),
+                      child: ListTile(
+                        title: Text(country.name),
+                        trailing: IconButton(
+                          onPressed: () {
+                            final updatedCountries = List<Country>.from(value.countries);
+                            updatedCountries.removeAt(index);
+                            selectedFilteredCountry.value = value.copyWith(
+                              countries: updatedCountries,
+                              countriesIds: updatedCountries.map((country) => country.id).toList()
+                            );
+                          },
+                          icon: const Icon(Icons.delete),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      )
     );
   }
 }

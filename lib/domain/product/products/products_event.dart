@@ -131,19 +131,33 @@ class DeleteAdminProductEvent extends ProductsEvent {
 }
 
 class AddFilteredProductsSuggestionsEvent extends ProductsEvent {
-  final FilteredResponseMode mode;
   final int page;
-  const AddFilteredProductsSuggestionsEvent({required this.mode, required this.page});
+  const AddFilteredProductsSuggestionsEvent({required this.page});
   @override
-  List<Object> get props => [mode, page];
+  List<Object> get props => [page];
+}
+
+class AddFilteredBuildResultsEvent extends ProductsEvent {
+  final String query;
+  final int page;
+  const AddFilteredBuildResultsEvent({required this.query, required this.page});
+  @override
+  List<Object> get props => [query, page];
+}
+
+class ResetStatesEvent extends ProductsEvent {
+  const ResetStatesEvent();
+  @override
+  List<Object> get props => [];
 }
 
 class AddFilteredProductsEvent extends ProductsEvent {
   final FilteredResponseMode mode;
+  final String categoryId;
   final int page;
-  const AddFilteredProductsEvent({required this.page, required this.mode});
+  const AddFilteredProductsEvent({required this.page, required this.mode, required this.categoryId});
   @override
-  List<Object> get props => [page];
+  List<Object> get props => [page, mode, categoryId];
 }
 
 class AddFilteredCountriesGrupoEvent extends ProductsEvent {
@@ -152,6 +166,21 @@ class AddFilteredCountriesGrupoEvent extends ProductsEvent {
   const AddFilteredCountriesGrupoEvent({required this.page, required this.companyId});
   @override
   List<Object> get props => [page, companyId];
+}
+
+class AddNewCountryGroupEvent extends ProductsEvent {
+  final Map<String, dynamic> body;
+  const AddNewCountryGroupEvent({required this.body});
+  @override
+  List<Object> get props => [body];
+}
+
+class UpdateCountryGroupEvent extends ProductsEvent {
+  final String countryGroupId;
+  final Map<String, dynamic> body;
+  const UpdateCountryGroupEvent({required this.countryGroupId, required this.body});
+  @override
+  List<Object> get props => [countryGroupId, body];
 }
 
 class AddSubCategoriesNewProductEvent extends ProductsEvent {
@@ -166,4 +195,26 @@ class AddNewProductEvent extends ProductsEvent {
   const AddNewProductEvent({required this.form});
   @override
   List<Object> get props => [form];
+}
+
+class AddShippingRatesEvent extends ProductsEvent {
+  final String companyId;
+  final int page;
+  const AddShippingRatesEvent({required this.companyId, required this.page});
+  @override
+  List<Object> get props => [companyId, page];
+}
+
+class AddCountryGroupsByCompanyEvent extends ProductsEvent {
+  final String companyId;
+  const AddCountryGroupsByCompanyEvent({required this.companyId});
+  @override
+  List<Object> get props => [companyId];
+}
+
+class AddShippingRateEvent extends ProductsEvent {
+  final Map<String, dynamic> body;
+  const AddShippingRateEvent({required this.body});
+  @override
+  List<Object> get props => [body];
 }

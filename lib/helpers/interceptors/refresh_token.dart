@@ -9,6 +9,7 @@ class RefreshTokenInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    // log('request: ${options.baseUrl}${options.path}');
     final token = locator<Preferences>().preferences['token'];
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';

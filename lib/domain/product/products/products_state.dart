@@ -11,6 +11,8 @@ enum ProductsStates{
   uploaded,
   adding,
   added,
+  updating,
+  updated,
 }
 
 enum FilteredResponseMode{
@@ -46,6 +48,9 @@ class ProductsState extends Equatable {
   final List<ProductGroup> productGroups;
   final List<ProductType> productTypes;
   final List<UnitMeasurement> unitMeasurements;
+  final List<FilteredShippingRate> shippingRates;
+  final List<CountryGroup> countryGroupsByCompany;
+  final List<FilteredProduct> filteredBuildResults;
 
   const ProductsState({
     this.productsStates = ProductsStates.initial,
@@ -71,7 +76,10 @@ class ProductsState extends Equatable {
     this.subCategoriesNewProduct = const [],
     this.productGroups = const [],
     this.productTypes = const [],
-    this.unitMeasurements = const []
+    this.unitMeasurements = const [],
+    this.shippingRates = const [],
+    this.countryGroupsByCompany = const [],
+    this.filteredBuildResults = const []
   });
 
   ProductsState copyWith({
@@ -96,7 +104,10 @@ class ProductsState extends Equatable {
     List<Category>? subCategoriesNewProduct,
     List<ProductGroup>? productGroups,
     List<ProductType>? productTypes,
-    List<UnitMeasurement>? unitMeasurements
+    List<UnitMeasurement>? unitMeasurements,
+    List<FilteredShippingRate>? shippingRates,
+    List<CountryGroup>? countryGroupsByCompany,
+    List<FilteredProduct>? filteredBuildResults
   }) {
     return ProductsState(
       productsStates: productsStates ?? this.productsStates,
@@ -120,7 +131,10 @@ class ProductsState extends Equatable {
       subCategoriesNewProduct: subCategoriesNewProduct ?? this.subCategoriesNewProduct,
       productGroups: productGroups ?? this.productGroups,
       productTypes: productTypes ?? this.productTypes,
-      unitMeasurements: unitMeasurements ?? this.unitMeasurements
+      unitMeasurements: unitMeasurements ?? this.unitMeasurements,
+      shippingRates: shippingRates ?? this.shippingRates,
+      countryGroupsByCompany: countryGroupsByCompany ?? this.countryGroupsByCompany,
+      filteredBuildResults: filteredBuildResults ?? this.filteredBuildResults
     );
   }
   
@@ -147,6 +161,9 @@ class ProductsState extends Equatable {
     subCategoriesNewProduct,
     productGroups,
     productTypes,
-    unitMeasurements
+    unitMeasurements,
+    shippingRates,
+    countryGroupsByCompany,
+    filteredBuildResults
   ];
 }

@@ -200,5 +200,11 @@
     "from": "From",
     "specification": "Specification",
     "detail": "Detail",
-    "product_added": "Product added successfully"
+    "product_added": "Product added successfully",
+    "no_shipping_rates_found": "No shipping rates found",
+    "enter_shipping_rate_name": "Enter Shipping Rate Name",
+    "country_group":"Country group",
+    "select_country_group":"Select country group",
+    "shipping_rates": "Shipping rates",
+    "no_results_found": "No results found"
 }

@@ -148,7 +148,14 @@ class AppRoutes {
                 builder: (context, state) {
                   return const CountryGroupPage();
                 },
-              )
+              ),
+              GoRoute(
+                path: 'shipping-rates',
+                builder: (context, state) {
+                  return ShippingRatePage();
+                },
+              ),
+
             ]
           )
         ]

@@ -76,9 +76,11 @@ class ProductService {
   }
 
   Future<dynamic> filteredProducts(Map<String, dynamic> filteredParamenters) async {
+    log('page: ${filteredParamenters['page']}');
     try {
       final response = await dio.post('/products/filtered-page', data: filteredParamenters);
       final filteredProducts = FilteredResponse<FilteredProduct>.fromJson(response.data, (json) => FilteredProduct.fromJson(json));
+      log('filteredProducts: ${filteredProducts.data.content.length}');
       return filteredProducts.data;
     } on DioException catch (e) {
       ErrorHandler(e);
@@ -141,6 +143,58 @@ class ProductService {
       }
     } on DioException catch (e) {
       log('error addNewProduct: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> updateCountryGroupById (String countryGroupId, Map<String,dynamic> body) async {
+    try {
+      final response = await dio.put('/country-groups/$countryGroupId', data: body);
+      log('response.data: ${response.data}');
+    } on DioException catch (e) {
+      log('error updateCountryGroupById: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> getCountryGroupsByCompany(String companyId) async {
+    try {
+      final response = await dio.get('/country-groups/company');
+      final countryGroups = CountryGroupResponse.fromJson(response.data);
+      return countryGroups.data;
+    } on DioException catch (e) {
+      log('error getCountryGroupsByCompany: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> addNewCountryGroup(Map<String, dynamic> body) async {
+    try {
+      final response = await dio.post('/country-groups', data: body);
+      log('response.data: ${response.data}');
+    } on DioException catch (e) {
+      log('error addNewCountryGroup: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> getShippingRates(Map<String, dynamic> filteredParams) async {
+    try {
+      final response = await dio.post('/shipping-rates/filtered-page', data: filteredParams);
+      final shippingRates = FilteredResponse<FilteredShippingRate>.fromJson(response.data, (json) => FilteredShippingRate.fromJson(json));
+      return shippingRates.data;
+    } on DioException catch (e) {
+      log('error getShippingRates: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> addNewShippingRate(Map<String, dynamic> body) async {
+    try {
+      final response = await dio.post('/shipping-rates', data: body);
+      log('response.data: ${response.data}');
+    } on DioException catch (e) {
+      log('error addNewShippingRate: ${e.response?.data}');
       ErrorHandler(e);
     }
   }

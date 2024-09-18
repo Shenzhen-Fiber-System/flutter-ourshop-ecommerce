@@ -745,3 +745,199 @@ class FilteredBanks extends Equatable {
         countryId,
     ];
 }
+//shipping rates
+
+class FilteredShippingRate extends Equatable {
+    final String id;
+    final String? name;
+    final String? countryId;
+    final String? countryGroupId;
+    final dynamic companyId;
+    final List<String> productIds;
+    final List<FilteredProduct> products;
+    final List<ShippingRange> shippingRanges;
+
+    const FilteredShippingRate({
+        required this.id,
+        required this.name,
+        required this.countryId,
+        required this.countryGroupId,
+        required this.companyId,
+        required this.productIds,
+        required this.products,
+        required this.shippingRanges,
+    });
+
+    FilteredShippingRate copyWith({
+        String? id,
+        String? name,
+        String? countryId,
+        String? countryGroupId,
+        dynamic companyId,
+        List<String>? productIds,
+        List<FilteredProduct>? products,
+        List<ShippingRange>? shippingRanges,
+    }) => 
+        FilteredShippingRate(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            countryId: countryId ?? this.countryId,
+            countryGroupId: countryGroupId ?? this.countryGroupId,
+            companyId: companyId ?? this.companyId,
+            productIds: productIds ?? this.productIds,
+            products: products ?? this.products,
+            shippingRanges: shippingRanges ?? this.shippingRanges,
+        );
+
+    factory FilteredShippingRate.fromJson(Map<String, dynamic> json) => FilteredShippingRate(
+        id: json["id"],
+        name: json["name"],
+        countryId: json["countryId"],
+        countryGroupId: json["countryGroupId"],
+        companyId: json["companyId"],
+        productIds: List<String>.from(json["productIds"].map((x) => x)),
+        products: List<FilteredProduct>.from(json["products"].map((x) => FilteredProduct.fromJson(x))),
+        shippingRanges: List<ShippingRange>.from(json["shippingRanges"].map((x) => ShippingRange.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "countryId": countryId,
+        "countryGroupId": countryGroupId,
+        "companyId": companyId,
+        "productIds": List<dynamic>.from(productIds.map((x) => x)),
+        "products": List<dynamic>.from(products.map((x) => x.toJson())),
+        "shippingRanges": List<dynamic>.from(shippingRanges.map((x) => x.toJson())),
+    };
+    
+    @override
+    List<Object?> get props => [
+        id,
+        name,
+        countryId,
+        countryGroupId,
+        companyId,
+        productIds,
+        products,
+        shippingRanges,
+    ];
+}
+
+
+class ShippingRange extends Equatable {
+    final String id;
+    final String shippingRateId;
+    final double? quantityFrom;
+    final double? quantityTo;
+    final double? price;
+
+    const ShippingRange({
+        required this.id,
+        required this.shippingRateId,
+        required this.quantityFrom,
+        required this.quantityTo,
+        required this.price,
+    });
+
+    ShippingRange copyWith({
+        String? id,
+        String? shippingRateId,
+        double? quantityFrom,
+        double? quantityTo,
+        double? price,
+    }) => 
+        ShippingRange(
+            id: id ?? this.id,
+            shippingRateId: shippingRateId ?? this.shippingRateId,
+            quantityFrom: quantityFrom ?? this.quantityFrom,
+            quantityTo: quantityTo ?? this.quantityTo,
+            price: price ?? this.price,
+        );
+
+    factory ShippingRange.fromJson(Map<String, dynamic> json) => ShippingRange(
+        id: json["id"],
+        shippingRateId: json["shippingRateId"],
+        quantityFrom: _toDouble(json["quantityFrom"]),
+        quantityTo: _toDouble(json["quantityTo"]),
+        price: _toDouble(json["price"]),
+    );
+
+    static double? _toDouble(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value.toDouble();
+      if (value is double) return value;
+      return double.tryParse(value.toString());
+    }
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "shippingRateId": shippingRateId,
+        "quantityFrom": quantityFrom?.toStringAsFixed(2),
+        "quantityTo": quantityTo?.toStringAsFixed(2),
+        "price": price?.toStringAsFixed(2),
+    };
+    
+    @override
+    List<Object?> get props => [
+        id,
+        shippingRateId,
+        quantityFrom,
+        quantityTo,
+        price,
+    ];
+}
+
+//Offers
+class FilteredOffers {
+    final String id;
+    final String name;
+    final String description;
+    final DateTime dateFrom;
+    final DateTime dateTo;
+    final bool showOffer;
+
+    FilteredOffers({
+        required this.id,
+        required this.name,
+        required this.description,
+        required this.dateFrom,
+        required this.dateTo,
+        required this.showOffer,
+    });
+
+    FilteredOffers copyWith({
+        String? id,
+        String? name,
+        String? description,
+        DateTime? dateFrom,
+        DateTime? dateTo,
+        bool? showOffer,
+    }) => 
+        FilteredOffers(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            description: description ?? this.description,
+            dateFrom: dateFrom ?? this.dateFrom,
+            dateTo: dateTo ?? this.dateTo,
+            showOffer: showOffer ?? this.showOffer,
+        );
+
+    factory FilteredOffers.fromJson(Map<String, dynamic> json) => FilteredOffers(
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+        dateFrom: DateTime.parse(json["dateFrom"]),
+        dateTo: DateTime.parse(json["dateTo"]),
+        showOffer: json["showOffer"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "description": description,
+        "dateFrom": dateFrom.toIso8601String(),
+        "dateTo": dateTo.toIso8601String(),
+        "showOffer": showOffer,
+    };
+}

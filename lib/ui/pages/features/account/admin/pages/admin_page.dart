@@ -127,6 +127,10 @@ class AdminPage extends StatelessWidget {
                               context.push('/admin/option/products', extra: AdminOptions.PRODUCTS);
                             } else if (subCategory == locator<AppLocalizations>().countries_group) {
                               context.push('/admin/option/products/countries-groups');
+                            } else if (subCategory == locator<AppLocalizations>().shipping_cost) {
+                              context.push('/admin/option/products/shipping-rates');
+                            } else if (subCategory == locator<AppLocalizations>().offers) {
+                              context.push('/admin/option/products/offers');
                             }
                           },
                         );
