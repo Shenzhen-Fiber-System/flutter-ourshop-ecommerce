@@ -41,27 +41,22 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     on<AddCartProductEvent>(_addCartProduct);
     on<RemoveCartProductEvent>(_removeCartProduct);
     on<AddSelectedParentCategoryEvent>((event,emit) {
-        final List<Category> updatedCategories = state.categories.map((category) {
-          if (category.id == event.selectedParentCategory) {
-            // Limpia los productos de la categoría seleccionada
-            return category.copyWith(products: []);
-          }
-          return category; // Mantiene las otras categorías sin modificar
-        }).toList();
-
         // Emitir el estado con la categoría seleccionada, productos vacíos solo en la categoría seleccionada y resetear la página
         emit(state.copyWith(
           selectedParentCategory: event.selectedParentCategory,
           currentPage: 0,
-          categories: updatedCategories,
+          filteredProducts: [],
         ));
 
         // Llama al evento para cargar los productos de la categoría seleccionada
-        // add(AddFilteredProductsEvent(
-        //   page: state.currentPage + 1,
-        //   mode: FilteredResponseMode.generalCategoryProducts,
-        //   categoryId: event.selectedParentCategory,
-        // ));
+        if (event.selectedParentCategory != 'all') {
+          resetFilteredParameters();
+          add(AddFilteredProductsEvent(
+            page: state.currentPage + 1,
+            mode: FilteredResponseMode.generalCategoryProducts,
+            categoryId: event.selectedParentCategory,
+          ));
+        }
     });
     on<AddSelectedSubCategoryEvent>((event,emit) => emit(state.copyWith(selectedSubCategory: event.selectedSubCategory)));
     on<SelectAllCartProductsEvent>(_selectAllCartProducts);
@@ -117,11 +112,10 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         filteredParamenters['pageSize'] = 10;
         final response = await  _productService.filteredProducts(filteredParamenters);
         if (response is FilteredData){
-          final List<FilteredProduct> updatedSuggestionsList = List.from(state.filteredProductsSuggestions);
-          updatedSuggestionsList.addAll(response.content as List<FilteredProduct>);
+          final List<FilteredProduct> updatedSuggestionsList = List.from(state.filteredProductsSuggestions)..addAll(response.content as List<FilteredProduct>);
           emit(state.copyWith(
               filteredProductsSuggestions: updatedSuggestionsList,
-              currentPage: event.page,
+              suggestionsCurrentPage: event.page,
               hasMore: response.page < response.totalPages,
               productsStates: ProductsStates.loaded
             )
@@ -138,18 +132,16 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         emit(state.copyWith(
           productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
         ));
-        filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
         filteredParamenters['searchFields'].add({"fieldName":"name", "value":""});
-        filteredParamenters['page'] = event.page == 0 ? 1 : event.page;
+        filteredParamenters['page'] = event.page;
         filteredParamenters['pageSize'] = 10;
         filteredParamenters['searchString'] = event.query;
         final response = await  _productService.filteredProducts(filteredParamenters);
         if (response is FilteredData){
-          final List<FilteredProduct> updatedBuildResultList = List.from(state.filteredBuildResults);
-          updatedBuildResultList.addAll(response.content as List<FilteredProduct>);
+          final List<FilteredProduct> updatedBuildResultList = List.from(state.filteredBuildResults)..addAll(response.content as List<FilteredProduct>);
           emit(state.copyWith(
               filteredBuildResults: updatedBuildResultList,
-              currentPage: response.page,
+              resultsCurrentPage: response.page,
               hasMore: response.page < response.totalPages,
               productsStates: ProductsStates.loaded
             )
@@ -160,58 +152,39 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         emit(state.copyWith(productsStates: ProductsStates.error));
       }
     });
-    on<ResetStatesEvent>((event, emit) => emit(state.copyWith(
+    on<ResetStatesEvent>((event, emit) {
+      resetFilteredParameters();
+      emit(state.copyWith(
+         filteredProducts: [],
          currentPage: 0, 
          filteredBuildResults: [], 
          filteredProductsSuggestions: [],
-         
+         selectedParentCategory: 'all',
+         suggestionsCurrentPage: 0,
+         resultsCurrentPage: 0
        )
-      )
-    );
+      );
+    });
     on<AddFilteredProductsEvent>((event, emit) async{
       try {
-        // Emitir el estado de carga dependiendo de si es la primera página o una adicional
+        log('page: ${event.page}');
         emit(state.copyWith(
           productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
         ));
-
-        // Configurar los parámetros filtrados, como uuids, page y pageSize
-        filteredParamenters['uuids'] = [];
+        // filteredParamenters['uuids'].add({"fieldName":"category.id", "value":event.mode == FilteredResponseMode.subCategoryProducts ? state.selectedSubCategory.id : state.selectedParentCategory});
         filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
-        filteredParamenters['page'] = event.page;
+        filteredParamenters['page'] = event.page == 0 ? 1 : event.page;
         filteredParamenters['pageSize'] = 10;
-
-        // Llamada al servicio para obtener los productos filtrados
         final dynamic response =  await _productService.filteredProducts(filteredParamenters);
 
         if (response is FilteredData) {
-          // Obtener la categoría actual, ya sea la principal o la subcategoría
-          final Category currentCategory = event.mode == FilteredResponseMode.generalCategoryProducts
-              ? state.categories.firstWhere((element) => element.id == state.selectedParentCategory)
-              : state.subCategories.firstWhere((element) => element.id == state.selectedSubCategory.id);
+          
+          final List<FilteredProduct> updatedProducts = List.from(state.filteredProducts)..addAll(response.content as List<FilteredProduct>);
 
-          // Obtener el índice de la categoría actual en la lista de categorías
-          final int index = state.categories.indexWhere((category) => category.id == currentCategory.id);
-
-          // Actualizar la lista de productos de la categoría agregando los productos nuevos
-          final List<FilteredProduct> updatedCategoryProducts = List<FilteredProduct>.from(currentCategory.products)
-            ..addAll(response.content as List<FilteredProduct>);
-
-          // Crear una categoría actualizada con los nuevos productos
-          final Category updatedCategory = currentCategory.copyWith(products: updatedCategoryProducts);
-
-          // Actualizar la lista de categorías en el estado del Bloc
-          final List<Category> updatedCategories = List<Category>.from(state.categories)
-            ..[index] = updatedCategory;
-
-          // Determinar si es la última página
-          final bool isLastPage = response.page >= response.totalPages;
-
-          // Emitir el nuevo estado con la lista de categorías actualizada y si hay más páginas
           emit(state.copyWith(
-            categories: updatedCategories,
+            filteredProducts: updatedProducts,
             currentPage: event.page,
-            hasMore: !isLastPage, // Si es la última página, no hay más páginas
+            hasMore: response.page < response.totalPages,  
             productsStates: ProductsStates.loaded,
           ));
         } else {
@@ -223,49 +196,6 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         log('catch filtered products error: ${e.toString()}');
         emit(state.copyWith(productsStates: ProductsStates.error));
       }
-      // try {
-      //   log('page: ${event.page}');
-      //   emit(state.copyWith(
-      //     productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
-      //   ));
-      //   filteredParamenters['uuids'] = [];
-      //   // filteredParamenters['uuids'].add({"fieldName":"category.id", "value":event.mode == FilteredResponseMode.subCategoryProducts ? state.selectedSubCategory.id : state.selectedParentCategory});
-      //   filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
-      //   filteredParamenters['page'] = event.page;
-      //   // filteredParamenters['page'] = event.page == 0 ? 1 : event.page;
-      //   filteredParamenters['pageSize'] = 10;
-      //   final dynamic response =  await _productService.filteredProducts(filteredParamenters);
-
-      //   if (response is FilteredData) {
-      //     final Category currentCategory = event.mode == FilteredResponseMode.generalCategoryProducts
-      //         ? state.categories.firstWhere((element) => element.id == state.selectedParentCategory)
-      //         : state.subCategories.firstWhere((element) => element.id == state.selectedSubCategory.id);
-
-      //     final int index = state.categories.indexWhere((category) => category.id == currentCategory.id);
-
-      //     // Copia la categoría actualizada con los nuevos productos
-      //     final updatedCategoryProducts = List<FilteredProduct>.from(currentCategory.products);
-      //     updatedCategoryProducts.addAll(response.content as List<FilteredProduct>);
-      //     final updatedCategory = currentCategory.copyWith(products: updatedCategoryProducts);
-          
-      //     // Crea una nueva lista de categorías con la categoría actualizada
-      //     final updatedCategories = List<Category>.from(state.categories)..[index] = updatedCategory;
-
-      //     emit(state.copyWith(
-      //       categories: updatedCategories,
-      //       currentPage: event.page,
-      //       hasMore: response.page < response.totalPages,  
-      //       productsStates: ProductsStates.loaded,
-      //     ));
-      //   } else {
-      //     log('else filtered products error: ');
-      //     emit(state.copyWith(productsStates: ProductsStates.error));
-      //   }
-      
-      // } catch (e) {
-      //   log('catch filtered products error: ${e.toString()}');
-      //   emit(state.copyWith(productsStates: ProductsStates.error));
-      // }
         
       
     });

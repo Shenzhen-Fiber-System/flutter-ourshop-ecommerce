@@ -37,34 +37,44 @@ class _HomePageState extends State<HomePage> {
     final AppLocalizations translations  = AppLocalizations.of(context)!;
     final ThemeData theme = Theme.of(context);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: PageView(
         scrollDirection: Axis.horizontal,
         physics: const NeverScrollableScrollPhysics(),
         controller: _pageController,
         children: pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        elevation: 1.0,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
-        useLegacyColorScheme: false,
-        showUnselectedLabels: true,
-        currentIndex: context.watch<GeneralBloc>().state.selectedBottomNavTab,
-        onTap: 
-        context.watch<ProductsBloc>().state.productsStates == ProductsStates.loading 
-          ? null 
-          : (value) {
-            _pageController.jumpToPage(value);
-            context.read<GeneralBloc>().add(ChangeBottomNavTab(value));
-          },
-        items:   [
-          BottomNavigationBarItem( label: translations.home, icon:const Icon(Icons.home)),
-          BottomNavigationBarItem( label: translations.search, icon:const Icon(Icons.search)),
-          BottomNavigationBarItem( label: '${translations.cart} ${context.watch<ProductsBloc>().state.cartProducts.length.toString()}', 
-            icon: const Icon(Icons.shopping_cart)
-          ),
-          BottomNavigationBarItem( label: translations.my_account, icon:const Icon(Icons.person)),
-        ]
+      bottomNavigationBar: BlocBuilder<GeneralBloc, GeneralState>(
+        builder: (context, state) {
+          if(state.keyboardVisible) {
+            return const SizedBox.shrink();
+          }
+          return BottomNavigationBar(
+            elevation: 1.0,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+            useLegacyColorScheme: false,
+            showUnselectedLabels: true,
+            currentIndex: state.selectedBottomNavTab,
+            
+            onTap: 
+            context.watch<ProductsBloc>().state.productsStates == ProductsStates.loading 
+              ? null 
+              : (value) {
+                _pageController.jumpToPage(value);
+                context.read<ProductsBloc>().add(const ResetStatesEvent());
+                context.read<GeneralBloc>().add(ChangeBottomNavTab(value));
+              },
+            items:   [
+              BottomNavigationBarItem( label: translations.home, icon:const Icon(Icons.home)),
+              BottomNavigationBarItem( label: translations.search, icon:const Icon(Icons.search)),
+              BottomNavigationBarItem( label: '${translations.cart} ${context.watch<ProductsBloc>().state.cartProducts.length.toString()}', 
+                icon: const Icon(Icons.shopping_cart)
+              ),
+              BottomNavigationBarItem( label: translations.my_account, icon:const Icon(Icons.person)),
+            ]
+          );
+        },
       ),
     );
   }

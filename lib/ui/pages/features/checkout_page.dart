@@ -86,7 +86,7 @@ class DefaultShippingAdress extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(8.0),
-      height: size.height * 0.15,
+      height: size.height * 0.20,
       width: size.width,
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,
@@ -96,14 +96,17 @@ class DefaultShippingAdress extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            children: [
-              Icon(Icons.location_on ,color: AppTheme.palette[700],)
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Column(
+              children: [
+                Icon(Icons.location_on ,color: AppTheme.palette[700],)
+              ],
+            ),
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 10.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

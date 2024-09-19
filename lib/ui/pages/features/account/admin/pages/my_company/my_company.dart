@@ -120,12 +120,6 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
     }
   }
 
-  // @override
-  // void deactivate() {
-  //   context.read<CompanyBloc>().add(AddUserCompanyEvent(Company(id: '',)));
-  //   super.deactivate();
-  // }
-
   void _addSocialMediaForm() {
     setState(() {
       _socialMediaForms.add(_buildSocialMediaFormWidget());
@@ -332,7 +326,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
                                           width: size.width,
                                           child: ElevatedButton(
                                             onPressed: _addBankPanel,
-                                            child: Text('Add Bank', style: theme.textTheme.labelMedium?.copyWith(color: Colors.white),),
+                                            child: Text(translations.add(translations.banks.split('s')[0]), style: theme.textTheme.labelMedium?.copyWith(color: Colors.white),),
                                           ),
                                         ),
                                         const SizedBox(height: 10.0,),

@@ -16,6 +16,15 @@ final Map<String, dynamic> filteredParamenters = {
   "searchString": ""
 };
 
+void resetFilteredParameters() {
+  filteredParamenters['uuids'] = [];
+  filteredParamenters['searchFields'] = [];
+  filteredParamenters['sortOrders'] = [];
+  filteredParamenters['page'] = 0;
+  filteredParamenters['pageSize'] = 10;
+  filteredParamenters['searchString'] = "";
+}
+
 class CompanyBloc extends Bloc<CompanyEvent, CompanyState> {
   final CompanyService _companyService;
   final SocialMediaService _socialMediaService;
@@ -35,6 +44,7 @@ class CompanyBloc extends Bloc<CompanyEvent, CompanyState> {
         emit(state.copyWith(status: CompanyStateStatus.loading, banks: []));
         filteredParamenters['uuids'].add({"fieldName":"country.id", "value":event.countryId});
         // to fetch 100 banks per request
+        filteredParamenters['page'] = 1;
         filteredParamenters['pageSize'] = 100;
         final dynamic company = await _companyService.getCompanyById(event.companyId);
         final dynamic socialMedias = await _socialMediaService.getSocialMedias();

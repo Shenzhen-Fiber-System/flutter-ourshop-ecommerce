@@ -1,8 +1,4 @@
 import 'dart:async';
-import 'dart:io';
-
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 part 'general_event.dart';
@@ -17,6 +13,7 @@ class GeneralBloc extends Bloc<GeneralEvent, GeneralState> {
     on<AddIsLoadingEvent>((event, emit) => emit(state.copyWith(isLoading: event.isLoading)));
     on<ChangeBottomNavTab>((event, emit) => emit(state.copyWith(selectedBottomNavTab: event.index)));
     on<InternetConnectionChangedEvent>((event, emit) => emit(state.copyWith(isInterentConnectionActive: event.interNetConnectionActive)));
+    on<KeyboardVisibilityChangedEvent>((event, emit) => emit(state.copyWith(keyboardVisible: event.keyboardVisible)));
   }
 
    @override

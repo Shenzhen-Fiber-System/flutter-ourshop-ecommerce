@@ -1,3 +1,4 @@
+import 'dart:developer';
 
 import 'package:ourshop_ecommerce/models/models.dart';
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
@@ -18,7 +19,7 @@ class Search extends SearchDelegate{
   @override
   Widget? buildLeading(BuildContext context) {
     return IconButton(
-      onPressed: () => close(context, null),
+      onPressed: () => context.pop(),
       icon: const Icon(Icons.arrow_back),
     );
   }
@@ -26,23 +27,19 @@ class Search extends SearchDelegate{
   @override
   Widget buildResults(BuildContext context) {
     query = query.trim();
-    context.read<ProductsBloc>().add(const ResetStatesEvent());
     return SearchResults(query: query,);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    context.read<ProductsBloc>().add(const ResetStatesEvent());
-    return  SearchSuggestions(query: query,);
+    return  const SearchSuggestions();
   }
 }
 
 //Suggestions
 class SearchSuggestions extends StatefulWidget {
-  const SearchSuggestions({super.key, required this.query});
+  const SearchSuggestions({super.key,});
 
-
-  final String query;
 
   @override
   State<SearchSuggestions> createState() => _SearchSuggestionsState();
@@ -55,9 +52,9 @@ class _SearchSuggestionsState extends State<SearchSuggestions> {
 
   @override
   void initState() {
-    fetchFilteredProducts();
-    _scrollController = ScrollController()..addListener(listener);
     super.initState();
+    _scrollController = ScrollController()..addListener(listener);
+    fetchFilteredProducts();
   }
 
   @override
@@ -69,9 +66,11 @@ class _SearchSuggestionsState extends State<SearchSuggestions> {
 
   @override
   void deactivate() {
+    log('deactivate search suggestions');
     context.read<ProductsBloc>().add(const ResetStatesEvent());
     super.deactivate();
   }
+
 
 
   void listener() {
@@ -85,7 +84,7 @@ class _SearchSuggestionsState extends State<SearchSuggestions> {
 
   void fetchFilteredProducts() {
     context.read<ProductsBloc>().add(AddFilteredProductsSuggestionsEvent(
-        page: context.read<ProductsBloc>().state.currentPage + 1,
+        page: context.read<ProductsBloc>().state.suggestionsCurrentPage + 1,
       )
     );
   }
@@ -101,6 +100,7 @@ class _SearchSuggestionsState extends State<SearchSuggestions> {
       height: size.height,
       width: size.width,
       child: BlocBuilder<ProductsBloc, ProductsState>(
+        buildWhen: (previous, current) => previous.filteredBuildResults != current.filteredBuildResults || previous.productsStates != current.productsStates,
         builder: (context, state) {
           if (state.productsStates == ProductsStates.loading) {
             return const Center(child: CircularProgressIndicator.adaptive());
@@ -157,9 +157,9 @@ class _SearchResultsState extends State<SearchResults> {
 
   @override
   void initState() {
+    super.initState();
     fetchFilteredProducts();
     _scrollController = ScrollController()..addListener(listener);
-    super.initState();
   }
 
   @override
@@ -167,12 +167,6 @@ class _SearchResultsState extends State<SearchResults> {
     _scrollController.removeListener(listener);
     _scrollController.dispose();
     super.dispose();
-  }
-
-  @override
-  void deactivate() {
-    context.read<ProductsBloc>().add(const ResetStatesEvent());
-    super.deactivate();
   }
 
 
@@ -188,9 +182,16 @@ class _SearchResultsState extends State<SearchResults> {
   void fetchFilteredProducts() {
     context.read<ProductsBloc>().add(AddFilteredBuildResultsEvent(
         query: widget.query,
-        page: context.read<ProductsBloc>().state.currentPage + 1,
+        page: context.read<ProductsBloc>().state.resultsCurrentPage + 1,
       )
     );
+  }
+
+  @override
+  void deactivate() {
+    log('deactivate search results');
+    context.read<ProductsBloc>().add(const ResetStatesEvent());
+    super.deactivate();
   }
 
   @override
@@ -204,6 +205,7 @@ class _SearchResultsState extends State<SearchResults> {
       height: size.height,
       width: size.width,
       child: BlocBuilder<ProductsBloc, ProductsState>(
+        buildWhen: (previous, current) => previous.filteredBuildResults != current.filteredBuildResults || previous.productsStates != current.productsStates,
         builder: (context, state) {
           if (state.productsStates == ProductsStates.loading) {
             return const Center(child: CircularProgressIndicator.adaptive());

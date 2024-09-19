@@ -13,7 +13,7 @@ export 'package:ourshop_ecommerce/ui/pages/features/login/signIn_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/login/signUp_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/my_account.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/cart/cart.dart';
-export 'package:ourshop_ecommerce/ui/pages/features/messenger/messenger.dart';
+export 'package:ourshop_ecommerce/ui/pages/features/search/search_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/home/home_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/admin_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/orders/admin_orders.dart';
@@ -70,6 +70,7 @@ export 'package:flick_video_player/flick_video_player.dart';
 export 'package:wakelock_plus/wakelock_plus.dart';
 export 'package:cached_network_image/cached_network_image.dart';
 export 'package:image_picker/image_picker.dart';
+export 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 //theme
 export '../../../../theme/theme.dart';

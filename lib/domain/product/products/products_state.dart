@@ -51,6 +51,9 @@ class ProductsState extends Equatable {
   final List<FilteredShippingRate> shippingRates;
   final List<CountryGroup> countryGroupsByCompany;
   final List<FilteredProduct> filteredBuildResults;
+  final List<FilteredProduct> filteredProducts;
+  final int suggestionsCurrentPage;
+  final int resultsCurrentPage;
 
   const ProductsState({
     this.productsStates = ProductsStates.initial,
@@ -79,7 +82,10 @@ class ProductsState extends Equatable {
     this.unitMeasurements = const [],
     this.shippingRates = const [],
     this.countryGroupsByCompany = const [],
-    this.filteredBuildResults = const []
+    this.filteredBuildResults = const [],
+    this.filteredProducts = const [],
+    this.suggestionsCurrentPage = 0,
+    this.resultsCurrentPage = 0
   });
 
   ProductsState copyWith({
@@ -107,7 +113,10 @@ class ProductsState extends Equatable {
     List<UnitMeasurement>? unitMeasurements,
     List<FilteredShippingRate>? shippingRates,
     List<CountryGroup>? countryGroupsByCompany,
-    List<FilteredProduct>? filteredBuildResults
+    List<FilteredProduct>? filteredBuildResults,
+    List<FilteredProduct>? filteredProducts,
+    int? suggestionsCurrentPage,
+    int? resultsCurrentPage
   }) {
     return ProductsState(
       productsStates: productsStates ?? this.productsStates,
@@ -134,7 +143,10 @@ class ProductsState extends Equatable {
       unitMeasurements: unitMeasurements ?? this.unitMeasurements,
       shippingRates: shippingRates ?? this.shippingRates,
       countryGroupsByCompany: countryGroupsByCompany ?? this.countryGroupsByCompany,
-      filteredBuildResults: filteredBuildResults ?? this.filteredBuildResults
+      filteredBuildResults: filteredBuildResults ?? this.filteredBuildResults,
+      filteredProducts: filteredProducts ?? this.filteredProducts,
+      suggestionsCurrentPage: suggestionsCurrentPage ?? this.suggestionsCurrentPage,
+      resultsCurrentPage: resultsCurrentPage ?? this.resultsCurrentPage
     );
   }
   
@@ -164,6 +176,8 @@ class ProductsState extends Equatable {
     unitMeasurements,
     shippingRates,
     countryGroupsByCompany,
-    filteredBuildResults
+    filteredBuildResults,
+    filteredProducts,
+    suggestionsCurrentPage,
   ];
 }
