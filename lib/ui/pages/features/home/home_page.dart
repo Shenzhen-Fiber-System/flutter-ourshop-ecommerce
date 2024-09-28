@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> pages = [
     const ProductsPage(),
-    const SearchPage(),
+    const OffersPage(),
     const Cart(),
     const MyAccount()
   ];
@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
               },
             items:   [
               BottomNavigationBarItem( label: translations.home, icon:const Icon(Icons.home)),
-              BottomNavigationBarItem( label: translations.search, icon:const Icon(Icons.search)),
+              BottomNavigationBarItem( label: translations.offers, icon:const Icon(Icons.local_offer_rounded)),
               BottomNavigationBarItem( label: '${translations.cart} ${context.watch<ProductsBloc>().state.cartProducts.length.toString()}', 
                 icon: const Icon(Icons.shopping_cart)
               ),
@@ -96,13 +96,13 @@ class SubCategoryList extends StatelessWidget {
   final Size size;
   final AppLocalizations translations;
   final ThemeData theme;
-  final void Function (Category?)? onTap;
+  final Function (Category)? onTap;
   final double? height;
   final double? width;
 
   @override
   Widget build(BuildContext context) {
-    if(category.subCategories!.isEmpty) {
+    if(category.subCategories != null && category.subCategories!.isEmpty) {
       return Center(child: Text(translations.no_sub_categories_found, style: theme.textTheme.titleMedium?.copyWith(color: Colors.black)));
     }
     return SizedBox(
@@ -115,22 +115,11 @@ class SubCategoryList extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 3.0),
             child: SubCategoryChip(
-              onTap: onTap, 
+              onTap: onTap ,
               c: c, 
               theme: theme
             ),
           );
-          // return SubcategoryCard(
-          //   height: size.height * 0.01, 
-          //   width: size.width * 0.35,
-          //   theme: theme,
-          //   translations: translations,
-            // urlImage: category.subCategories![index].iconSvg,
-          //   children: [
-          //     Text(category.subCategories![index].name, style: theme.textTheme.labelSmall,),
-          //   ],
-          //   onTap: () => onTap != null ? onTap!(category.subCategories![index]) : null,
-          // );
         },
       ),
     );

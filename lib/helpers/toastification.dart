@@ -125,6 +125,7 @@ class ErrorToast extends Toast {
   final Color? primaryColor;
   final Color? backgroundColor;
   final Color? foregroundColor;
+  final Function(ToastificationItem)? onAutoCompleted;
 
   ErrorToast({
     required this.title,
@@ -145,7 +146,8 @@ class ErrorToast extends Toast {
     this.showIcon,
     this.primaryColor,
     this.backgroundColor, 
-    this.foregroundColor, 
+    this.foregroundColor,
+    this.onAutoCompleted,
   });
 
   @override
@@ -192,7 +194,7 @@ class ErrorToast extends Toast {
       callbacks: ToastificationCallbacks(
         onTap: (toastItem) => log('Toast ${toastItem.id} tapped'),
         onCloseButtonTap: (toastItem) => log('Toast ${toastItem.id} close button tapped'),
-        onAutoCompleteCompleted: (toastItem) => log('Toast ${toastItem.id} auto complete completed'),
+        onAutoCompleteCompleted: (toastItem) => onAutoCompleted != null ? onAutoCompleted!(toastItem) : null,
         onDismissed: (toastItem) => log('Toast ${toastItem.id} dismissed'),
       ),
     );

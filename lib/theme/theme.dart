@@ -278,9 +278,10 @@ class AppTheme{
     ),
     bannerTheme: MaterialBannerThemeData(
       backgroundColor: palette[1000]!,
-      contentTextStyle: ThemeData().textTheme.bodyMedium,
+      contentTextStyle: ThemeData().textTheme.bodyMedium?.copyWith(color: Colors.white),
       padding: const EdgeInsets.all(20.0),
       leadingPadding: const EdgeInsets.all(20.0),
+      
     ),
     chipTheme: ChipThemeData(
       backgroundColor: Colors.white,

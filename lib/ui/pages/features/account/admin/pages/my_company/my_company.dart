@@ -10,7 +10,7 @@ enum BanKAccountType {
 }
 
 class ExpansionPanelItem {
-  final Bank bank;
+  final CompanyBank bank;
   bool isExpanded;
 
   ExpansionPanelItem({
@@ -129,8 +129,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
   void _addBankPanel() {
     _bankPanelsNotifier.value = List<ExpansionPanelItem>.from(_bankPanelsNotifier.value)
       ..add(ExpansionPanelItem(
-        bank: Bank(
-          id: '',
+        bank: CompanyBank(
           companyId: context.read<CompanyBloc>().state.userCompany.id,
           bankId: '',
           accountType: '',
@@ -138,10 +137,11 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
           swiftCode: '',
           address: '',
           phoneNumber: '',
-          intermediaryBankId: '',
-          // showOrder: true,
-          bankCountryId: '',
+          intermediaryBankId: '', 
+          id: '', 
+          bankCountryId: '', 
           intermediaryBankCountryId: '',
+          // showOrder: true,
         ),
         isExpanded: true,
       ));
@@ -178,8 +178,8 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
               child: Text('Error loading company information', style: theme.textTheme.bodyLarge?.copyWith(color: Colors.red),),
             );
           }
-          if(state.userCompany.banks.isNotEmpty) {
-            _bankPanelsNotifier.value = state.userCompany.banks.map((bank) => ExpansionPanelItem(bank: bank)).toList();
+          if(state.userCompany.banks!.isNotEmpty) {
+            _bankPanelsNotifier.value = state.userCompany.banks!.map((bank) => ExpansionPanelItem(bank: bank)).toList();
           }
           return SingleChildScrollView(
               controller: _scrollController,
@@ -382,6 +382,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
   Widget _buildSocialMediaFormWidget() {
     final Size size = MediaQuery.of(context).size;
     final ThemeData theme = Theme.of(context);
+    final AppLocalizations translations = AppLocalizations.of(context)!;
     return Row(
       children: [
         SizedBox(
@@ -389,9 +390,9 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
           child: FormBuilderDropdown(
             name: 'social_media_${_socialMediaForms.length}',
             style: theme.textTheme.labelLarge,
-            decoration: const InputDecoration(
-              labelText: 'Social Media',
-              hintText: 'Social Media',
+            decoration: InputDecoration(
+              labelText: translations.social_media,
+              hintText: translations.social_media,
             ),
             validator: FormBuilderValidators.compose([
               FormBuilderValidators.required(),
@@ -408,9 +409,9 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
           child: FormBuilderTextField(
             name: 'social_media_url_${_socialMediaForms.length}',
             style: theme.textTheme.labelLarge,
-            decoration: const InputDecoration(
-              labelText: 'Social Media URL',
-              hintText: 'Social Media URL',
+            decoration: InputDecoration(
+              labelText: translations.social_media_url,
+              hintText: translations.social_media_url,
             ),
             validator: FormBuilderValidators.compose([
               FormBuilderValidators.required(),
@@ -430,7 +431,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
   }
 
   Widget _buildBankFormWidget(int index){
-    final Bank bank = _bankPanelsNotifier.value[index].bank;
+    final CompanyBank bank = _bankPanelsNotifier.value[index].bank;
     final ThemeData theme = Theme.of(context);
     return Column(
       children: [
@@ -468,7 +469,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
           ]), 
           items: context.read<CompanyBloc>().state.banks.map((country) => DropdownMenuItem(
             value: country.id,
-            child: Text(country.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
+            child: Text(country.name ?? 'no name', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
           )).toList(),
         ),
         const SizedBox(height: 10.0,),
@@ -574,7 +575,7 @@ class _MyCompanyState extends State<MyCompany> with TickerProviderStateMixin {
           ]), 
           items: context.read<CompanyBloc>().state.banks.map((bank) => DropdownMenuItem(
             value: bank.id,
-            child: Text(bank.name, style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
+            child: Text(bank.name ?? 'no bank name', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black)),
           )).toList(),
         ),
         IconButton(

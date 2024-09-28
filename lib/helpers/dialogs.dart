@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:url_launcher/url_launcher.dart';
+
 import '../ui/pages/pages.dart';
 
 sealed class AlertDialogs {
@@ -284,7 +286,27 @@ class ShippingAddressDialog extends AlertDialogs {
                         FormBuilderValidators.required(),
                         FormBuilderValidators.numeric(),
                       ]),
-                    )
+                    ),
+                    SizedBox(height: space,),
+                    FormBuilderDropdown(
+                      name: "countryId",
+                      decoration: InputDecoration(
+                        labelText: translations.country,
+                        hintText: translations.choose_country
+                      ),
+                      items: context.watch<CountryBloc>().state.countries.map((Country country) => DropdownMenuItem(
+                        value: country.id,
+                        child: Row(
+                          children: [
+                            FlagPhoto(country: country,),
+                            Padding(
+                              padding: const EdgeInsets.only(left:10.0),
+                              child: Text(Helpers.truncateText(country.name, 20), style: theme.textTheme.bodySmall,),
+                            ),
+                          ],
+                        ),
+                      )).toList(),
+                    ),
                   ],
                 )
               ),
@@ -343,4 +365,120 @@ class DeleteProductDialog extends AlertDialogs {
     );
   }
           
+}
+
+class ContactSellerDialog extends AlertDialogs{
+
+  final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
+  final FilteredProduct product;
+
+  ContactSellerDialog({required this.product});
+
+  @override
+  Future showAlertDialog(BuildContext context, AppLocalizations translations, ThemeData theme) async {
+    final LoggedUser user = context.read<UsersBloc>().state.loggedUser;
+    return await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(translations.contact_seller),
+                CloseButton(
+                  onPressed: () =>context.pop(),
+                ),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: FormBuilder(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    FormBuilderTextField(
+                      name: "email",
+                      decoration: InputDecoration(
+                        labelText: translations.email,
+                        hintText: translations.placeholder(translations.email.toLowerCase()),
+                      ),
+                      initialValue: user.email,
+                    ),
+                    SizedBox(height: space,),
+                    FormBuilderTextField(
+                      name: "message",
+                      initialValue: translations.contact_seller_message(
+                        user.email,
+                        user.name,
+                        user.userPhoneNumberCode+user.userPhoneNumber,
+                        product.name,
+                        
+                      ),
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        labelText: translations.message,
+                        hintText: translations.placeholder(translations.message.toLowerCase()),
+                      ),
+                    ),
+                  ],
+                )
+              ),
+            ),
+            actionsPadding: theme.dialogTheme.actionsPadding,
+            actions: <Widget>[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.saveAndValidate()) {
+                      _openWhatsApp('555566765764', _formKey.currentState!.value['message']);
+                    }
+                  },
+                  child: Text(translations.whatsapp, style: theme.textTheme.labelMedium,),
+                ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.saveAndValidate()) {
+                      final data = {
+                        "dataNotification": <Map<String,dynamic>>[
+                          { "name": "email", "value": _formKey.currentState!.value['email'] },
+                          { "name": "companyId", "value": product.companyId },
+                          { "name": "productId", "value": product.id },
+                          { "name": "message", "value": _formKey.currentState!.value['message'] },
+                          { "name": "seller_company_name", "value": "company name" },
+                          { "name": "buyer_name", "value": user.name },
+                          { "name": "buyer_lastname", "value": user.lastName },
+                          { "name": "buyer_contact_email", "value": user.email },
+                          { "name": "buyer_contact_whatsapp", "value": user.userPhoneNumberCode+user.userPhoneNumber },
+                        ],
+                        "language": context.read<SettingsBloc>().state.currentLanguage.value.toUpperCase(),
+                        "nameTypeNotification":"contact_seller_for_product_prices"
+                      };
+                      log('data: $data');
+                      context.pop();
+                    }
+                  },
+                  child: Text(translations.email, style: theme.textTheme.labelMedium,),
+                ),
+              ),
+            ],
+          );
+        }
+      );
+  }
+
+  Future<void> _openWhatsApp(String phoneNumber, String message) async {
+    final url = 'https://api.whatsapp.com/send/?phone=$phoneNumber&text=${Uri.encodeComponent(message)}';
+    try {  
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url));
+      }
+    } catch (e) {
+      log('error: $e');
+    }
+  }
+  
 }

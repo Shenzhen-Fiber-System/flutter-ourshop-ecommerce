@@ -27,60 +27,78 @@ class OrderResponse {
         message: json["message"],
         data: Order.fromJson(json["data"]),
     );
-
-    Map<String, dynamic> toJson() => {
-        "success": success,
-        "message": message,
-        "data": data.toJson(),
-    };
 }
 
 
 class Order {
-    final String id;
-    final String orderNumber;
-    final String customerId;
-    final dynamic companyId;
-    final String customerName;
-    final String orderStatus;
-    final dynamic shippingAddressId;
-    final List<OrderItem> orderItems;
-    final List<dynamic> orderStatuses;
-    final double subTotal;
-    final double discount;
-    final double total;
-    final DateTime createdAt;
+    final String? id;
+    final String? orderNumber;
+    final String? customerId;
+    final String? companyId;
+    final String? customerName;
+    final String? orderStatus;
+    final List<OrderItem>? orderItems;
+    final dynamic orderStatuses;
+    final double? subTotal;
+    final double? discount;
+    final double? total;
+    final DateTime? createdAt;
+    final List<ShippingRangeCalculation>? shippingRangeCalculation;
+    final dynamic addressLine1;
+    final dynamic addressLine2;
+    final dynamic addressLine3;
+    final dynamic phoneNumber;
+    final dynamic city;
+    final dynamic state;
+    final dynamic country;
+    final dynamic zipCode;
 
     Order({
-        required this.id,
-        required this.orderNumber,
-        required this.customerId,
-        required this.companyId,
-        required this.customerName,
-        required this.orderStatus,
-        required this.shippingAddressId,
-        required this.orderItems,
-        required this.orderStatuses,
-        required this.subTotal,
-        required this.discount,
-        required this.total,
-        required this.createdAt,
+        this.id,
+        this.orderNumber,
+        this.customerId,
+        this.companyId,
+        this.customerName,
+        this.orderStatus,
+        this.orderItems,
+        this.orderStatuses,
+        this.subTotal,
+        this.discount,
+        this.total,
+        this.createdAt,
+        this.shippingRangeCalculation,
+        this.addressLine1,
+        this.addressLine2,
+        this.addressLine3,
+        this.phoneNumber,
+        this.city,
+        this.state,
+        this.country,
+        this.zipCode,
     });
 
     Order copyWith({
         String? id,
         String? orderNumber,
         String? customerId,
-        dynamic companyId,
+        String? companyId,
         String? customerName,
         String? orderStatus,
-        dynamic shippingAddressId,
         List<OrderItem>? orderItems,
-        List<dynamic>? orderStatuses,
+        dynamic orderStatuses,
         double? subTotal,
         double? discount,
         double? total,
         DateTime? createdAt,
+        List<ShippingRangeCalculation>? shippingRangeCalculation,
+        dynamic addressLine1,
+        dynamic addressLine2,
+        dynamic addressLine3,
+        dynamic phoneNumber,
+        dynamic city,
+        dynamic state,
+        dynamic country,
+        dynamic zipCode,
     }) => 
         Order(
             id: id ?? this.id,
@@ -89,13 +107,21 @@ class Order {
             companyId: companyId ?? this.companyId,
             customerName: customerName ?? this.customerName,
             orderStatus: orderStatus ?? this.orderStatus,
-            shippingAddressId: shippingAddressId ?? this.shippingAddressId,
             orderItems: orderItems ?? this.orderItems,
             orderStatuses: orderStatuses ?? this.orderStatuses,
             subTotal: subTotal ?? this.subTotal,
             discount: discount ?? this.discount,
             total: total ?? this.total,
             createdAt: createdAt ?? this.createdAt,
+            shippingRangeCalculation: shippingRangeCalculation ?? this.shippingRangeCalculation,
+            addressLine1: addressLine1 ?? this.addressLine1,
+            addressLine2: addressLine2 ?? this.addressLine2,
+            addressLine3: addressLine3 ?? this.addressLine3,
+            phoneNumber: phoneNumber ?? this.phoneNumber,
+            city: city ?? this.city,
+            state: state ?? this.state,
+            country: country ?? this.country,
+            zipCode: zipCode ?? this.zipCode,
         );
 
     factory Order.fromJson(Map<String, dynamic> json) => Order(
@@ -105,63 +131,55 @@ class Order {
         companyId: json["companyId"],
         customerName: json["customerName"],
         orderStatus: json["orderStatus"],
-        shippingAddressId: json["shippingAddressId"],
-        orderItems: List<OrderItem>.from(json["orderItems"].map((x) => OrderItem.fromJson(x))),
-        orderStatuses: List<dynamic>.from(json["orderStatuses"].map((x) => x)),
+        orderItems: json["orderItems"] == null ? [] : List<OrderItem>.from(json["orderItems"]!.map((x) => OrderItem.fromJson(x))),
+        orderStatuses: json["orderStatuses"],
         subTotal: json["subTotal"],
         discount: json["discount"],
         total: json["total"],
-        createdAt: DateTime.parse(json["createdAt"]),
+        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
+        shippingRangeCalculation: json["shippingRangeCalculation"] == null ? [] : List<ShippingRangeCalculation>.from(json["shippingRangeCalculation"]!.map((x) => ShippingRangeCalculation.fromJson(x))),
+        addressLine1: json["addressLine1"],
+        addressLine2: json["addressLine2"],
+        addressLine3: json["addressLine3"],
+        phoneNumber: json["phoneNumber"],
+        city: json["city"],
+        state: json["state"],
+        country: json["country"],
+        zipCode: json["zipCode"],
     );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "orderNumber": orderNumber,
-        "customerId": customerId,
-        "companyId": companyId,
-        "customerName": customerName,
-        "orderStatus": orderStatus,
-        "shippingAddressId": shippingAddressId,
-        "orderItems": List<dynamic>.from(orderItems.map((x) => x.toJson())),
-        "orderStatuses": List<dynamic>.from(orderStatuses.map((x) => x)),
-        "subTotal": subTotal,
-        "discount": discount,
-        "total": total,
-        "createdAt": createdAt.toIso8601String(),
-    };
 }
 
-class OrderItem extends Equatable {
-    final String id;
-    final String orderId;
-    final String productId;
-    final String productName;
-    final String productCategoryName;
-    final String productUnitMeasurementName;
-    final String productMainPhotoUrl;
-    final String productCompanyId;
-    final double qty;
-    final double price;
-    final double discount;
-    final double total;
-    final double subTotal;
-    final String companyName;
+class OrderItem  extends Equatable {
+    final String? id;
+    final String? orderId;
+    final String? productId;
+    final String? productName;
+    final String? productCategoryName;
+    final String? productUnitMeasurementName;
+    final String? productMainPhotoUrl;
+    final String? productCompanyId;
+    final double? qty;
+    final double? price;
+    final double? discount;
+    final double? total;
+    final double? subTotal;
+    final String? companyName;
 
     const OrderItem({
-        required this.id,
-        required this.orderId,
-        required this.productId,
-        required this.productName,
-        required this.productCategoryName,
-        required this.productUnitMeasurementName,
-        required this.productMainPhotoUrl,
-        required this.productCompanyId,
-        required this.qty,
-        required this.price,
-        required this.discount,
-        required this.total,
-        required this.subTotal,
-        required this.companyName,
+        this.id,
+        this.orderId,
+        this.productId,
+        this.productName,
+        this.productCategoryName,
+        this.productUnitMeasurementName,
+        this.productMainPhotoUrl,
+        this.productCompanyId,
+        this.qty,
+        this.price,
+        this.discount,
+        this.total,
+        this.subTotal,
+        this.companyName,
     });
 
     OrderItem copyWith({
@@ -213,39 +231,61 @@ class OrderItem extends Equatable {
         subTotal: json["subTotal"],
         companyName: json["companyName"],
     );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "orderId": orderId,
-        "productId": productId,
-        "productName": productName,
-        "productCategoryName": productCategoryName,
-        "productUnitMeasurementName": productUnitMeasurementName,
-        "productMainPhotoUrl": productMainPhotoUrl,
-        "productCompanyId": productCompanyId,
-        "qty": qty,
-        "price": price,
-        "discount": discount,
-        "total": total,
-        "subTotal": subTotal,
-        "companyName": companyName,
-    };
     
-      @override
-      List<Object?> get props => [
-        id,
-        orderId,
-        productId,
-        productName,
-        productCategoryName,
-        productUnitMeasurementName,
-        productMainPhotoUrl,
-        productCompanyId,
-        qty,
-        price,
-        discount,
-        total,
-        subTotal,
-        companyName,
-      ];
+    @override
+    List<Object?> get props => [
+      id,
+      orderId,
+      productId,
+      productName,
+      productCategoryName,
+      productUnitMeasurementName,
+      productMainPhotoUrl,
+      productCompanyId,
+      qty,
+      price,
+      discount,
+      total,
+      subTotal,
+      companyName,
+    ];
+}
+
+class ShippingRangeCalculation {
+    final int? quantity;
+    final int? quantityProducts;
+    final double? price;
+    final ShippingRange? shippingRange;
+    final String? shippingRangeId;
+
+    ShippingRangeCalculation({
+        this.quantity,
+        this.quantityProducts,
+        this.price,
+        this.shippingRange,
+        this.shippingRangeId,
+    });
+
+    ShippingRangeCalculation copyWith({
+        int? quantity,
+        int? quantityProducts,
+        double? price,
+        ShippingRange? shippingRange,
+        String? shippingRangeId,
+    }) => 
+        ShippingRangeCalculation(
+            quantity: quantity ?? this.quantity,
+            quantityProducts: quantityProducts ?? this.quantityProducts,
+            price: price ?? this.price,
+            shippingRange: shippingRange ?? this.shippingRange,
+            shippingRangeId: shippingRangeId ?? this.shippingRangeId,
+        );
+
+    factory ShippingRangeCalculation.fromJson(Map<String, dynamic> json) => ShippingRangeCalculation(
+        quantity: json["quantity"],
+        quantityProducts: json["quantityProducts"],
+        price: json["price"],
+        shippingRange: json["shippingRange"] == null ? null : ShippingRange.fromJson(json["shippingRange"]),
+        shippingRangeId: json["shippingRangeId"],
+    );
 }

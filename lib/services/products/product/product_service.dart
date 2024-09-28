@@ -29,9 +29,10 @@ class ProductService {
 
 
   Future<dynamic> getProductsByCategory(String categoryId) async {
+    log('categoryId: $categoryId');
     try {
       final response = await dio.get('/products/by-category/$categoryId');
-      final products = ProductResponse.fromJson(response.data);
+      final products = FilteredResponse<FilteredProduct>.fromJson(response.data, (json) => FilteredProduct.fromJson(json));
       return products.data;
     } on DioException catch (e) {
       log(e.response?.data);
@@ -51,6 +52,7 @@ class ProductService {
 
   Future<dynamic> filteredAdminProducts(Map<String, dynamic> filteredParamenters) async {
     try {
+      log('url: ${dio.options.baseUrl}');
       final response = await dio.post('/products/filtered-page', data: filteredParamenters);
       final filteredProducts = FilteredResponse<FilteredProduct>.fromJson(response.data, (json) => FilteredProduct.fromJson(json));
       return filteredProducts.data;
@@ -76,13 +78,14 @@ class ProductService {
   }
 
   Future<dynamic> filteredProducts(Map<String, dynamic> filteredParamenters) async {
-    log('page: ${filteredParamenters['page']}');
     try {
+      // log('filteredParamenters: $filteredParamenters');
       final response = await dio.post('/products/filtered-page', data: filteredParamenters);
       final filteredProducts = FilteredResponse<FilteredProduct>.fromJson(response.data, (json) => FilteredProduct.fromJson(json));
-      log('filteredProducts: ${filteredProducts.data.content.length}');
+      // log('filteredProducts: ${filteredProducts.data.content.length}');
       return filteredProducts.data;
     } on DioException catch (e) {
+      log('error filteredProducts: ${e.response?.data}');
       ErrorHandler(e);
     }
   }
@@ -150,7 +153,7 @@ class ProductService {
   Future<dynamic> updateCountryGroupById (String countryGroupId, Map<String,dynamic> body) async {
     try {
       final response = await dio.put('/country-groups/$countryGroupId', data: body);
-      log('response.data: ${response.data}');
+      log('updateCountryGroupById: ${response.data}');
     } on DioException catch (e) {
       log('error updateCountryGroupById: ${e.response?.data}');
       ErrorHandler(e);
@@ -171,7 +174,17 @@ class ProductService {
   Future<dynamic> addNewCountryGroup(Map<String, dynamic> body) async {
     try {
       final response = await dio.post('/country-groups', data: body);
-      log('response.data: ${response.data}');
+      if (response.data['success'] == true) {
+        SuccessToast(
+          title: locator<AppLocalizations>().country_group_added,
+          style: ToastificationStyle.flatColored,
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.green.shade500,
+        ).showToast(AppRoutes.globalContext!);
+
+        return true;
+
+      }
     } on DioException catch (e) {
       log('error addNewCountryGroup: ${e.response?.data}');
       ErrorHandler(e);
@@ -192,10 +205,69 @@ class ProductService {
   Future<dynamic> addNewShippingRate(Map<String, dynamic> body) async {
     try {
       final response = await dio.post('/shipping-rates', data: body);
-      log('response.data: ${response.data}');
+      if (response.data['success'] == true) {
+        SuccessToast(
+          title: locator<AppLocalizations>().shipping_rate_added,
+          style: ToastificationStyle.flatColored,
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.green.shade500,
+        ).showToast(AppRoutes.globalContext!);
+      }
     } on DioException catch (e) {
       log('error addNewShippingRate: ${e.response?.data}');
       ErrorHandler(e);
     }
   }
+
+  Future<dynamic> getFilteredOfferTypes(Map<String, dynamic> filteredParams) async {
+    try {
+      final response = await dio.post('/offer-types/filtered-page', data: filteredParams);
+      final offerTypes = FilteredResponse<FilteredOfferTypes>.fromJson(response.data, (json) => FilteredOfferTypes.fromJson(json));
+      return offerTypes.data;
+    } on DioException catch (e) {
+      log('error getFilteredOfferTypes: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
+
+
+  Future<dynamic> getSearchProductShippingRates(String query) async {
+    try {
+      final response = await dio.get('/products/search/$query');
+      final searchProductShippingRates = ProductResponse.fromJson(response.data);
+      return searchProductShippingRates.data;
+    } on DioException catch (e) {
+      log('DioException: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> calculateshippingRate(Map<String,dynamic> data) async {
+    try {
+      log('dio: ${dio.options.headers}');
+      log('data: $data');
+      final response = await dio.post('/shipping-rates/calculate', data: data );
+      log('response: ${response.data}');
+
+    } on DioException catch (e) {
+      log('error calculateshipping: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
+
+  Future<dynamic> getProdutsOffers(Map<String,dynamic>filteredParams) async {
+    try {
+      final response = await dio.post('/offers/filtered-page', data: filteredParams);
+      final productsOffers = FilteredResponse<FilteredOfferProduct>.fromJson(response.data, (json) => FilteredOfferProduct.fromMap(json)) ;
+      return productsOffers.data;
+    } on DioException catch (e) {
+      log('error getProdutsOffers: ${e.response?.data}');
+      ErrorHandler(e);
+    }
+  }
 }
+
+
+//TODO pasos
+
+// - caluclar el costo de envio

@@ -7,12 +7,20 @@ sealed class UsersEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class AddLoggedUserEvent extends UsersEvent {
-  final LoggedUser loggedUser;
-  const AddLoggedUserEvent(this.loggedUser);
+class Login extends UsersEvent {
+  // final LoggedUser loggedUser;
+  final Map<String, dynamic> data;
+  const Login({required this.data});
 
   @override
-  List<Object> get props => [loggedUser];
+  List<Object> get props => [data];
+}
+
+class RegisterNewUser extends UsersEvent {
+  final Map<String, dynamic> data;
+  const RegisterNewUser({required this.data});
+  @override
+  List<Object> get props => [data];
 }
 
 
@@ -49,12 +57,4 @@ class AddSelectedShippingAddressEvent extends UsersEvent {
   const AddSelectedShippingAddressEvent(this.shippingAddress);
   @override
   List<Object> get props => [shippingAddress];
-}
-
-class AddIsLoadingUevent extends UsersEvent {
-  final bool isLoading;
-  const AddIsLoadingUevent(this.isLoading);
-
-  @override
-  List<Object> get props => [isLoading];
 }

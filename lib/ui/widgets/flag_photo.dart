@@ -1,4 +1,6 @@
 
+import 'dart:developer';
+
 import '../pages/pages.dart';
 
 class FlagPhoto extends StatelessWidget {
@@ -11,31 +13,36 @@ class FlagPhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      '${dotenv.env['FLAG_URL']}${country.flagUrl}', 
+    return CachedNetworkImage(
+      key: ValueKey('${dotenv.env['FLAG_URL']}${country.flagUrl}'),
+      cacheKey: '${dotenv.env['FLAG_URL']}${country.flagUrl}',
+      imageUrl: '${dotenv.env['FLAG_URL']}${country.flagUrl}', 
       width: 30, 
       height: 30,
-      errorBuilder: (context, error, stackTrace) {
-        return const Icon(Icons.no_photography);
-      },
-      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-        return wasSynchronouslyLoaded 
-        ? child 
-        : AnimatedOpacity(
-          opacity: frame == null ? 0 : 1,
-          duration: const Duration(seconds: 1),
-          curve: Curves.easeOut,
-          child: child,
-        );
-      },
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) {
-          return child;
-        }
-        return const Center(
-          child: CircularProgressIndicator.adaptive(),
-        );
-      },
+      fit: BoxFit.cover,
+        filterQuality: FilterQuality.high,
+        errorWidget: (context, url, error) {
+          return  const Icon(Icons.error);
+        },
+        imageBuilder: (context, imageProvider) {
+          return Image(image: imageProvider, fit: BoxFit.cover);
+        },
+        errorListener: (value) {
+          log('value: $value');
+        },
+        placeholderFadeInDuration: const Duration(milliseconds: 500),
+        fadeInDuration: const Duration(milliseconds: 500),
+        fadeOutDuration: const Duration(milliseconds: 500),
+        fadeInCurve: Curves.easeIn,
+        fadeOutCurve: Curves.easeOut,
+        progressIndicatorBuilder: (context, url, progress) {
+          return Center(
+            child: CircularProgressIndicator.adaptive(
+              value: progress.progress,
+              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.palette[1000]!),
+            )
+          );
+        },
     );
   }
 }

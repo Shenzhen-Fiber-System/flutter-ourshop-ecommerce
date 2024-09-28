@@ -60,30 +60,30 @@ class ProductCard extends StatelessWidget {
                     style: theme.textTheme.labelMedium?.copyWith(color: Colors.black, fontWeight: FontWeight.w400),
                   ),
                   const SizedBox(height: 5.0),
-                  if (product.productReviewInfo != null) 
+                  if (product.productReviewInfo?.ratingAvg != null) 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(right: 8.0),
-                          child: Text('${product.productReviewInfo?.ratingAvg.toStringAsFixed(1)}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
+                          child: Text(product.productReviewInfo!.ratingAvg.toStringAsFixed(1), style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
                         ),
                         RaitingBarWidget(product: product),
                       ],
                     )
                   else const SizedBox.shrink(),
-                  if (product.productReviewInfo?.summary != null && product.productReviewInfo!.summary.isNotEmpty)
+                  if (product.productReviewInfo?.summary != null && product.productReviewInfo!.summary!.isNotEmpty)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(translations.product_ratings(product.productReviewInfo!.reviewCount), style: theme.textTheme.bodySmall,),
+                      Text(translations.product_ratings(product.productReviewInfo!.reviewCount ?? 0.0), style: theme.textTheme.bodySmall,),
                     ],
                   )
                   else const SizedBox.shrink(),
                   const SizedBox(height: 2.0),
-                  SendAnimatedWidget(translations: translations, theme: theme),
+                  const SendAnimatedWidget(),
                   Row(
                     children: [
                       Text(
@@ -91,18 +91,19 @@ class ProductCard extends StatelessWidget {
                         style: theme.textTheme.labelMedium?.copyWith(color: Colors.black, fontWeight: FontWeight.w600),
                       ),
                       const Spacer(),
-                      GestureDetector(
-                        onTap: (){},
-                        child:  CircleAvatar(
-                          maxRadius: 18,
-                          backgroundColor: AppTheme.palette[1000],
-                          child: const Icon(
-                            Icons.add_shopping_cart_rounded,
-                            color: Colors.white,
-                            size: 15,
+                      if (product.unitPrice != null)
+                        GestureDetector(
+                          onTap: () => context.read<ProductsBloc>().add(AddCartProductEvent(product: product)),
+                          child:  CircleAvatar(
+                            maxRadius: 18,
+                            backgroundColor: AppTheme.palette[1000],
+                            child: const Icon(
+                              Icons.add_shopping_cart_rounded,
+                              color: Colors.white,
+                              size: 15,
+                            ),
                           ),
-                        ),
-                      )
+                        )
                       // IconButton.filled(
                       //   style: theme.textButtonTheme.style?.copyWith(
                       //     backgroundColor: const WidgetStatePropertyAll(Color(0xff003049)),
@@ -127,13 +128,7 @@ class ProductCard extends StatelessWidget {
   }
 }
 class SendAnimatedWidget extends StatefulWidget {
-  const SendAnimatedWidget({super.key, 
-    required this.translations,
-    required this.theme,
-  });
-
-  final AppLocalizations translations;
-  final ThemeData theme;
+  const SendAnimatedWidget({super.key,});
 
   @override
   State<SendAnimatedWidget> createState() => _SendAnimatedWidgetState();
@@ -163,6 +158,8 @@ class _SendAnimatedWidgetState extends State<SendAnimatedWidget> with TickerProv
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations translations = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
     return AnimatedBuilder(
       animation: Listenable.merge([
         _controller
@@ -178,7 +175,7 @@ class _SendAnimatedWidgetState extends State<SendAnimatedWidget> with TickerProv
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(widget.translations.send, style: widget.theme.textTheme.labelMedium?.copyWith(color: Colors.pink),),
+          Text(translations.send, style: theme.textTheme.labelMedium?.copyWith(color: Colors.pink),),
           const Padding(
             padding: EdgeInsets.only(left:5.0),
             child: Icon(Icons.delivery_dining, color: Colors.pink, size: 20.0,),
@@ -300,9 +297,7 @@ class CartCard extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Checkbox(
                 value: product.selected, 
-                // onChanged: (value) => context.read<ProductsBloc>().selectOrDeselectCartProduct(product)
-                onChanged: (value) {}
-                
+                onChanged: (value) => context.read<ProductsBloc>().add(SelectOrDeselectCartProductEvent(product: product))
               ),
             )
           else const SizedBox.shrink(),
@@ -322,12 +317,12 @@ class CartCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(Helpers.truncateText(product.name, 22), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),),
+                          Text(Helpers.truncateText(product.name, 20), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),),
                         ],
                       ),
                       Row(
                         children: [
-                          Text(product.unitPrice != null ? (product.unitPrice! * product.quantity).toStringAsFixed(2) : product.fboPriceEnd!.toStringAsFixed(2), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black, fontWeight:  FontWeight.w600),),
+                          Text(product.unitPrice != null ? '\$${(product.unitPrice! * product.quantity).toStringAsFixed(2)}' : '\$${(product.fboPriceEnd! * product.quantity).toStringAsFixed(2)}', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black, fontWeight:  FontWeight.w600),),
                         ],
                       ), 
                       Row(
@@ -339,7 +334,7 @@ class CartCard extends StatelessWidget {
                           ),
                           const Spacer(),
                           //TODO add increase decrease
-                          // IncreaseDecrease(theme: theme, product: product),
+                          IncreaseDecrease(theme: theme, product: product),
                           
                         ],
                       )
@@ -359,21 +354,19 @@ class IncreaseDecrease extends StatelessWidget {
   const IncreaseDecrease({super.key, required this.theme, required this.product});
 
   final ThemeData theme;
-  final Product product;
+  final FilteredProduct product;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         IconButton(
-          // onPressed: () => context.read<ProductsBloc>().removeCartProduct(product),
-          onPressed: () {},
+          onPressed: () => context.read<ProductsBloc>().add(RemoveCartProductEvent(product: product)),
           icon: Icon(Icons.remove_circle_outline, color: AppTheme.palette[900],),
         ),
         Text(product.quantity.toString(), style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[900]),),
         IconButton(
-          // onPressed: () => context.read<ProductsBloc>().addCartProduct(product),
-          onPressed: () {},
+          onPressed: () => context.read<ProductsBloc>().add(AddCartProductEvent(product: product)),
           icon: Icon(Icons.add_circle_outline, color: AppTheme.palette[900]),
         ),
       ],

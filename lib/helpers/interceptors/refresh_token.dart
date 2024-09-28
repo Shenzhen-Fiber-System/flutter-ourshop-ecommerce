@@ -4,12 +4,9 @@ import 'dart:developer';
 import '../../ui/pages/pages.dart';
 
 class RefreshTokenInterceptor extends Interceptor {
-  bool _isRefreshing = false;
-  Completer<void>? _refreshCompleter;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // log('request: ${options.baseUrl}${options.path}');
     final token = locator<Preferences>().preferences['token'];
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -19,71 +16,44 @@ class RefreshTokenInterceptor extends Interceptor {
 
   @override
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
-    log('Error interceptor: ${err.response?.data}');
+    // log('Error interceptor: ${err.response?.data}');
     if (err.response?.statusCode == 401 && err.response?.data['message'] == 'Unauthorized') {
-      log('unauthorized');
-      if (!_isRefreshing) {
-        _isRefreshing = true;
-        _refreshCompleter = Completer<void>();
+      log('Unauthorized - Intentando refrescar el token');
+      ErrorHandler(err);
+      // Evitar bucle infinito, chequeando si ya intentó refrescar el token una vez
+      final options = err.requestOptions;
 
-        try {
-          final newTokens = await _refreshToken();
-          log('after refresh token');
-          if (newTokens != null) {
-            locator<Preferences>().saveData('token', newTokens['accessToken']!);
-            locator<Preferences>().saveData('refreshToken', newTokens['refreshToken']!);
-            _refreshCompleter?.complete();
-          } else {
-            _refreshCompleter?.completeError('Failed to refresh token');
-          }
-        } catch (e) {
-          _refreshCompleter?.completeError(e);
-        } finally {
-          _isRefreshing = false;
-        }
+      if (options.headers['retry'] == true) {
+        // Si ya se intentó reintentar esta solicitud, evitar bucle infinito
+        log('Token refrescado previamente - No reintentando');
+        return handler.next(err);
       }
 
-      await _refreshCompleter?.future;
+      options.headers['retry'] = true;  // Marcar esta solicitud para evitar múltiples reintentos
 
-      if (_refreshCompleter?.isCompleted == true) {
-        final options = err.requestOptions;
-        options.headers['Authorization'] = 'Bearer ${locator<Preferences>().preferences['token']}';
-
+      final refreshToken = locator<Preferences>().preferences['refreshToken'];
+      
+      if (refreshToken.isNotEmpty) {
         try {
-          final response = await locator<AuthService>().dio.request(
-            options.path,
-            options: Options(
-              method: options.method,
-              headers: options.headers,
-            ),
-            data: options.data,
-            queryParameters: options.queryParameters,
-          );
+          // Refrescar el token
+          // await locator<AuthService>().refreshToken(refreshToken);
+          // final newToken = locator<Preferences>().preferences['token'];
 
-          return handler.resolve(response);
+          // Agregar el nuevo token a la solicitud original
+          // options.headers['Authorization'] = 'Bearer $newToken';
+
+          // Reintentar la solicitud original
+          // final response = await locator<DioInstance>().instance.fetch(options);
+          // return handler.resolve(response);
         } catch (e) {
-          return handler.reject(DioException(requestOptions: options, error: 'Retry failed: $e'));
+          log('Error al refrescar el token: $e');
+          return handler.next(err);  // Si falla el refresh, devuelve el error
         }
       } else {
-        return handler.reject(err);
+        return handler.next(err);  // Si no hay refresh token, pasa el error
       }
     } else {
-      return handler.next(err);
+      return handler.next(err);  // Si no es un error 401, continúa con el manejo del error
     }
-  }
-
-  Future<Map<String, String>?> _refreshToken() async {
-    final refreshToken = locator<Preferences>().preferences['refreshToken'];
-    if (refreshToken != null) {
-      try {
-        final newTokens = await AuthService(dio: DioInstance('admin').instance).refreshToken(refreshToken);
-        if (newTokens != null) {
-          return newTokens;
-        }
-      } catch (e) {
-        log('Refresh token error: $e');
-      }
-    }
-    return null;
   }
 }

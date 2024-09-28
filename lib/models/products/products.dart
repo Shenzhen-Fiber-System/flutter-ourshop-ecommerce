@@ -3,7 +3,7 @@ import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 class ProductResponse extends Equatable {
     final bool success;
     final String message;
-    final List<Product> data;
+    final List<FilteredProduct> data;
 
     const ProductResponse({
         required this.success,
@@ -14,14 +14,9 @@ class ProductResponse extends Equatable {
     factory ProductResponse.fromJson(Map<String, dynamic> json) => ProductResponse(
         success: json["success"],
         message: json["message"],
-        data: List<Product>.from(json["data"].map((x) => Product.fromJson(x))),
+        data: List<FilteredProduct>.from(json["data"].map((x) => FilteredProduct.fromJson(x))),
     );
 
-    Map<String, dynamic> toJson() => {
-        "success": success,
-        "message": message,
-        "data": List<dynamic>.from(data.map((x) => x.toJson())),
-    };
     @override
     List<Object?> get props => [
       success, 
@@ -205,41 +200,38 @@ class Product extends Equatable {
       reviews: reviews ?? this.reviews,
     );
 
-
-    
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "keyValue": keyValue,
-        "productGroupId": productGroupId,
-        "companyId": companyId,
-        "subCategoryId": subCategoryId,
-        "categoryId": categoryId,
-        "categoryName": categoryName,
-        "modelNumber": modelNumber,
-        "productTypeId": productTypeId,
-        "brandName": brandName,
-        "unitMeasurementId": unitMeasurementId,
-        "fboPriceStart": fboPriceStart,
-        "fboPriceEnd": fboPriceEnd,
-        "moqUnit": moqUnit,
-        "stock": stock,
-        "packageLength": packageLength,
-        "packageWidth": packageWidth,
-        "packageHeight": packageHeight,
-        "packageWeight": packageWeight,
-        "unitPrice": unitPrice,
-        "specifications": List<dynamic>.from(specifications.map((x) => x.toJson())),
-        "details": List<dynamic>.from(details.map((x) => x.toJson())),
-        "certifications": List<dynamic>.from(certifications.map((x) => x.toJson())),
-        "productStatus": productStatus,
-        "productPhotos": List<dynamic>.from(photos.map((x) => x.toJson())),
-        "productVideos": List<dynamic>.from(videos.map((x) => x.toJson())),
-        "mainPhotoUrl": mainPhotoUrl,
-        "mainVideoUrl": mainVideoUrl,
-        "productReviewInfo": productReviewInfo?.toJson(),
-    };
+    // Map<String, dynamic> toJson() => {
+    //     "id": id,
+    //     "name": name,
+    //     "keyValue": keyValue,
+    //     "productGroupId": productGroupId,
+    //     "companyId": companyId,
+    //     "subCategoryId": subCategoryId,
+    //     "categoryId": categoryId,
+    //     "categoryName": categoryName,
+    //     "modelNumber": modelNumber,
+    //     "productTypeId": productTypeId,
+    //     "brandName": brandName,
+    //     "unitMeasurementId": unitMeasurementId,
+    //     "fboPriceStart": fboPriceStart,
+    //     "fboPriceEnd": fboPriceEnd,
+    //     "moqUnit": moqUnit,
+    //     "stock": stock,
+    //     "packageLength": packageLength,
+    //     "packageWidth": packageWidth,
+    //     "packageHeight": packageHeight,
+    //     "packageWeight": packageWeight,
+    //     "unitPrice": unitPrice,
+    //     "specifications": List<dynamic>.from(specifications.map((x) => x.toJson())),
+    //     "details": List<dynamic>.from(details.map((x) => x.toJson())),
+    //     "certifications": List<dynamic>.from(certifications.map((x) => x.toJson())),
+    //     "productStatus": productStatus,
+    //     "productPhotos": List<dynamic>.from(photos.map((x) => x.toJson())),
+    //     "productVideos": List<dynamic>.from(videos.map((x) => x.toJson())),
+    //     "mainPhotoUrl": mainPhotoUrl,
+    //     "mainVideoUrl": mainVideoUrl,
+    //     "productReviewInfo": productReviewInfo?.toJson(),
+    // };
     
     @override
     List<Object?> get props => [
@@ -282,14 +274,14 @@ class Certification extends Equatable {
     final String id;
     final String name;
     final String? certificationNumber;
-    final String productId;
+    final String? productId;
     final String? description;
 
     const Certification({
         required this.id,
         required this.name,
         this.certificationNumber,
-        required this.productId,
+        this.productId,
         this.description,
     });
 
@@ -340,11 +332,10 @@ class Photo {
         dynamic companyName,
     }) => 
         Photo(
-            id: id ?? this.id,
-            name: name ?? this.name,
-            url: url ?? this.url,
-            importanceOrder: importanceOrder ?? this.importanceOrder,
-
+          id: id ?? this.id,
+          name: name ?? this.name,
+          url: url ?? this.url,
+          importanceOrder: importanceOrder ?? this.importanceOrder,
         );
 
     factory Photo.fromJson(Map<String, dynamic> json) => Photo(
@@ -366,13 +357,13 @@ class Photo {
 
 class ProductReviewInfo {
     final double ratingAvg;
-    final int reviewCount;
-    final List<Summary> summary;
+    final int? reviewCount;
+    final List<Summary>? summary;
 
     ProductReviewInfo({
         required this.ratingAvg,
-        required this.reviewCount,
-        required this.summary,
+        this.reviewCount,
+        this.summary,
     });
 
     ProductReviewInfo copyWith({
@@ -381,35 +372,29 @@ class ProductReviewInfo {
         List<Summary>? summary,
     }) => 
         ProductReviewInfo(
-            ratingAvg: ratingAvg ?? this.ratingAvg,
-            reviewCount: reviewCount ?? this.reviewCount,
-            summary: summary ?? this.summary,
+          ratingAvg: ratingAvg ?? this.ratingAvg,
+          reviewCount: reviewCount ?? this.reviewCount,
+          summary: summary ?? this.summary,
         );
 
     factory ProductReviewInfo.fromJson(Map<String, dynamic> json) => ProductReviewInfo(
         ratingAvg: json["ratingAvg"]?.toDouble(),
         reviewCount: json["reviewCount"],
-        summary: List<Summary>.from(json["summary"].map((x) => Summary.fromJson(x))),
+        summary:json["summary"] != null ? List<Summary>.from(json["summary"].map((x) => Summary.fromJson(x))) : [],
     );
-
-    Map<String, dynamic> toJson() => {
-        "ratingAvg": ratingAvg,
-        "reviewCount": reviewCount,
-        "summary": List<dynamic>.from(summary.map((x) => x.toJson())),
-    };
 }
 
 class Summary {
-    final int rating;
-    final int reviewCount;
-    final int totalReviews;
-    final double percentage;
+    final int? rating;
+    final int? reviewCount;
+    final int? totalReviews;
+    final double? percentage;
 
     Summary({
-        required this.rating,
-        required this.reviewCount,
-        required this.totalReviews,
-        required this.percentage,
+        this.rating,
+        this.reviewCount,
+        this.totalReviews,
+        this.percentage,
     });
 
     Summary copyWith({

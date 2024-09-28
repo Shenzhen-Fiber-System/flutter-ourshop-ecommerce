@@ -12,32 +12,19 @@ class ProductsPage extends StatefulWidget {
 
 class _ProductsPageState extends State<ProductsPage> with TickerProviderStateMixin {
 
-  // late ScrollController _scrollController;
   final Map<String, ScrollController> _scrollControllers = {};
 
   @override
   void initState() {     
     context.read<ProductsBloc>().add(const AddCategoriesEvent());
-    // _scrollController = ScrollController()..addListener(listener);
     super.initState();
   }
 
   @override
   void dispose() {
-    // _scrollController.dispose();
-    // _scrollController.removeListener(listener);
     _scrollControllers.forEach((_, controller) => controller.dispose());
     super.dispose();
   }
-
-  // void listener() {
-  //   final double threshold = _scrollController.position.maxScrollExtent * 0.05;
-  //   if (_scrollController.position.pixels >= threshold && 
-  //       context.read<ProductsBloc>().state.hasMore && 
-  //       context.read<ProductsBloc>().state.productsStates != ProductsStates.loadingMore) {
-  //       fetchFilteredProducts();
-  //   }
-  // }
 
   ScrollController _getOrCreateScrollController(String categoryId) {
     if (!_scrollControllers.containsKey(categoryId)) {
@@ -68,7 +55,16 @@ class _ProductsPageState extends State<ProductsPage> with TickerProviderStateMix
     final AppLocalizations translations = AppLocalizations.of(context)!;
     final ThemeData theme = Theme.of(context);
 
-    return BlocBuilder<ProductsBloc, ProductsState>(
+    return BlocConsumer<ProductsBloc, ProductsState>(
+      listener: (context, state) {
+        if (state.selectedSubCategory.id.isNotEmpty) {
+          context.go('/sub-category/${state.selectedSubCategory.id}',);
+        }
+      },
+      listenWhen: (previous, current) {
+        if (previous.selectedSubCategory.id != current.selectedSubCategory.id) return true;
+        return false;
+      },
       buildWhen: (previous, current) => previous.categories != current.categories || previous.productsStates != current.productsStates || previous.selectedParentCategory != current.selectedParentCategory || previous.parentCategoryLoaded != current.parentCategoryLoaded,
       builder: (context, state) {
 
@@ -132,8 +128,7 @@ class _ProductsPageState extends State<ProductsPage> with TickerProviderStateMix
                           child: Column(
                           key: PageStorageKey<String>(category.id),
                           children: [
-                              Container(
-                                color: Colors.red,
+                              SizedBox(
                                 height: size.height * 0.08,
                                 width: size.width,
                                 child: SubCategoryList(
@@ -142,9 +137,8 @@ class _ProductsPageState extends State<ProductsPage> with TickerProviderStateMix
                                   translations: translations, 
                                   theme: theme,
                                   onTap: (selectedSubCategory) {
-                                    if (selectedSubCategory != null) {
-                                      context.go('/sub-category/${selectedSubCategory.id}',);
-                                    }
+                                      context.read<ProductsBloc>().add(AddSelectedSubCategoryEvent(selectedSubCategoryId: selectedSubCategory.id));
+                                      // context.go('/sub-category/${selectedSubCategory.id}',);
                                   },
                                 ),
                               ),
@@ -193,20 +187,106 @@ class _ProductsPageState extends State<ProductsPage> with TickerProviderStateMix
   }
 }
 
-class AllProducts extends StatelessWidget {
+class AllProducts extends StatefulWidget {
   const AllProducts({
     super.key,
   });
 
   @override
+  State<AllProducts> createState() => _AllProductsState();
+}
+
+class _AllProductsState extends State<AllProducts> {
+
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()..addListener(listener);
+    fetchFilteredProducts();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(listener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    context.read<ProductsBloc>().add(const ResetStatesEvent());
+    super.deactivate();
+  }
+
+
+
+  void listener() {
+    final double threshold = _scrollController.position.maxScrollExtent * 0.1;
+    if (_scrollController.position.pixels >= threshold && 
+        context.read<ProductsBloc>().state.hasMore && 
+        context.read<ProductsBloc>().state.productsStates != ProductsStates.loadingMore) {
+      fetchFilteredProducts();
+    }
+  }
+
+  void fetchFilteredProducts() {
+    context.read<ProductsBloc>().add(AddFilteredProductsEvent(
+        page: context.read<ProductsBloc>().state.currentPage + 1, 
+        mode: FilteredResponseMode.all, 
+        categoryId: '',
+      )
+    );
+  }
+  @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     final ThemeData theme = Theme.of(context);
-    return Container(
-      color: Colors.amber,
+    final AppLocalizations translations = AppLocalizations.of(context)!;
+    final TextStyle style = theme.textTheme.bodyMedium!.copyWith(color: Colors.black);
+    return SizedBox(
       height: size.height,
       width: size.width,
-      child: Text('TODO, OFERTAS DEL DIA ETC...', style: theme.textTheme.titleMedium?.copyWith(color: Colors.black),)
+      child: BlocBuilder<ProductsBloc, ProductsState>(
+        buildWhen: (previous, current) => previous.filteredProducts != current.filteredProducts,
+        builder: (context, state) {
+          if (state.productsStates == ProductsStates.loading) {
+            return const Center(child: CircularProgressIndicator.adaptive());
+          }
+          if (state.productsStates == ProductsStates.error) {
+            return Center(child: Text(translations.error, style: style,));
+          }
+
+          return GridView.builder(
+            controller: _scrollController,
+              itemCount:state.hasMore
+                      ? state.filteredProducts.length + 1
+                      : state.filteredProducts.length,
+              itemBuilder: (context, index) {
+                if (index == state.filteredProducts.length) {
+                  return const Center(child: CircularProgressIndicator.adaptive());
+                }
+                if (state.filteredProducts.isEmpty) {
+                  return Center(child: Text(translations.no_results_found, style: style,));
+                }
+                final FilteredProduct product = state.filteredProducts[index];
+                return ProductCard(
+                  height: size.height, 
+                  width: size.width, 
+                  product: product, 
+                  theme: theme, 
+                  translations: translations
+                );
+              }, gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.6
+              ),
+            );
+        },
+      )
     );
   }
 }

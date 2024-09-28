@@ -9,7 +9,7 @@ class Observable extends BlocObserver {
     if (bloc is SettingsBloc) {
       final currentState = change.currentState as SettingsState;
       final nextState = change.nextState as SettingsState;
-      if (currentState.currentLanguege != nextState.currentLanguege) {
+      if (currentState.currentLanguage != nextState.currentLanguage) {
         // log('Language changed to ${nextState.currentLanguege}');
       }
     } else if (bloc is RolesBloc) {
@@ -48,14 +48,31 @@ class Observable extends BlocObserver {
       // if(currentState.filteredBuildResults != nextState.filteredBuildResults) {
       //   log('filteredBuildResults: ${nextState.filteredBuildResults.length}');
       // }
-      if(currentState.currentPage != nextState.currentPage) {
-        log('filteredProductCurerntPage: ${nextState.currentPage}');
+      // if(currentState.currentPage != nextState.currentPage) {
+      //   log('filteredProductCurerntPage: ${nextState.currentPage}');
+      // }
+      // if (currentState.suggestionsCurrentPage != nextState.suggestionsCurrentPage){
+      //   log('suggestionsCurrentPage: ${nextState.suggestionsCurrentPage}');
+      // }
+      // if (currentState.resultsCurrentPage != nextState.resultsCurrentPage){
+      //   log('suggestionsCurrentPage: ${nextState.resultsCurrentPage}');
+      // }
+
+      // if(currentState.filteredProducts != nextState.filteredProducts) {
+      //   log('filteredProducts:${nextState.filteredProducts.length}');
+      // }
+      if(currentState.selectedParentCategory != nextState.selectedParentCategory) {
+        log('selectedParentCategory:${nextState.selectedParentCategory}');
       }
-      if (currentState.suggestionsCurrentPage != nextState.suggestionsCurrentPage){
-        log('suggestionsCurrentPage: ${nextState.suggestionsCurrentPage}');
+      if (currentState.selectedSubCategory != nextState.selectedSubCategory){
+
+        log('selectedSubCategory: ${nextState.selectedSubCategory.name}');
+        // log('selectedSubCategory parent id: ${nextState.selectedSubCategory.parentCategoryId}');
       }
-      if (currentState.resultsCurrentPage != nextState.resultsCurrentPage){
-        log('suggestionsCurrentPage: ${nextState.resultsCurrentPage}');
+
+      if (currentState.searchProductShippingRates != nextState.searchProductShippingRates){
+        log('searchProductShippingRates: ${nextState.searchProductShippingRates}');
+
       }
     } else if (bloc is OrdersBloc){
       final currentState = change.currentState as OrdersState;

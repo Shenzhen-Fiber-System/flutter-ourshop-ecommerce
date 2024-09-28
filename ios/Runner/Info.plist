@@ -49,5 +49,19 @@
 	<string>OurShop needs access to your photo library</string>
 	<key>NSCameraUsageDescription</key>
 	<string>OurShop needs access to your camera</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+	<dict>
+		<key>CFBundleURLSchemes</key>
+		<array>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string> <!-- Reemplaza con el identificador de tu aplicación -->
+		</array>
+	</dict>
+	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

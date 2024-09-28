@@ -73,8 +73,8 @@ class _ChooseLanguagePageState extends State<ChooseLanguagePage> {
                               )
                             ) :  null,
                             onTap: () {
-                              context.read<SettingsBloc>().add(ChangeSelectedLanguage(availbaleLanguage.id));
-                              // locator<Preferences>().saveData('language', language);
+                              context.read<SettingsBloc>().add(ChangeSelectedLanguage(selectedLanguage:availbaleLanguage.id));
+                              locator<Preferences>().saveData('language', availbaleLanguage.id.toString());
                             },
                           );
                         },

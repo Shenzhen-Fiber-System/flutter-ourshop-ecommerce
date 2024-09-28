@@ -8,11 +8,11 @@ sealed class RolesEvent extends Equatable {
 }
 
 class AddRolesEvent extends RolesEvent {
-  final List<Role> roles;
-  const AddRolesEvent(this.roles);
+
+  const AddRolesEvent();
 
   @override
-  List<Object> get props => [roles];
+  List<Object> get props => [];
 }
 
 class SelectedRolesEvent extends RolesEvent {

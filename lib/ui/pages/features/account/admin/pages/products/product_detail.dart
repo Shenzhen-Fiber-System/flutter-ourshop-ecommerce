@@ -5,24 +5,41 @@ enum AdminProductMode{
   NEW
 }
 
-class AdminProductDetail extends StatelessWidget {
-  AdminProductDetail({super.key, required this.product});
+class AdminProductDetail extends StatefulWidget {
+  const AdminProductDetail({super.key, required this.product});
 
   final FilteredProduct product;
+
+  @override
+  State<AdminProductDetail> createState() => _AdminProductDetailState();
+}
+
+class _AdminProductDetailState extends State<AdminProductDetail> {
   final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProductsBloc>().add( AddSubCategoriesNewProductEvent(
+        categoryId: context.read<UsersBloc>().state.loggedUser.companyMainCategoryId
+      )
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Helpers.truncateText(product.name, 30)),
+        title: Text(Helpers.truncateText(widget.product.name, 30)),
       ),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.save),
+        child: const Icon(Icons.save, color: Colors.white,),
         onPressed: (){}
       ),
       body: ProductForm(
-        formKey: _formKey, 
+        formKey: _formKey,
+        mode: AdminProductMode.EDIT,
+        product: widget.product,
       ),
     );
   }
@@ -39,7 +56,13 @@ class ProductForm extends StatelessWidget {
    ProductForm({
     super.key,
     required GlobalKey<FormBuilderState> formKey, 
-  }) : _formKey = formKey;
+    this.product,
+    required this.mode, 
+  }) : assert(!(mode == AdminProductMode.EDIT && product == null), 'Edit mode needs a product to continue'),
+        _formKey = formKey;
+
+  final AdminProductMode mode;
+  final FilteredProduct? product;
 
 
   final GlobalKey<FormBuilderState> _formKey;
@@ -66,6 +89,10 @@ class ProductForm extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final TextStyle style = theme.textTheme.bodyLarge!.copyWith(color: Colors.black);
     final Size size = MediaQuery.of(context).size;
+
+    if (product != null && mode == AdminProductMode.EDIT) {
+      // option.value = product!.priceType == 'unitPrice' ? 0 : product!.priceType == 'priceRange' ? 1 : 2;
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: FormBuilder(
@@ -77,6 +104,7 @@ class ProductForm extends StatelessWidget {
             children: [
               spacer,
               FormBuilderTextField(
+                initialValue: product != null ? product!.name : '',
                 name: 'name',
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration:  InputDecoration(
@@ -90,6 +118,7 @@ class ProductForm extends StatelessWidget {
               Text(translations.general, style: style.copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey.shade600) ,),
               spacer,
               FormBuilderDropdown(
+                // initialValue: product != null ? product!.categoryId : '',
                 name: 'no_CategoryId',
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: FormBuilderValidators.compose([
@@ -116,6 +145,7 @@ class ProductForm extends StatelessWidget {
                 valueListenable: subCategories,
                 builder: (BuildContext context, value, Widget? child) {
                   return FormBuilderDropdown(
+                    // initialValue: product != null ? product!.categoryId : '',
                     name: 'categoryId',
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: FormBuilderValidators.compose([
@@ -137,6 +167,7 @@ class ProductForm extends StatelessWidget {
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                 ]),
+                // initialValue: product != null ? product!.productGroupId : '',
                 name: 'productGroupId',
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(
@@ -153,6 +184,7 @@ class ProductForm extends StatelessWidget {
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                 ]),
+                // initialValue: product != null ? product!.productTypeId : '', 
                 name: 'productTypeId',
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration:  InputDecoration(
@@ -169,6 +201,7 @@ class ProductForm extends StatelessWidget {
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                 ]),
+                // initialValue: product != null ? product!.unitMeasurementId : '',
                 name: 'unitMeasurementId',
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration:  InputDecoration(
@@ -186,6 +219,7 @@ class ProductForm extends StatelessWidget {
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                 ]),
+                initialValue: product != null ? product!.modelNumber : '',
                 name: 'modelNumber',
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration:  InputDecoration(
@@ -198,6 +232,7 @@ class ProductForm extends StatelessWidget {
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                 ]),
+                initialValue: product != null ? product!.brandName : '',
                 name: 'brandName',
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration:  InputDecoration(
@@ -210,6 +245,7 @@ class ProductForm extends StatelessWidget {
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                 ]),
+                initialValue: product != null ? product!.keyValue : '',
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 name: 'keyValue',
                 decoration:  InputDecoration(
@@ -223,6 +259,7 @@ class ProductForm extends StatelessWidget {
                   return Offstage(
                     offstage: true, // Campo oculto
                     child: FormBuilderTextField(
+                      
                       name: 'priceType',
                       initialValue: value == 0 ? 'unitPrice' : value == 1 ? 'priceRange' : 'priceByQuantity',
                     ),
@@ -244,6 +281,7 @@ class ProductForm extends StatelessWidget {
                   FormBuilderValidators.required(),
                   FormBuilderValidators.numeric(),
                 ]),
+                initialValue: product != null ?  product!.stock.toString() : '',
                 name: "stock",
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(
@@ -258,6 +296,7 @@ class ProductForm extends StatelessWidget {
                   FormBuilderValidators.required(),
                   FormBuilderValidators.numeric(),
                 ]),
+                initialValue: product != null ? product!.packageLength.toString() : '',
                 name: "packageLength",
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(
@@ -272,6 +311,7 @@ class ProductForm extends StatelessWidget {
                   FormBuilderValidators.required(),
                   FormBuilderValidators.numeric(),
                 ]),
+                initialValue: product != null ? product!.packageWidth.toString() : '',
                 name: "packageWidth",
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(
@@ -286,6 +326,7 @@ class ProductForm extends StatelessWidget {
                   FormBuilderValidators.required(),
                   FormBuilderValidators.numeric(),
                 ]),
+                initialValue: product != null ? product!.packageHeight.toString() : '',
                 name: "packageHeight",
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(
@@ -300,6 +341,7 @@ class ProductForm extends StatelessWidget {
                   FormBuilderValidators.required(),
                   FormBuilderValidators.numeric(),
                 ]),
+                initialValue: product != null ? product!.packageWeight.toString() : '',
                 name: "packageWeight",
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(

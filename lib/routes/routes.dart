@@ -86,7 +86,7 @@ class AppRoutes {
       ),
       GoRoute(
         path: '/checkout',
-        builder: (context, state) => const CheckoutPage(),
+        builder: (context, state) => CheckoutPage(),
       ),
       GoRoute(
         path: '/admin',
@@ -155,8 +155,15 @@ class AppRoutes {
                   return ShippingRatePage();
                 },
               ),
-
+              GoRoute(
+                path: 'offers',
+                builder: (context, state) => const AdminOffersPage(),
+              ),
             ]
+          ),
+          GoRoute(
+            path: 'option/communication',
+            builder: (context, state) => const AdminCommunicationPage(),
           )
         ]
       ),

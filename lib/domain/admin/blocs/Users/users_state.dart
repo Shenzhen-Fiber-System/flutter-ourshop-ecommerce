@@ -1,5 +1,17 @@
 part of 'users_bloc.dart';
 
+enum UserStatus {
+  login,
+  logged,
+  registering,
+  registered,
+  loading,
+  loaded,
+  success,
+  error,
+  initial,
+}
+
 class UsersState extends Equatable {
 
   final LoggedUser loggedUser;
@@ -7,7 +19,7 @@ class UsersState extends Equatable {
   final PaymentMethod selectedCard;
   final ShippingAddress selectedShippingAddress;
   final List<ShippingAddress> shippingAddresses;
-  final bool isLoading;
+  final UserStatus status;
 
   const UsersState({
       this.loggedUser = const LoggedUser(
@@ -39,41 +51,41 @@ class UsersState extends Equatable {
           expirationDate: "12/23",
           cvv: "123"
         ),
-        PaymentMethod(
-          id: "2",
-          type: CardType.MASTERCARD,
-          cardNumber: "5134 5678 1234 5678",
-          expirationDate: "12/23",
-          cvv: "123"
-        ),
-        PaymentMethod(
-          id: "3",
-          type: CardType.VISA,
-          cardNumber: "4234 5678 1234 5678",
-          expirationDate: "12/23",
-          cvv: "123"
-        ),
-        PaymentMethod(
-          id: "4",
-          type: CardType.MASTERCARD,
-          cardNumber: "5134 5678 1234 5678",
-          expirationDate: "12/23",
-          cvv: "123"
-        ),
-        PaymentMethod(
-          id: "5",
-          type: CardType.VISA,
-          cardNumber: "4234 5678 1234 5678",
-          expirationDate: "12/23",
-          cvv: "123"
-        ),
-        PaymentMethod(
-          id: "6",
-          type: CardType.MASTERCARD,
-          cardNumber: "5134 5678 1234 5678",
-          expirationDate: "12/23",
-          cvv: "123"
-        ),
+        // PaymentMethod(
+        //   id: "2",
+        //   type: CardType.MASTERCARD,
+        //   cardNumber: "5134 5678 1234 5678",
+        //   expirationDate: "12/23",
+        //   cvv: "123"
+        // ),
+        // PaymentMethod(
+        //   id: "3",
+        //   type: CardType.VISA,
+        //   cardNumber: "4234 5678 1234 5678",
+        //   expirationDate: "12/23",
+        //   cvv: "123"
+        // ),
+        // PaymentMethod(
+        //   id: "4",
+        //   type: CardType.MASTERCARD,
+        //   cardNumber: "5134 5678 1234 5678",
+        //   expirationDate: "12/23",
+        //   cvv: "123"
+        // ),
+        // PaymentMethod(
+        //   id: "5",
+        //   type: CardType.VISA,
+        //   cardNumber: "4234 5678 1234 5678",
+        //   expirationDate: "12/23",
+        //   cvv: "123"
+        // ),
+        // PaymentMethod(
+        //   id: "6",
+        //   type: CardType.MASTERCARD,
+        //   cardNumber: "5134 5678 1234 5678",
+        //   expirationDate: "12/23",
+        //   cvv: "123"
+        // ),
       ],
       this.selectedCard = const PaymentMethod(
         id: "",
@@ -127,22 +139,22 @@ class UsersState extends Equatable {
           municipality: "SJDC",
         ),
       ],
-      this.isLoading = false,
+      this.status = UserStatus.initial,
     });
 
   UsersState copyWith({
     LoggedUser? loggedUser,
-    bool? isLoading,
     List<PaymentMethod>? cards,
     PaymentMethod? selectedCard,
     ShippingAddress? selectedShippingAddress,
+    UserStatus? status,
   }) {
     return UsersState(
       loggedUser: loggedUser ?? this.loggedUser,
       cards: cards ?? this.cards,
       selectedCard: selectedCard ?? this.selectedCard,
       selectedShippingAddress: selectedShippingAddress ?? this.selectedShippingAddress,
-      isLoading: isLoading ?? this.isLoading,
+      status: status ?? this.status,
     );
   }
   
@@ -152,6 +164,6 @@ class UsersState extends Equatable {
     cards,
     selectedCard,
     selectedShippingAddress,
-    isLoading,
+    status,
   ];
 }

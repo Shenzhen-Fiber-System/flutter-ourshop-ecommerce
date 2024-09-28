@@ -8,9 +8,8 @@ sealed class CountryEvent extends Equatable {
 }
 
 class AddCountriesEvent extends CountryEvent {
-  final List<Country> countries;
-  const AddCountriesEvent(this.countries);
+  const AddCountriesEvent();
 
   @override
-  List<Object> get props => [countries];
+  List<Object> get props => [];
 }

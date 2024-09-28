@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../../../../pages.dart';
 
 enum ShippingRateMode{
@@ -11,7 +13,7 @@ class ShippingRatePage extends StatelessWidget {
 
   final ValueNotifier<ShippingRateMode> _shippingRateMode = ValueNotifier<ShippingRateMode>(ShippingRateMode.SHOW);
   final ValueNotifier<List<Map<String,dynamic>>> shippingRanges = ValueNotifier<List<Map<String,dynamic>>>([]);
-  final ValueNotifier<List<String>> productIds = ValueNotifier<List<String>>([]);
+  final ValueNotifier<List<FilteredProduct>> productIds = ValueNotifier<List<FilteredProduct>>([]);
 
   final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
 
@@ -21,6 +23,7 @@ class ShippingRatePage extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     const Widget spacer = SizedBox(height: 10.0);
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60.0),
         child: ValueListenableBuilder(
@@ -34,6 +37,8 @@ class ShippingRatePage extends StatelessWidget {
                     _shippingRateMode.value = ShippingRateMode.SHOW;
                     shippingRanges.value =  [];
                     productIds.value =  [];
+                    context.read<ProductsBloc>().add(const ResetSearchedShippingRatesEvent());
+                    //After reseting the state we need to clear the  
                     return;
                   }
                     context.pop();
@@ -55,26 +60,29 @@ class ShippingRatePage extends StatelessWidget {
           },
         ),
       ),
-      body: ValueListenableBuilder(
-        valueListenable: _shippingRateMode,
-        builder: (BuildContext context, ShippingRateMode value, Widget? child) {
-          switch (value) {
-            case ShippingRateMode.ADD:
-              return ShippingRateForm(
-                formKey: _formKey, 
-                spacer: spacer, 
-                translations: translations, 
-                theme: theme, productIds: 
-                productIds, 
-                shippingRanges: shippingRanges
-              );
-            case ShippingRateMode.EDIT:
-              return const Center(child: Text('Edit Shipping Rate'));
-            case ShippingRateMode.SHOW:
-              return child!;
-          }
-        },
-        child: const ShippingRatesList(),
+      body: Container(
+        color: Colors.white,
+        child: ValueListenableBuilder(
+          valueListenable: _shippingRateMode,
+          builder: (BuildContext context, ShippingRateMode value, Widget? child) {
+            switch (value) {
+              case ShippingRateMode.ADD:
+                return ShippingRateForm(
+                  formKey: _formKey, 
+                  spacer: spacer, 
+                  translations: translations, 
+                  theme: theme, 
+                  productIds: productIds, 
+                  shippingRanges: shippingRanges
+                );
+              case ShippingRateMode.EDIT:
+                return const Center(child: Text('Edit Shipping Rate'));
+              case ShippingRateMode.SHOW:
+                return child!;
+            }
+          },
+          child: const ShippingRatesList(),
+        ),
       ),
       floatingActionButton: ValueListenableBuilder(
         valueListenable: _shippingRateMode,
@@ -94,17 +102,18 @@ class ShippingRatePage extends StatelessWidget {
                   'price': range['price'],
                 };
               }).toList();
+              final List<String> pids = productIds.value.map((product) => product.id).toList();
               final Map<String, dynamic> data = {
                 'name': _formKey.currentState!.value['name'],
                 'countryGroupId': _formKey.currentState!.value['countryGroupId'],
                 'countryId': _formKey.currentState!.value['countryId'],
-                'productIds': productIds.value,
-                'productShippingRates': productIds.value,
+                'productIds': pids,
+                'productShippingRates': pids,
                 'shippingRanges': shippingRangesList
               };
               context.read<ProductsBloc>().add(AddShippingRateEvent(body: data));
+              _shippingRateMode.value = ShippingRateMode.SHOW;
             }
-            // _shippingRateMode.value = ShippingRateMode.SHOW;
           },
         ),
       )
@@ -176,7 +185,7 @@ class _ShippingRatesListState extends State<ShippingRatesList> {
             return Center(child: Text(translations.error, style: theme.textTheme.bodyLarge?.copyWith(color: Colors.black)));
           }
     
-          if (state.adminProducts.isEmpty) {
+          if (state.shippingRates.isEmpty) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5.0),
               child: Column(
@@ -199,11 +208,14 @@ class _ShippingRatesListState extends State<ShippingRatesList> {
           }
           return ListView.builder(
             controller: _scrollController,
-            itemCount: state.shippingRates.length + (state.hasMore ? 1 : 0),
+            // itemCount: state.hasMore
+            //             ? state.shippingRates.length + 1
+            //             : state.shippingRates.length,
+            itemCount: state.shippingRates.length,
             itemBuilder: (context, index) {
-              if (index >= state.shippingRates.length && state.hasMore) {
-                return const Center(child: CircularProgressIndicator.adaptive());
-              }
+              // if (index >= state.shippingRates.length && state.hasMore) {
+              //   return const Center(child: CircularProgressIndicator.adaptive());
+              // }
               final FilteredShippingRate shippingRate = state.shippingRates[index];
               return ListTile(
                 title: Text(shippingRate.name ?? 'No Name'),
@@ -223,7 +235,7 @@ class _ShippingRatesListState extends State<ShippingRatesList> {
 }
 
 class ShippingRateForm extends StatelessWidget {
-  const ShippingRateForm({
+  ShippingRateForm({
     super.key,
     required GlobalKey<FormBuilderState> formKey,
     required this.spacer,
@@ -237,78 +249,163 @@ class ShippingRateForm extends StatelessWidget {
   final Widget spacer;
   final AppLocalizations translations;
   final ThemeData theme;
-  final ValueNotifier<List<String>> productIds;
+  final ValueNotifier<List<FilteredProduct>> productIds;
   final ValueNotifier<List<Map<String, dynamic>>> shippingRanges;
+  final Debouncer _debouncer = Debouncer(milliseconds: 500);
+  // final ValueNotifier<List<FilteredProduct>> productsIdsSelected = ValueNotifier<List<FilteredProduct>>([]);
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: FormBuilder(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              spacer,
-              FormBuilderTextField(
-                name: "name",
-                decoration: InputDecoration(
-                  labelText: translations.name,
-                  hintText: translations.enter_shipping_rate_name,
+    final Size size = MediaQuery.of(context).size;
+    return SizedBox(height: size.height,
+      child: SingleChildScrollView(
+        child: FormBuilder(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                spacer,
+                FormBuilderTextField(
+                  name: "name",
+                  decoration: InputDecoration(
+                    labelText: translations.name,
+                    hintText: translations.enter_shipping_rate_name,
+                  ),
                 ),
-              ),
-              spacer,
-              FormBuilderDropdown(
-                name: "countryGroupId",
-                decoration: InputDecoration(
-                  labelText: translations.country_group,
-                  hintText: translations.select_country_group,
+                spacer,
+                FormBuilderDropdown(
+                  name: "countryGroupId",
+                  decoration: InputDecoration(
+                    labelText: translations.country_group,
+                    hintText: translations.select_country_group,
+                  ),
+                  items: context.watch<ProductsBloc>().state.countryGroupsByCompany.map((CountryGroup countryGroup) {
+                    return DropdownMenuItem(
+                      value: countryGroup.id,
+                      child: Text(countryGroup.name),
+                    );
+                  }).toList(),
                 ),
-                items: context.watch<ProductsBloc>().state.countryGroupsByCompany.map((CountryGroup countryGroup) {
-                  return DropdownMenuItem(
-                    value: countryGroup.id,
-                    child: Text(countryGroup.name),
-                  );
-                }).toList(),
-              ),
-              spacer,
-              FormBuilderDropdown(
-                name: "countryId",
-                decoration: InputDecoration(
-                  labelText: translations.country,
-                  hintText: translations.country,
+                spacer,
+                // FormBuilderDropdown(
+                //   name: "countryId",
+                //   decoration: InputDecoration(
+                //     labelText: translations.country,
+                //     hintText: translations.country,
+                //   ),
+                //   items: context.read<CountryBloc>().state.countries.map((Country country) {
+                //     return DropdownMenuItem(
+                //       value: country.id,
+                //       child: Text(country.name),
+                //     );
+                //   }).toList(),
+                // ),
+                // spacer,
+                spacer,
+                Text(translations.shipping_rates, style: theme.textTheme.titleLarge?.copyWith(color: Colors.black)),
+                spacer,
+                FormBuilderShippingRange(
+                  name: 'shippingRanges', 
+                  shippingRangesNotifier: shippingRanges,
                 ),
-                items: context.read<CountryBloc>().state.countries.map((Country country) {
-                  return DropdownMenuItem(
-                    value: country.id,
-                    child: Text(country.name),
-                  );
-                }).toList(),
-              ),
-              spacer,
-              Text(translations.products, style: theme.textTheme.titleLarge?.copyWith(color: Colors.black)),
-              spacer,
-              FormBuilderAutoComplete(
-                name: 'productIds',
-                selectedIdsNotifier: productIds,
-                allOptions: context.read<CountryBloc>().state.countries.map((Country country) {
-                  return {
-                    'id': country.id,
-                    'name': country.name
-                  };
-                }).toList(),
-              ),
-              spacer,
-              Text(translations.shipping_rates, style: theme.textTheme.titleLarge?.copyWith(color: Colors.black)),
-              spacer,
-              FormBuilderShippingRange(
-                name: 'shippingRanges', 
-                shippingRangesNotifier: shippingRanges,
-              ),
-              spacer,
-            
-            ],
+                spacer,
+                Text(translations.products, style: theme.textTheme.titleLarge?.copyWith(color: Colors.black)),
+                spacer,
+                ValueListenableBuilder(
+                  // valueListenable: productsIdsSelected,
+                  valueListenable: productIds,
+                  builder: (context, value, child) {
+                    if(value.isEmpty){
+                      return const SizedBox.shrink();
+                    }
+                    return SizedBox(
+                      height: size.height * 0.2,
+                      width: size.width,
+                      child: SingleChildScrollView(
+                        child: Wrap(
+                          spacing: 8.0,
+                          children: value.map((id) {
+                            final FilteredProduct product =value.firstWhere((opt) => opt.id == id.id);
+                            return Chip(
+                              padding: EdgeInsets.zero,
+                              labelPadding: EdgeInsets.zero,
+                              label: Text(Helpers.truncateText(product.name, 20)),
+                              onDeleted: () {
+                                // productsIdsSelected.value = List.from(productsIdsSelected.value)..removeWhere((element) => element.id == product.id);
+                                productIds.value = List.from(productIds.value)..removeWhere((element) => element.id == product.id);
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                spacer,
+                FormBuilderTextField(
+                  name: "productIds",
+                  decoration: InputDecoration(
+                    labelText: translations.search,
+                    hintText: translations.placeholder(translations.products),
+                    suffixIcon: IconButton(
+                      onPressed: (){
+                        //clear the input value
+                        _formKey.currentState!.fields['productIds']!.didChange('');
+                        context.read<ProductsBloc>().add(const ResetSearchedShippingRatesEvent());
+                      }, 
+                      icon: const Icon(Icons.close)
+                    )
+                  ),
+        
+                  onChanged: (value) {
+                    if ( value == null || value.trim().isEmpty) {
+                      return;
+                    }
+                    _debouncer.run(() => context.read<ProductsBloc>().add(AddSearchProductShippingRatesEvent(query: value)));
+                    
+                  },
+                ),
+                // FormBuilderAutoComplete(
+                //   name: 'productIds',
+                //   selectedIdsNotifier: productIds,
+                //   allOptions: context.watch<ProductsBloc>().state.searchProductShippingRates.map((FilteredProduct product) {
+                //     return {
+                //       'id': product.id,
+                //       'name': product.name
+                //     };
+                //   }).toList(),
+                // ),
+                spacer,
+                SizedBox(
+                  height: size.height * 0.3,
+                  width: size.width,
+                  child: ListView.separated(
+                    separatorBuilder: (context, index) => const Divider(),
+                    itemCount: context.watch<ProductsBloc>().state.searchProductShippingRates.length,
+                    itemBuilder: (context, index) {
+                      final FilteredProduct product = context.read<ProductsBloc>().state.searchProductShippingRates[index];
+                      return ListTile(
+                        title: Text(Helpers.truncateText(product.name, 20),),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            
+                            if (productIds.value.contains(product)) {
+                              return;
+                            }
+                            productIds.value = List.from(productIds.value)..add(product);
+                            // productsIdsSelected.value = List.from(productsIdsSelected.value)..add(product);
+                          },
+                        ),
+                      );
+                    }
+                  ),
+                )
+              
+              ],
+            ),
           ),
         ),
       ),
@@ -456,7 +553,117 @@ class FormBuilderAutoComplete extends StatefulWidget {
   _FormBuilderAutoCompleteState createState() => _FormBuilderAutoCompleteState();
 }
 
+// class _FormBuilderAutoCompleteState extends State<FormBuilderAutoComplete> {
+
+//   final Debouncer _debouncer = Debouncer(milliseconds: 500);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return FormBuilderField<List<String>>(
+//       name: widget.name,
+//       initialValue: widget.selectedIdsNotifier.value,
+//       builder: (FormFieldState<List<String>?> field) {
+//         return Column(
+//           children: [
+//             Autocomplete<Map<String, String>>(
+//               optionsBuilder: (TextEditingValue textEditingValue) {
+//                 if (textEditingValue.text.isEmpty) {
+//                   return const Iterable<Map<String, String>>.empty();
+//                 }
+//                 return widget.allOptions.where((option) {
+//                   return option['name']!
+//                       .toLowerCase()
+//                       .contains(textEditingValue.text.toLowerCase());
+//                 });
+//               },
+//               displayStringForOption: (Map<String, String> option) => option['name']!,
+//               fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+//                 return TextFormField(
+//                   onFieldSubmitted: (value) => onFieldSubmitted(),
+//                   controller: controller,
+//                   focusNode: focusNode,
+//                   decoration: InputDecoration(
+//                     labelText: 'Search',
+//                     hintText: 'Enter text to search',
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(5.0),
+//                     ),
+//                   ),
+//                   validator:FormBuilderValidators.compose([
+//                     FormBuilderValidators.minLength(3),
+//                   ]),
+//                   autovalidateMode: AutovalidateMode.onUserInteraction,
+//                   onChanged: (value) {
+//                     context.read<ProductsBloc>().add(const ResetSearchedShippingRatesEvent());
+//                     if(value.length > 3){
+//                       _debouncer.run(() => context.read<ProductsBloc>().add(AddSearchProductShippingRatesEvent(query: value)));
+//                     }
+//                   },
+//                 );
+//               },
+//               onSelected: (Map<String, String> selectedOption) {
+//                 if (!widget.selectedIdsNotifier.value.contains(selectedOption['id'])) {
+//                   widget.selectedIdsNotifier.value = List.from(widget.selectedIdsNotifier.value)
+//                     ..add(selectedOption['id']!);
+//                 }
+//                 field.didChange(widget.selectedIdsNotifier.value);
+//               },
+//               optionsViewBuilder: (context, onSelected, options) {
+//                 return Align(
+//                   alignment: Alignment.topLeft,
+//                   child: Material(
+//                     child: SizedBox(
+//                       width: MediaQuery.of(context).size.width * 0.9,
+//                       child: ListView.builder(
+//                         itemCount: options.length,
+//                         itemBuilder: (context, index) {
+//                           final option = options.elementAt(index);
+//                           return ListTile(
+//                             shape: const RoundedRectangleBorder(
+//                               side: BorderSide.none,
+//                             ),
+//                             title: Text(option['name']!),
+//                             onTap: () => onSelected(option), 
+//                           );
+//                         },
+//                       ),
+//                     ),
+//                   ),
+//                 );
+//               },
+//             ),
+//             const SizedBox(height: 10),
+//             ValueListenableBuilder<List<String>>(
+//               valueListenable: widget.selectedIdsNotifier,
+//               builder: (context, selectedIds, _) {
+//                 return Wrap(
+//                   spacing: 8.0,
+//                   children: selectedIds.map((id) {
+//                     final option = widget.allOptions.firstWhere((opt) => opt['id'] == id);
+//                     return Chip(
+//                       label: Text(option['name']!),
+//                       onDeleted: () {
+//                         widget.selectedIdsNotifier.value = List.from(widget.selectedIdsNotifier.value)
+//                           ..remove(id);
+//                         field.didChange(widget.selectedIdsNotifier.value);
+//                       },
+//                     );
+//                   }).toList(),
+//                 );
+//               },
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
+// }
+
+
+
 class _FormBuilderAutoCompleteState extends State<FormBuilderAutoComplete> {
+  final Debouncer _debouncer = Debouncer(milliseconds: 500);
+
   @override
   Widget build(BuildContext context) {
     return FormBuilderField<List<String>>(
@@ -465,59 +672,76 @@ class _FormBuilderAutoCompleteState extends State<FormBuilderAutoComplete> {
       builder: (FormFieldState<List<String>?> field) {
         return Column(
           children: [
-            Autocomplete<Map<String, String>>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                if (textEditingValue.text.isEmpty) {
-                  return const Iterable<Map<String, String>>.empty();
-                }
-                return widget.allOptions.where((option) {
-                  return option['name']!
-                      .toLowerCase()
-                      .contains(textEditingValue.text.toLowerCase());
-                });
-              },
-              displayStringForOption: (Map<String, String> option) => option['name']!,
-              fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                return TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  decoration: InputDecoration(
-                    labelText: 'Search',
-                    hintText: 'Enter text to search',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                );
-              },
-              onSelected: (Map<String, String> selectedOption) {
-                if (!widget.selectedIdsNotifier.value.contains(selectedOption['id'])) {
-                  widget.selectedIdsNotifier.value = List.from(widget.selectedIdsNotifier.value)
-                    ..add(selectedOption['id']!);
-                }
-                field.didChange(widget.selectedIdsNotifier.value);
-              },
-              optionsViewBuilder: (context, onSelected, options) {
-                return Align(
-                  alignment: Alignment.topLeft,
-                  child: Material(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      child: ListView.builder(
-                        itemCount: options.length,
-                        itemBuilder: (context, index) {
-                          final option = options.elementAt(index);
-                          return ListTile(
-                            shape: const RoundedRectangleBorder(
-                              side: BorderSide.none,
-                            ),
-                            title: Text(option['name']!),
-                            onTap: () => onSelected(option),
-                          );
-                        },
+            BlocBuilder<ProductsBloc, ProductsState>(
+              builder: (context, state) {
+                return Autocomplete<Map<String, String>>(
+                  optionsBuilder: (TextEditingValue textEditingValue) {
+                    if (textEditingValue.text.isEmpty) {
+                      return const Iterable<Map<String, String>>.empty();
+                    }
+
+                    return state.searchProductShippingRates.map((FilteredProduct product) {
+                      return {
+                        'id': product.id,
+                        'name': product.name.trim().toLowerCase(),
+                      };
+                    }).where((option) {
+                      return option['name']!.contains(textEditingValue.text.trim().toLowerCase());
+                    }).toList();
+                  },
+                  displayStringForOption: (Map<String, String> option) => option['name']!,
+                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                    return TextFormField(
+                      onFieldSubmitted: (value) => onFieldSubmitted(),
+                      controller: controller,
+                      focusNode: focusNode,
+                      decoration: InputDecoration(
+                        labelText: 'Search',
+                        hintText: 'Enter text to search',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
                       ),
-                    ),
-                  ),
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.minLength(3),
+                      ]),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      onChanged: (value) {
+                        context.read<ProductsBloc>().add(const ResetSearchedShippingRatesEvent());
+                        _debouncer.run(() => context.read<ProductsBloc>().add(AddSearchProductShippingRatesEvent(query: value)));
+                      },
+                    );
+                  },
+                  onSelected: (Map<String, String> selectedOption) {
+                    if (!widget.selectedIdsNotifier.value.contains(selectedOption['id'])) {
+                      widget.selectedIdsNotifier.value = List.from(widget.selectedIdsNotifier.value)
+                        ..add(selectedOption['id']!);
+                    }
+                    field.didChange(widget.selectedIdsNotifier.value);
+                  },
+                  optionsViewBuilder: (context, onSelected, options) {
+                    return Align(
+                      alignment: Alignment.topLeft,
+                      child: Material(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          child: ListView.builder(
+                            itemCount: options.length,
+                            itemBuilder: (context, index) {
+                              final option = options.elementAt(index);
+                              return ListTile(
+                                shape: const RoundedRectangleBorder(
+                                  side: BorderSide.none,
+                                ),
+                                title: Text(option['name']!),
+                                onTap: () => onSelected(option),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -528,9 +752,9 @@ class _FormBuilderAutoCompleteState extends State<FormBuilderAutoComplete> {
                 return Wrap(
                   spacing: 8.0,
                   children: selectedIds.map((id) {
-                    final option = widget.allOptions.firstWhere((opt) => opt['id'] == id);
+                    final option = context.read<ProductsBloc>().state.searchProductShippingRates.firstWhere((opt) => opt.id == id);
                     return Chip(
-                      label: Text(option['name']!),
+                      label: Text(option.name),
                       onDeleted: () {
                         widget.selectedIdsNotifier.value = List.from(widget.selectedIdsNotifier.value)
                           ..remove(id);

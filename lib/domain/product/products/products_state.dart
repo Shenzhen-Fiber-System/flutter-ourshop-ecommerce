@@ -16,11 +16,10 @@ enum ProductsStates{
 }
 
 enum FilteredResponseMode{
-  suggestions,
-  results,
   filteredProducts,
   generalCategoryProducts,
-  subCategoryProducts
+  subCategoryProducts,
+  all
 
 }
 
@@ -54,6 +53,12 @@ class ProductsState extends Equatable {
   final List<FilteredProduct> filteredProducts;
   final int suggestionsCurrentPage;
   final int resultsCurrentPage;
+  final int subCategoryProductsCurrentPage;
+  final List<FilteredOfferTypes> offerTypes;
+  final List<FilteredProduct> searchProductOffer;
+  final List<FilteredProduct> searchProductShippingRates;
+  final List<FilteredOfferProduct> offerProducts;
+  final int offerProductsCurrentPage;
 
   const ProductsState({
     this.productsStates = ProductsStates.initial,
@@ -85,7 +90,13 @@ class ProductsState extends Equatable {
     this.filteredBuildResults = const [],
     this.filteredProducts = const [],
     this.suggestionsCurrentPage = 0,
-    this.resultsCurrentPage = 0
+    this.resultsCurrentPage = 0,
+    this.subCategoryProductsCurrentPage = 0,
+    this.offerTypes = const [],
+    this.searchProductOffer = const [],
+    this.searchProductShippingRates = const [],
+    this.offerProducts = const [],
+    this.offerProductsCurrentPage = 0
   });
 
   ProductsState copyWith({
@@ -116,7 +127,13 @@ class ProductsState extends Equatable {
     List<FilteredProduct>? filteredBuildResults,
     List<FilteredProduct>? filteredProducts,
     int? suggestionsCurrentPage,
-    int? resultsCurrentPage
+    int? resultsCurrentPage,
+    int? subCategoryProductsCurrentPage,
+    List<FilteredOfferTypes>? offerTypes,
+    List<FilteredProduct>? searchProductOffer,
+    List<FilteredProduct>? searchProductShippingRates,
+    List<FilteredOfferProduct>? offerProducts,
+    int? offerProductsCurrentPage
   }) {
     return ProductsState(
       productsStates: productsStates ?? this.productsStates,
@@ -146,7 +163,13 @@ class ProductsState extends Equatable {
       filteredBuildResults: filteredBuildResults ?? this.filteredBuildResults,
       filteredProducts: filteredProducts ?? this.filteredProducts,
       suggestionsCurrentPage: suggestionsCurrentPage ?? this.suggestionsCurrentPage,
-      resultsCurrentPage: resultsCurrentPage ?? this.resultsCurrentPage
+      resultsCurrentPage: resultsCurrentPage ?? this.resultsCurrentPage,
+      subCategoryProductsCurrentPage: subCategoryProductsCurrentPage ?? this.subCategoryProductsCurrentPage,
+      offerTypes: offerTypes ?? this.offerTypes,
+      searchProductOffer: searchProductOffer ?? this.searchProductOffer,
+      searchProductShippingRates: searchProductShippingRates ?? this.searchProductShippingRates,
+      offerProducts: offerProducts ?? this.offerProducts,
+      offerProductsCurrentPage: offerProductsCurrentPage ?? this.offerProductsCurrentPage
     );
   }
   
@@ -179,5 +202,11 @@ class ProductsState extends Equatable {
     filteredBuildResults,
     filteredProducts,
     suggestionsCurrentPage,
+    resultsCurrentPage,
+    offerTypes,
+    searchProductOffer,
+    searchProductShippingRates,
+    offerProducts,
+    offerProductsCurrentPage
   ];
 }

@@ -4,25 +4,25 @@ part of 'settings_bloc.dart';
 
 class SettingsState extends Equatable {
 
-  final Language currentLanguege;
+  final Language currentLanguage;
   final ThemeMode currentTheme;
   final int selectedLanguage;
   final bool disable;
 
   const SettingsState({
-    this.currentLanguege = Language.ENGLISH,
+    this.currentLanguage = Language.ENGLISH,
     this.currentTheme = ThemeMode.light,
     this.selectedLanguage = -1,
     this.disable = true,
   });
 
   SettingsState copyWith({
-    Language? currentLanguege,
+    Language? currentLanguage,
     ThemeMode? currentTheme,
     int? selectedLanguage,
     bool? disable,
   }) => SettingsState(
-    currentLanguege: currentLanguege ?? this.currentLanguege,
+    currentLanguage: currentLanguage ?? this.currentLanguage,
     currentTheme: currentTheme ?? this.currentTheme,
     selectedLanguage: selectedLanguage ?? this.selectedLanguage,
     disable: disable ?? this.disable,
@@ -32,7 +32,7 @@ class SettingsState extends Equatable {
   
   @override
   List<Object> get props => [
-    currentLanguege, 
+    currentLanguage, 
     currentTheme, 
     selectedLanguage, 
     disable

@@ -44,7 +44,7 @@ class _CountryGroupPageState extends State<CountryGroupPage> {
     void fetchCountriesGroups() {
     context.read<ProductsBloc>().add(AddFilteredCountriesGrupoEvent(
       page: context.read<ProductsBloc>().state.currentPage + 1,
-      companyId:  context.read<CompanyBloc>().state.userCompany.id
+      companyId: context.read<UsersBloc>().state.loggedUser.companyId,
     ));
   }
 
@@ -223,17 +223,20 @@ class _CountryGroupPageState extends State<CountryGroupPage> {
                 onPressed:state.productsStates == ProductsStates.updating ? null : () {
                   if (_formKey.currentState!.saveAndValidate()) {
                     final Map<String, dynamic> data = {};
-                    // data['id'] = selectedFilteredCountry.value.id;
-                    data['name'] = _formKey.currentState!.value['name'];
                     // data['countries'] = selectedFilteredCountry.value.countries;
-                    data['countries'] = selectedFilteredCountry.value.countriesIds;
+                    data['name'] = _formKey.currentState!.value['name'];
                     if (value == CountryGroupPageMode.EDIT) {
+                      data['id'] = selectedFilteredCountry.value.id;
+                      data['countries'] = selectedFilteredCountry.value.countriesIds;
                       context.read<ProductsBloc>().add(UpdateCountryGroupEvent(
                           countryGroupId: selectedFilteredCountry.value.id,
                           body: data
                         )
                       );
+                      mode.value = CountryGroupPageMode.SHOW;
+                      return;
                     }
+                    data['countriesIds'] = selectedFilteredCountry.value.countriesIds;
                     context.read<ProductsBloc>().add(AddNewCountryGroupEvent(body: data));
                   }
                   mode.value = CountryGroupPageMode.SHOW;

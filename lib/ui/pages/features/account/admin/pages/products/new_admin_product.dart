@@ -28,7 +28,6 @@ class _NewAdminProductState extends State<NewAdminProduct> {
     return BlocBuilder<ProductsBloc, ProductsState>(
       builder: (context, state) {
         return Scaffold(
-          
           appBar: AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
@@ -40,6 +39,7 @@ class _NewAdminProductState extends State<NewAdminProduct> {
           const Center(child:  CircularProgressIndicator.adaptive()) 
           : ProductForm(
             formKey: _formKey,
+            mode: AdminProductMode.NEW,
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: state.productsStates == ProductsStates.adding ? null : () async  {

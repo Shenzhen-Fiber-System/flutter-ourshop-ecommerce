@@ -45,11 +45,11 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
     "sortOrders": [],
     "page": page,
     "pageSize": 10,
-    "searchString": "ecu"
+    "searchString": ""
   };
 
   try {
-    if (!state.hasMore) return;
+    // if (!state.hasMore) return;
     final response = await _orderService.getFilteredAdminOrders(filteredParameters);
     if (response is FilteredData) { 
 

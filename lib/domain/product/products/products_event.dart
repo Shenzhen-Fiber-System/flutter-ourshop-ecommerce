@@ -43,14 +43,14 @@ class AddFavoriteProductEvent extends ProductsEvent {
 
 class AddCartProductEvent extends ProductsEvent {
   final FilteredProduct product;
-  const AddCartProductEvent(this.product);
+  const AddCartProductEvent({required this.product});
   @override
   List<Object> get props => [product];
 }
 
 class RemoveCartProductEvent extends ProductsEvent {
   final FilteredProduct product;
-  const RemoveCartProductEvent(this.product);
+  const RemoveCartProductEvent({required this.product});
   @override
   List<Object> get props => [product];
 }
@@ -95,32 +95,33 @@ class AddCategoryHeaderImagesEvent extends ProductsEvent {
 }
 
 class AddSelectedSubCategoryEvent extends ProductsEvent {
-  final Category selectedSubCategory;
-  const AddSelectedSubCategoryEvent({required this.selectedSubCategory});
+  final String selectedSubCategoryId;
+  const AddSelectedSubCategoryEvent({required this.selectedSubCategoryId});
   @override
-  List<Object> get props => [selectedSubCategory];
+  List<Object> get props => [selectedSubCategoryId];
 }
 
 class AddSubCategoryProductsEvent extends ProductsEvent {
-  final List<FilteredProduct> subCategoryProducts;
-  const AddSubCategoryProductsEvent({required this.subCategoryProducts});
+  final FilteredResponseMode mode;
+  final int page;
+  const AddSubCategoryProductsEvent({required this.mode, required this.page});
   @override
-  List<Object> get props => [subCategoryProducts];
+  List<Object> get props => [mode, page];
 }
 
 class AddSubCategoriesEvent extends ProductsEvent {
-  final List<Category> subCategories;
-  const AddSubCategoriesEvent({required this.subCategories});
+  final String categoryId;
+  const AddSubCategoriesEvent({required this.categoryId});
   @override
-  List<Object> get props => [subCategories];
+  List<Object> get props => [categoryId];
 }
 
 class AddAdminProductsEvent extends ProductsEvent {
-  final String uuid;
+  final String companyId;
   final int page;
-  const AddAdminProductsEvent({required this.uuid, required this.page});
+  const AddAdminProductsEvent({required this.companyId, required this.page});
   @override
-  List<Object> get props => [uuid, page];
+  List<Object> get props => [companyId, page];
 }
 
 class DeleteAdminProductEvent extends ProductsEvent {
@@ -217,4 +218,46 @@ class AddShippingRateEvent extends ProductsEvent {
   const AddShippingRateEvent({required this.body});
   @override
   List<Object> get props => [body];
+}
+
+class AddFilteredOfferTypesEvent extends ProductsEvent {
+  const AddFilteredOfferTypesEvent();
+  @override
+  List<Object> get props => [];
+}
+
+class AddSearchProductOfferEvent extends ProductsEvent {
+  final String query;
+  final String companyId;
+  const AddSearchProductOfferEvent({required this.query, required this.companyId});
+  @override
+  List<Object> get props => [query, companyId];
+}
+
+class AddSearchProductShippingRatesEvent extends ProductsEvent {
+  final String query;
+  // final String companyId;
+  const AddSearchProductShippingRatesEvent({required this.query});
+  @override
+  List<Object> get props => [query];
+}
+
+class ResetSearchedShippingRatesEvent extends ProductsEvent {
+  const ResetSearchedShippingRatesEvent();
+  @override
+  List<Object> get props => [];
+}
+
+class CalculateShippingRateEvent extends ProductsEvent {
+  final Map<String, dynamic> body;
+  const CalculateShippingRateEvent({required this.body});
+  @override
+  List<Object> get props => [body];
+}
+
+class AddOfferProductEvent extends ProductsEvent {
+  final int page;
+  const AddOfferProductEvent({required this.page});
+  @override
+  List<Object> get props => [page];
 }

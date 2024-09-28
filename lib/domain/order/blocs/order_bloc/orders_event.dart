@@ -58,3 +58,10 @@ class FilterAdminOrdersEvent extends OrdersEvent {
   @override
   List<Object> get props => [searchString, isFiltering];
 }
+
+class AddOrderProductsEvent extends OrdersEvent {
+  
+
+  @override
+  List<Object> get props => [];
+}

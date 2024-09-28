@@ -32,12 +32,6 @@ class FilteredResponse<T> extends Equatable {
         message: json["message"],
         data: FilteredData<T>.fromJson(json["data"], fromJsonT),
       );
-
-  Map<String, dynamic> toJson() => {
-    "success": success,
-    "message": message,
-    "data": data.toJson(),
-  };
   
   @override
   List<Object?> get props => [
@@ -90,14 +84,6 @@ class FilteredData<T> extends Equatable {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    "content": List<dynamic>.from(content.map((x) => (x as dynamic).toJson())),
-    "totalElements": totalElements,
-    "page": page,
-    "pageSize": pageSize,
-    "totalPages": totalPages,
-  };
-
   @override
   List<Object?> get props => [
     content,
@@ -113,15 +99,16 @@ class FilteredData<T> extends Equatable {
 class FilteredProduct extends Equatable {
     final String id;
     final String name;
-    final String keyValue;
+    final String? keyValue;
     final String? productGroupId;
     final String? companyId;
+    final String? companySubdomain;
     final String? subCategoryId;
     final String? categoryId;
     final String? categoryName;
-    final String modelNumber;
+    final String? modelNumber;
     final String? productTypeId;
-    final String brandName;
+    final String? brandName;
     final String? unitMeasurementId;
     final double? fboPriceStart;
     final double? fboPriceEnd;
@@ -142,39 +129,41 @@ class FilteredProduct extends Equatable {
     final String? mainVideoUrl;
     final ProductReviewInfo? productReviewInfo;
     final List<PriceRange> priceRanges;
+
     final bool selected;
     final int quantity;
 
     const FilteredProduct({
         required this.id,
         required this.name,
-        required this.keyValue,
-        required this.productGroupId,
-        required this.companyId,
-        required this.subCategoryId,
-        required this.categoryId,
-        required this.categoryName,
-        required this.modelNumber,
-        required this.productTypeId,
-        required this.brandName,
-        required this.unitMeasurementId,
-        required this.fboPriceStart,
-        required this.fboPriceEnd,
-        required this.moqUnit,
-        required this.stock,
-        required this.packageLength,
-        required this.packageWidth,
-        required this.packageHeight,
-        required this.packageWeight,
-        required this.unitPrice,
+        this.keyValue,
+        this.productGroupId,
+        this.companyId,
+        this.companySubdomain,
+        this.subCategoryId,
+        this.categoryId,
+        this.categoryName,
+        this.modelNumber,
+        this.productTypeId,
+        this.brandName,
+        this.unitMeasurementId,
+        this.fboPriceStart,
+        this.fboPriceEnd,
+        this.moqUnit,
+        this.stock,
+        this.packageLength,
+        this.packageWidth,
+        this.packageHeight,
+        this.packageWeight,
+        this.unitPrice,
         required this.specifications,
         required this.details,
         required this.certifications,
-        required this.productStatus,
+        this.productStatus,
         required this.productPhotos,
         required this.productVideos,
-        required this.mainPhotoUrl,
-        required this.mainVideoUrl,
+        this.mainPhotoUrl,
+        this.mainVideoUrl,
         required this.productReviewInfo,
         required this.priceRanges,
         this.selected = false,
@@ -187,6 +176,7 @@ class FilteredProduct extends Equatable {
         String? keyValue,
         String? productGroupId,
         String? companyId,
+        String? companySubdomain,
         String? subCategoryId,
         String? categoryId,
         String? categoryName,
@@ -223,6 +213,7 @@ class FilteredProduct extends Equatable {
             keyValue: keyValue ?? this.keyValue,
             productGroupId: productGroupId ?? this.productGroupId,
             companyId: companyId ?? this.companyId,
+            companySubdomain: companySubdomain ?? this.companySubdomain,
             subCategoryId: subCategoryId ?? this.subCategoryId,
             categoryId: categoryId ?? this.categoryId,
             categoryName: categoryName ?? this.categoryName,
@@ -279,47 +270,13 @@ class FilteredProduct extends Equatable {
         details: List<Certification>.from(json["details"].map((x) => Certification.fromJson(x))),
         certifications: List<Certification>.from(json["certifications"].map((x) => Certification.fromJson(x))),
         productStatus: json["productStatus"],
-        productPhotos: List<FilteredProductMedia>.from(json["productPhotos"].map((x) => FilteredProductMedia.fromJson(x))),
-        productVideos: List<FilteredProductMedia>.from(json["productVideos"].map((x) => FilteredProductMedia.fromJson(x))),
+        productPhotos: List<FilteredProductMedia>.from(json["photos"].map((x) => FilteredProductMedia.fromJson(x))),
+        productVideos: List<FilteredProductMedia>.from(json["videos"].map((x) => FilteredProductMedia.fromJson(x))),
         mainPhotoUrl: json["mainPhotoUrl"],
         mainVideoUrl: json["mainVideoUrl"],
-        productReviewInfo: json["productReviewInfo"] == null ? null : ProductReviewInfo.fromJson(json["productReviewInfo"]),
+        productReviewInfo: ProductReviewInfo.fromJson(json["productReviewInfo"]),
         priceRanges: List<PriceRange>.from(json["priceRanges"].map((x) => PriceRange.fromJson(x))),
     );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "keyValue": keyValue,
-        "productGroupId": productGroupId,
-        "companyId": companyId,
-        "subCategoryId": subCategoryId,
-        "categoryId": categoryId,
-        "categoryName": categoryName,
-        "modelNumber": modelNumber,
-        "productTypeId": productTypeId,
-        "brandName": brandName,
-        "unitMeasurementId": unitMeasurementId,
-        "fboPriceStart": fboPriceStart,
-        "fboPriceEnd": fboPriceEnd,
-        "moqUnit": moqUnit,
-        "stock": stock,
-        "packageLength": packageLength,
-        "packageWidth": packageWidth,
-        "packageHeight": packageHeight,
-        "packageWeight": packageWeight,
-        "unitPrice": unitPrice,
-        "specifications": List<dynamic>.from(specifications.map((x) => x.toJson())),
-        "details": List<dynamic>.from(details.map((x) => x.toJson())),
-        "certifications": List<dynamic>.from(certifications.map((x) => x.toJson())),
-        "productStatus": productStatus,
-        "productPhotos": List<dynamic>.from(productPhotos.map((x) => x.toJson())),
-        "productVideos": List<dynamic>.from(productVideos.map((x) => x.toJson())),
-        "mainPhotoUrl": mainPhotoUrl,
-        "mainVideoUrl": mainVideoUrl,
-        "productReviewInfo": productReviewInfo?.toJson(),
-        "priceRanges": List<dynamic>.from(priceRanges.map((x) => x.toJson())),
-    };
 
   @override
   List<Object?> get props => [
@@ -393,12 +350,6 @@ class PriceRange {
         price: json["price"]?.toDouble(),
     );
 
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "quantityFrom": quantityFrom,
-        "quantityTo": quantityTo,
-        "price": price,
-    };
 }
 
 
@@ -435,26 +386,20 @@ class Detail {
         productId: json["productId"],
     );
 
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "description": description,
-        "productId": productId,
-    };
 }
 
 class FilteredProductMedia {
     final String id;
-    final String productId;
+    // final String? productId;
     final FilteredProductVideoPhoto? photo;
-    final int importanceOrder;
+    // final int? importanceOrder;
     final FilteredProductVideoPhoto? video;
 
     FilteredProductMedia({
         required this.id,
-        required this.productId,
+        // this.productId,
         this.photo,
-        required this.importanceOrder,
+        // this.importanceOrder,
         this.video,
     });
 
@@ -467,42 +412,35 @@ class FilteredProductMedia {
     }) => 
         FilteredProductMedia(
             id: id ?? this.id,
-            productId: productId ?? this.productId,
+            // productId: productId ?? this.productId,
             photo: photo ?? this.photo,
-            importanceOrder: importanceOrder ?? this.importanceOrder,
+            // importanceOrder: importanceOrder ?? this.importanceOrder,
             video: video ?? this.video,
         );
 
     factory FilteredProductMedia.fromJson(Map<String, dynamic> json) => FilteredProductMedia(
         id: json["id"],
-        productId: json["productId"],
+        // productId: json["productId"],
         photo: json["photo"] == null ? null : FilteredProductVideoPhoto.fromJson(json["photo"]),
-        importanceOrder: json["importanceOrder"],
+        // importanceOrder: json["importanceOrder"],
         video: json["video"] == null ? null : FilteredProductVideoPhoto.fromJson(json["video"]),
     );
 
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "productId": productId,
-        "photo": photo?.toJson(),
-        "importanceOrder": importanceOrder,
-        "video": video?.toJson(),
-    };
 }
 
 class FilteredProductVideoPhoto {
-    final String id;
-    final String name;
+    // final String id;
+    // final String name;
     final String url;
-    final int importanceOrder;
-    final String? companyName;
+    // final int? importanceOrder;
+    // final String? companyName;
 
     FilteredProductVideoPhoto({
-        required this.id,
-        required this.name,
+        // required this.id,
+        // required this.name,
         required this.url,
-        required this.importanceOrder,
-        this.companyName,
+        // this.importanceOrder,
+        // this.companyName,
     });
 
     FilteredProductVideoPhoto copyWith({
@@ -513,28 +451,20 @@ class FilteredProductVideoPhoto {
         String? companyName,
     }) => 
         FilteredProductVideoPhoto(
-            id: id ?? this.id,
-            name: name ?? this.name,
+            // id: id ?? this.id,
+            // name: name ?? this.name,
             url: url ?? this.url,
-            importanceOrder: importanceOrder ?? this.importanceOrder,
-            companyName: companyName ?? this.companyName,
+            // importanceOrder: importanceOrder ?? this.importanceOrder,
+            // companyName: companyName ?? this.companyName,
         );
 
     factory FilteredProductVideoPhoto.fromJson(Map<String, dynamic> json) => FilteredProductVideoPhoto(
-        id: json["id"],
-        name: json["name"],
+        // id: json["id"],
+        // name: json["name"],
         url: json["url"],
-        importanceOrder: json["importanceOrder"],
-        companyName: json["companyName"],
+        // importanceOrder: json["importanceOrder"],
+        // companyName: json["companyName"],
     );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "url": url,
-        "importanceOrder": importanceOrder,
-        "companyName": companyName,
-    };
 }
 
 class FilteredGroupCountries extends Equatable {
@@ -569,13 +499,6 @@ class FilteredGroupCountries extends Equatable {
         countriesIds: json["countriesIds"],
         countries: List<Country>.from(json["countries"].map((x) => Country.fromJson(x))),
     );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "countriesIds": countriesIds,
-        "countries": List<dynamic>.from(countries.map((x) => x.toJson())),
-    };
     
     @override
     
@@ -599,27 +522,25 @@ class FilteredOrders extends Equatable {
     final String customerName;
     final String orderStatus;
     final dynamic shippingAddressId;
-    final dynamic orderItems;
-    final List<dynamic> orderStatuses;
+    // final List<dynamic> orderStatuses;
     final double subTotal;
     final double discount;
     final double total;
-    final DateTime createdAt;
+    // final DateTime createdAt;
 
     const FilteredOrders({
         required this.id,
         required this.orderNumber,
         required this.customerId,
-        required this.companyId,
+        this.companyId,
         required this.customerName,
         required this.orderStatus,
         required this.shippingAddressId,
-        required this.orderItems,
-        required this.orderStatuses,
+        // this.orderStatuses = const [],
         required this.subTotal,
         required this.discount,
         required this.total,
-        required this.createdAt,
+        // required this.createdAt,
     });
 
     FilteredOrders copyWith({
@@ -631,11 +552,11 @@ class FilteredOrders extends Equatable {
         String? orderStatus,
         dynamic shippingAddressId,
         dynamic orderItems,
-        List<dynamic>? orderStatuses,
+        // List<dynamic>? orderStatuses,
         double? subTotal,
         double? discount,
         double? total,
-        DateTime? createdAt,
+        // DateTime? createdAt,
     }) => 
         FilteredOrders(
             id: id ?? this.id,
@@ -645,12 +566,11 @@ class FilteredOrders extends Equatable {
             customerName: customerName ?? this.customerName,
             orderStatus: orderStatus ?? this.orderStatus,
             shippingAddressId: shippingAddressId ?? this.shippingAddressId,
-            orderItems: orderItems ?? this.orderItems,
-            orderStatuses: orderStatuses ?? this.orderStatuses,
+            // orderStatuses: orderStatuses ?? this.orderStatuses,
             subTotal: subTotal ?? this.subTotal,
             discount: discount ?? this.discount,
             total: total ?? this.total,
-            createdAt: createdAt ?? this.createdAt,
+            // createdAt: createdAt ?? this.createdAt,
         );
 
     factory FilteredOrders.fromJson(Map<String, dynamic> json) => FilteredOrders(
@@ -661,29 +581,12 @@ class FilteredOrders extends Equatable {
         customerName: json["customerName"],
         orderStatus: json["orderStatus"],
         shippingAddressId: json["shippingAddressId"],
-        orderItems: json["orderItems"],
-        orderStatuses: List<dynamic>.from(json["orderStatuses"].map((x) => x)),
+        // orderStatuses: List<dynamic>.from(json["orderStatuses"].map((x) => x)),
         subTotal: json["subTotal"],
         discount: json["discount"],
         total: json["total"],
-        createdAt: DateTime.parse(json["createdAt"]),
+        // createdAt: DateTime.parse(json["createdAt"]),
     );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "orderNumber": orderNumber,
-        "customerId": customerId,
-        "companyId": companyId,
-        "customerName": customerName,
-        "orderStatus": orderStatus,
-        "shippingAddressId": shippingAddressId,
-        "orderItems": orderItems,
-        "orderStatuses": List<dynamic>.from(orderStatuses.map((x) => x)),
-        "subTotal": subTotal,
-        "discount": discount,
-        "total": total,
-        "createdAt": createdAt.toIso8601String(),
-    };
     
       @override
       List<Object?> get props => [
@@ -694,25 +597,24 @@ class FilteredOrders extends Equatable {
         customerName,
         orderStatus,
         shippingAddressId,
-        orderItems,
-        orderStatuses,
+        // orderStatuses,
         subTotal,
         discount,
         total,
-        createdAt,
+        // createdAt,
       ];
 }
 
 // My company - Banks 
 class FilteredBanks extends Equatable {
-    final String id;
-    final String name;
-    final String countryId;
+    final String? name;
+    final String? id;
+    final String? countryId;
 
     const FilteredBanks({
-        required this.id,
-        required this.name,
-        required this.countryId,
+        this.id,
+        this.name,
+        this.countryId,
     });
 
     FilteredBanks copyWith({
@@ -731,12 +633,6 @@ class FilteredBanks extends Equatable {
         name: json["name"],
         countryId: json["countryId"],
     );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "countryId": countryId,
-    };
     
     @override
     List<Object?> get props => [
@@ -799,17 +695,6 @@ class FilteredShippingRate extends Equatable {
         products: List<FilteredProduct>.from(json["products"].map((x) => FilteredProduct.fromJson(x))),
         shippingRanges: List<ShippingRange>.from(json["shippingRanges"].map((x) => ShippingRange.fromJson(x))),
     );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "countryId": countryId,
-        "countryGroupId": countryGroupId,
-        "companyId": companyId,
-        "productIds": List<dynamic>.from(productIds.map((x) => x)),
-        "products": List<dynamic>.from(products.map((x) => x.toJson())),
-        "shippingRanges": List<dynamic>.from(shippingRanges.map((x) => x.toJson())),
-    };
     
     @override
     List<Object?> get props => [
@@ -827,29 +712,29 @@ class FilteredShippingRate extends Equatable {
 
 class ShippingRange extends Equatable {
     final String id;
-    final String shippingRateId;
-    final double? quantityFrom;
-    final double? quantityTo;
+    // final String shippingRateId;
+    final int? quantityFrom;
+    final int? quantityTo;
     final double? price;
 
     const ShippingRange({
         required this.id,
-        required this.shippingRateId,
-        required this.quantityFrom,
-        required this.quantityTo,
-        required this.price,
+        // required this.shippingRateId,
+        this.quantityFrom,
+        this.quantityTo,
+        this.price,
     });
 
     ShippingRange copyWith({
         String? id,
-        String? shippingRateId,
-        double? quantityFrom,
-        double? quantityTo,
+        // String? shippingRateId,
+        int? quantityFrom,
+        int? quantityTo,
         double? price,
     }) => 
         ShippingRange(
             id: id ?? this.id,
-            shippingRateId: shippingRateId ?? this.shippingRateId,
+            // shippingRateId: shippingRateId ?? this.shippingRateId,
             quantityFrom: quantityFrom ?? this.quantityFrom,
             quantityTo: quantityTo ?? this.quantityTo,
             price: price ?? this.price,
@@ -857,9 +742,11 @@ class ShippingRange extends Equatable {
 
     factory ShippingRange.fromJson(Map<String, dynamic> json) => ShippingRange(
         id: json["id"],
-        shippingRateId: json["shippingRateId"],
-        quantityFrom: _toDouble(json["quantityFrom"]),
-        quantityTo: _toDouble(json["quantityTo"]),
+        // shippingRateId: json["shippingRateId"],
+        // quantityFrom: _toDouble(json["quantityFrom"]),
+        // quantityTo: _toDouble(json["quantityTo"]),
+        quantityFrom: json["quantityFrom"],
+        quantityTo: json["quantityTo"],
         price: _toDouble(json["price"]),
     );
 
@@ -869,19 +756,10 @@ class ShippingRange extends Equatable {
       if (value is double) return value;
       return double.tryParse(value.toString());
     }
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "shippingRateId": shippingRateId,
-        "quantityFrom": quantityFrom?.toStringAsFixed(2),
-        "quantityTo": quantityTo?.toStringAsFixed(2),
-        "price": price?.toStringAsFixed(2),
-    };
     
     @override
     List<Object?> get props => [
         id,
-        shippingRateId,
         quantityFrom,
         quantityTo,
         price,
@@ -940,4 +818,291 @@ class FilteredOffers {
         "dateTo": dateTo.toIso8601String(),
         "showOffer": showOffer,
     };
+}
+
+//communicatin -submittions
+class FilteredRequests extends Equatable {
+    final String? id;
+    final String? requestTypeId;
+    final String? companyId;
+    final String? email;
+    final String? fullName;
+    final String? phoneNumber;
+    final String? phoneNumberCode;
+    final String? title;
+    final String? message;
+    final dynamic secondaryMessage;
+    final String? target;
+    final dynamic isReadAt;
+    final dynamic language;
+    final bool? read;
+
+    const FilteredRequests({
+        this.id,
+        this.requestTypeId,
+        this.companyId,
+        this.email,
+        this.fullName,
+        this.phoneNumber,
+        this.phoneNumberCode,
+        this.title,
+        this.message,
+        this.secondaryMessage,
+        this.target,
+        this.isReadAt,
+        this.language,
+        this.read,
+    });
+
+    FilteredRequests copyWith({
+        String? id,
+        String? requestTypeId,
+        String? companyId,
+        String? email,
+        String? fullName,
+        String? phoneNumber,
+        String? phoneNumberCode,
+        String? title,
+        String? message,
+        dynamic secondaryMessage,
+        String? target,
+        dynamic isReadAt,
+        dynamic language,
+        bool? read,
+    }) => 
+        FilteredRequests(
+            id: id ?? this.id,
+            requestTypeId: requestTypeId ?? this.requestTypeId,
+            companyId: companyId ?? this.companyId,
+            email: email ?? this.email,
+            fullName: fullName ?? this.fullName,
+            phoneNumber: phoneNumber ?? this.phoneNumber,
+            phoneNumberCode: phoneNumberCode ?? this.phoneNumberCode,
+            title: title ?? this.title,
+            message: message ?? this.message,
+            secondaryMessage: secondaryMessage ?? this.secondaryMessage,
+            target: target ?? this.target,
+            isReadAt: isReadAt ?? this.isReadAt,
+            language: language ?? this.language,
+            read: read ?? this.read,
+        );
+
+    factory FilteredRequests.fromJson(Map<String, dynamic> json) => FilteredRequests(
+        id: json["id"],
+        requestTypeId: json["requestTypeId"],
+        companyId: json["companyId"],
+        email: json["email"],
+        fullName: json["fullName"],
+        phoneNumber: json["phoneNumber"],
+        phoneNumberCode: json["phoneNumberCode"],
+        title: json["title"],
+        message: json["message"],
+        secondaryMessage: json["secondaryMessage"],
+        target: json["target"],
+        isReadAt: json["isReadAt"],
+        language: json["language"],
+        read: json["read"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "requestTypeId": requestTypeId,
+        "companyId": companyId,
+        "email": email,
+        "fullName": fullName,
+        "phoneNumber": phoneNumber,
+        "phoneNumberCode": phoneNumberCode,
+        "title": title,
+        "message": message,
+        "secondaryMessage": secondaryMessage,
+        "target": target,
+        "isReadAt": isReadAt,
+        "language": language,
+        "read": read,
+    };
+    
+      @override
+      
+      List<Object?> get props => [
+        id,
+        requestTypeId,
+        companyId,
+        email,
+        fullName,
+        phoneNumber,
+        phoneNumberCode,
+        title,
+        message,
+        secondaryMessage,
+        target,
+        isReadAt,
+        language,
+        read,
+      ];
+}
+
+
+class FilteredOfferTypes extends Equatable {
+    final String? id;
+    final String? name;
+    final String? description;
+    final DateTime? dateFrom;
+    final DateTime? dateTo;
+    final bool? showOffer;
+
+    const FilteredOfferTypes({
+        this.id,
+        this.name,
+        this.description,
+        this.dateFrom,
+        this.dateTo,
+        this.showOffer,
+    });
+
+    FilteredOfferTypes copyWith({
+        String? id,
+        String? name,
+        String? description,
+        DateTime? dateFrom,
+        DateTime? dateTo,
+        bool? showOffer,
+    }) => 
+        FilteredOfferTypes(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            description: description ?? this.description,
+            dateFrom: dateFrom ?? this.dateFrom,
+            dateTo: dateTo ?? this.dateTo,
+            showOffer: showOffer ?? this.showOffer,
+        );
+
+    factory FilteredOfferTypes.fromJson(Map<String, dynamic> json) => FilteredOfferTypes(
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+        dateFrom: json["dateFrom"] == null ? null : DateTime.parse(json["dateFrom"]),
+        dateTo: json["dateTo"] == null ? null : DateTime.parse(json["dateTo"]),
+        showOffer: json["showOffer"],
+    );
+    
+      @override
+      
+      List<Object?> get props => [
+        id,
+        name,
+        description,
+        dateFrom,
+        dateTo,
+        showOffer,
+      ];
+}
+
+class FilteredOfferProduct {
+    final String? id;
+    final String? discountType;
+    final double? discountValue;
+    final DateTime? startDate;
+    final DateTime? endDate;
+    final int? minimumPurchaseQuantity;
+    final int? maximumDiscountQuantity;
+    final double? maximumDiscountAmount;
+    final String? status;
+    final dynamic offerTypeId;
+    final FilteredOfferTypes? offerType;
+    final FilteredProduct? product;
+    final dynamic productId;
+    final dynamic productUnitPriceWithDiscount;
+
+    FilteredOfferProduct({
+        this.id,
+        this.discountType,
+        this.discountValue,
+        this.startDate,
+        this.endDate,
+        this.minimumPurchaseQuantity,
+        this.maximumDiscountQuantity,
+        this.maximumDiscountAmount,
+        this.status,
+        this.offerTypeId,
+        this.offerType,
+        this.product,
+        this.productId,
+        this.productUnitPriceWithDiscount,
+    });
+
+    FilteredOfferProduct copyWith({
+        String? id,
+        String? discountType,
+        double? discountValue,
+        DateTime? startDate,
+        DateTime? endDate,
+        int? minimumPurchaseQuantity,
+        int? maximumDiscountQuantity,
+        double? maximumDiscountAmount,
+        String? status,
+        dynamic offerTypeId,
+        FilteredOfferTypes? offerType,
+        FilteredProduct? product,
+        dynamic productId,
+        dynamic productUnitPriceWithDiscount,
+    }) => 
+        FilteredOfferProduct(
+            id: id ?? this.id,
+            discountType: discountType ?? this.discountType,
+            discountValue: discountValue ?? this.discountValue,
+            startDate: startDate ?? this.startDate,
+            endDate: endDate ?? this.endDate,
+            minimumPurchaseQuantity: minimumPurchaseQuantity ?? this.minimumPurchaseQuantity,
+            maximumDiscountQuantity: maximumDiscountQuantity ?? this.maximumDiscountQuantity,
+            maximumDiscountAmount: maximumDiscountAmount ?? this.maximumDiscountAmount,
+            status: status ?? this.status,
+            offerTypeId: offerTypeId ?? this.offerTypeId,
+            offerType: offerType ?? this.offerType,
+            product: product ?? this.product,
+            productId: productId ?? this.productId,
+            productUnitPriceWithDiscount: productUnitPriceWithDiscount ?? this.productUnitPriceWithDiscount,
+        );
+
+    factory FilteredOfferProduct.fromMap(Map<String, dynamic> json) => FilteredOfferProduct(
+        id: json["id"],
+        discountType: json["discountType"],
+        discountValue: json["discountValue"],
+        startDate: json["startDate"] == null ? null : DateTime.parse(json["startDate"]),
+        endDate: json["endDate"] == null ? null : DateTime.parse(json["endDate"]),
+        minimumPurchaseQuantity: json["minimumPurchaseQuantity"],
+        maximumDiscountQuantity: json["maximumDiscountQuantity"],
+        maximumDiscountAmount: json["maximumDiscountAmount"],
+        status: json["status"],
+        offerTypeId: json["offerTypeId"],
+        offerType: json["offerType"] == null ? null : FilteredOfferTypes.fromJson(json["offerType"]),
+        product: json["product"] == null ? null : FilteredProduct.fromJson(json["product"]),
+        productId: json["productId"],
+        productUnitPriceWithDiscount: json["productUnitPriceWithDiscount"],
+    );
+
+    DiscountType getDiscountType() {
+      switch (discountType) {
+        case 'PERCENTAGE':
+          return DiscountType.PERCENTAGE;
+        case 'AMOUNT':
+          return DiscountType.FIXED;
+        default:
+          return DiscountType.UNKNOWN;
+      }
+    }
+    
+    double get newprice{
+      if (discountType == 'PERCENTAGE') {
+        return product!.unitPrice! - (product!.unitPrice! * discountValue! / 100);
+      } else {
+        return product!.unitPrice! - discountValue!;
+      }
+    }
+}
+
+
+enum DiscountType {
+  PERCENTAGE,
+  FIXED,
+  UNKNOWN,
 }

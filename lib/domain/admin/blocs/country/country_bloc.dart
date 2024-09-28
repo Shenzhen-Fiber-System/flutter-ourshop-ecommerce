@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../../../ui/pages/pages.dart';
 
 part 'country_event.dart';
@@ -9,17 +11,22 @@ class CountryBloc extends Bloc<CountryEvent, CountryState> {
   
   CountryBloc(CountryService countryService) : _countryService = countryService, 
   super(const CountryState()) {
-    on<AddCountriesEvent>((event, emit) => emit(state.copyWith(countries: event.countries)));
+    on<AddCountriesEvent>((event, emit) async {
+      try {
+        emit(state.copyWith(status: CountryStatus.loading));
+        final countries = await _countryService.getCountries();
+        if (countries is List<Country>) {
+          emit(state.copyWith(countries: countries, status: CountryStatus.loaded));
+        }
+      } catch (e) {
+        log('Error: $e');
+        emit(state.copyWith(status: CountryStatus.error));
+      }
+    });
   }
 
-
-  Future<void> fetchCountries() async {
-    final countries = await _countryService.getCountries();
-    if (countries is List<Country>) add(AddCountriesEvent(countries));
-  }
-
-  // String get countryName {
-  //   final country = state.countries.firstWhere((element) => element.id == locator<UsersBloc>().state.loggedUser.userCountryId,);
+  // Future<void> fetchCountries() async {
+  //   final countries = await _countryService.getCountries();
+  //   if (countries is List<Country>) add(AddCountriesEvent(countries));
   // }
-
 }

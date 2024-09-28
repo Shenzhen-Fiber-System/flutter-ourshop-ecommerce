@@ -1,4 +1,6 @@
 // pages
+export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/admin_offers.dart';
+export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/communication/communication_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/shipping_rates.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/orders/admin_order_detail.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/my_company/web_editor.dart';
@@ -13,7 +15,7 @@ export 'package:ourshop_ecommerce/ui/pages/features/login/signIn_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/login/signUp_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/my_account.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/cart/cart.dart';
-export 'package:ourshop_ecommerce/ui/pages/features/search/search_page.dart';
+export 'package:ourshop_ecommerce/ui/pages/features/offers/offers_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/home/home_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/admin_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/orders/admin_orders.dart';
@@ -22,7 +24,6 @@ export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products
 
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/countries_group_page.dart';
 export 'package:ourshop_ecommerce/ui/pages/features/account/admin/pages/products/new_admin_product.dart';
-
 
 
 

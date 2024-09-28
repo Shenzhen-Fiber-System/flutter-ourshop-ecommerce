@@ -10,9 +10,10 @@ class SelectedProductPage extends StatelessWidget {
     final Size size = MediaQuery.of(context).size;
     final ThemeData theme = Theme.of(context);
     final AppLocalizations translations = AppLocalizations.of(context)!;
+    const Widget spacer = SizedBox(width: 10.0,);
 
     return BlocListener<ProductsBloc, ProductsState>(
-      listenWhen: (previous, current) => previous.cartProducts.length != current.cartProducts.length,
+      listenWhen: (previous, current) =>  current.cartProducts.length > previous.cartProducts.length ,
       listener: (context, state) {
         ScaffoldMessenger.of(context).showMaterialBanner(
           MaterialBanner(
@@ -20,7 +21,7 @@ class SelectedProductPage extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(),
-                child: Text(translations.close, style: theme.textTheme.bodyMedium?.copyWith(color: theme.primaryColor),),
+                child: Text(translations.close, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
               )
             ],
           )
@@ -78,17 +79,19 @@ class SelectedProductPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 5.0,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0, left: 10.0),
-                      child: Text('${product.productReviewInfo?.ratingAvg.toStringAsFixed(1)}', style: theme.textTheme.labelLarge?.copyWith(color: Colors.black),),
-                    ),
-                    RaitingBarWidget(product: product),
-                  ],
-                ),
+                if (product.productReviewInfo?.ratingAvg != null)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0, left: 10.0),
+                        child: Text(product.productReviewInfo!.ratingAvg.toStringAsFixed(1), style: theme.textTheme.labelLarge?.copyWith(color: Colors.black),),
+                      ),
+                      RaitingBarWidget(product: product),
+                    ],
+                  )
+                else const SizedBox.shrink(),
                 const SizedBox(height: 5.0,),
                 Row(
                   children: [
@@ -156,33 +159,88 @@ class SelectedProductPage extends StatelessWidget {
           bottomNavigationBar: CustomBottomBar(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: size.width * 0.4,
-                    child: OutlinedButton(
-                      onPressed: () => context.read<ProductsBloc>().add(AddCartProductEvent(product)),
-                      child: Row(
-                        children: [
-                          Icon(Icons.shopping_bag_outlined, color: AppTheme.palette[1000], size: 14,),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5.0),
-                            child: Text(translations.add_to_cart, style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[1000]),),
-                          ),
-                        ],
+              child: BlocBuilder<ProductsBloc, ProductsState>(
+                builder: (context, state) {
+                  if (product.unitPrice == null) {
+                    return SizedBox(
+                      width: size.width * 0.9,
+                      child: ElevatedButton(
+                        style: theme.elevatedButtonTheme.style?.copyWith(
+                          backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+                            if (states.contains(WidgetState.disabled)) {
+                              return Colors.grey.shade400;
+                            }
+                            return Colors.green;
+                          }),
+                        ),
+                        onPressed: () => ContactSellerDialog(product: product).showAlertDialog(context, translations, theme),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.support_agent_outlined, color: Colors.white, size: 25.0,),
+                            spacer,
+                            Text(translations.contact_seller, style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: size.width * 0.4,
-                    child: ElevatedButton(
-                      onPressed: () => context.push('/checkout'),
-                      child: Text(translations.checkout, style: theme.textTheme.labelMedium),
-                    ),
-                  ),
-                ],
+                    );
+                  }
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: 
+                    [
+                      SizedBox(
+                        width: size.width * 0.4,
+                        child: OutlinedButton(
+                          style: theme.outlinedButtonTheme.style?.copyWith(
+                            padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.zero),
+                          ),
+                          onPressed: () => context.read<ProductsBloc>().add(AddCartProductEvent(product: product)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.shopping_bag_outlined, color: AppTheme.palette[1000], size: 13.0,),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 5.0),
+                                child: Text(translations.add_to_cart, style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[1000]),),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // SizedBox(
+                      //   width: size.width * 0.4,
+                      //   child: ElevatedButton(
+                      //     onPressed: state.cartProducts.isEmpty ? null : () => context.push('/checkout'),
+                      //     child: Text(translations.checkout, style: theme.textTheme.labelMedium),
+                      //   ),
+                      // ),
+                      SizedBox(
+                        width: size.width * 0.4,
+                        child: ElevatedButton(
+                          style: theme.elevatedButtonTheme.style?.copyWith(
+                            backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+                              if (states.contains(WidgetState.disabled)) {
+                                return Colors.grey.shade400;
+                              }
+                              return Colors.green;
+                            }),
+                          ),
+                          onPressed: () => ContactSellerDialog(product: product).showAlertDialog(context, translations, theme),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.support_agent_outlined, color: Colors.white, size: 13.0,),
+                              spacer,
+                              Text(Helpers.truncateText(translations.contact_seller, 12), style: theme.textTheme.bodySmall?.copyWith(color: Colors.white),),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),

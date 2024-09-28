@@ -63,7 +63,7 @@ class CompanyService {
       }
     }
 
-    Future<dynamic> getBanksByCompany (Map<String,dynamic> filteredParams) async {
+    Future<dynamic> getBanksByCountry (Map<String,dynamic> filteredParams) async {
       try {
         final response = await dio.post('/banks/filtered-page', data: filteredParams);
         final banks = FilteredResponse<FilteredBanks>.fromJson(response.data, (json) => FilteredBanks.fromJson(json));

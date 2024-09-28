@@ -1,6 +1,6 @@
 part of 'orders_bloc.dart';
 
-enum OrdersStatus { initial, loading, loaded, error, loadingMore }
+enum OrdersStatus { initial, loading, loaded, error, loadingMore, submittingOrder, orderSubmitted }
 
 class OrdersState extends Equatable {
   final List<FilteredOrders> adminOrders;
@@ -10,6 +10,7 @@ class OrdersState extends Equatable {
   final bool hasMore;
   final List<FilteredOrders> filteredAdminOrders;
   final bool isFiltering;
+  final List<FilteredProduct> orderProducts;
 
   const OrdersState({
     this.adminOrders = const [],
@@ -19,6 +20,7 @@ class OrdersState extends Equatable {
     this.hasMore = true,
     this.filteredAdminOrders = const [],
     this.isFiltering = false,
+    this.orderProducts = const [],
   });
 
   OrdersState copyWith({
@@ -29,6 +31,7 @@ class OrdersState extends Equatable {
     bool? hasMore,
     List<FilteredOrders>? filteredAdminOrders,
     bool? isFiltering,
+    List<FilteredProduct>? orderProducts,
   }) {
     return OrdersState(
       adminOrders: adminOrders ?? this.adminOrders,
@@ -38,6 +41,7 @@ class OrdersState extends Equatable {
       hasMore: hasMore ?? this.hasMore,
       filteredAdminOrders: filteredAdminOrders ?? this.filteredAdminOrders,
       isFiltering: isFiltering ?? this.isFiltering,
+      orderProducts: orderProducts ?? this.orderProducts,
     );
   }
 
@@ -50,5 +54,6 @@ class OrdersState extends Equatable {
     hasMore,
     filteredAdminOrders,
     isFiltering,
+    orderProducts,
   ];
 }

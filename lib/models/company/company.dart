@@ -50,21 +50,21 @@ class Company extends Equatable {
     final String subdomain;
     final String email;
     final dynamic qtyProductLandingPage;
-    final List<dynamic> socialMedias;
-    final List<Bank> banks;
+    final List<dynamic>? socialMedias;
+    final List<CompanyBank>? banks;
     final dynamic whatsappNumber;
     final bool hasProfileImg;
 
     const Company({
         required this.id,
         required this.name,
-        required this.address,
-        required this.phoneNumber,
-        required this.phoneNumberCode,
-        required this.countryId,
-        required this.country,
-        required this.mainCategoryId,
-        required this.currentBusinessCategoryId,
+        this.address,
+        this.phoneNumber,
+        this.phoneNumberCode,
+        this.countryId,
+        this.country,
+        this.mainCategoryId,
+        this.currentBusinessCategoryId,
         required this.folderName,
         required this.totalEmployee,
         required this.websiteUrl,
@@ -74,8 +74,8 @@ class Company extends Equatable {
         required this.subdomain,
         required this.email,
         required this.qtyProductLandingPage,
-        required this.socialMedias,
-        required this.banks,
+        this.socialMedias,
+        this.banks,
         required this.whatsappNumber,
         required this.hasProfileImg,
     });
@@ -100,7 +100,7 @@ class Company extends Equatable {
         String? email,
         dynamic qtyProductLandingPage,
         List<dynamic>? socialMedias,
-        List<Bank>? banks,
+        List<CompanyBank>? banks,
         dynamic whatsappNumber,
         bool? hasProfileImg,
     }) => 
@@ -148,37 +148,11 @@ class Company extends Equatable {
         subdomain: json["subdomain"],
         email: json["email"],
         qtyProductLandingPage: json["qtyProductLandingPage"],
-        socialMedias: List<dynamic>.from(json["socialMedias"].map((x) => x)),
-        banks: List<Bank>.from(json["banks"].map((x) => Bank.fromJson(x))),
+        socialMedias: json["socialMedias"] == null ? [] : List<dynamic>.from(json["socialMedias"].map((x) => x)),
+        banks: json["banks"] == null ? [] : List<CompanyBank>.from(json["banks"].map((x) => CompanyBank.fromJson(x))),
         whatsappNumber: json["whatsappNumber"],
         hasProfileImg: json["hasProfileImg"],
     );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "address": address,
-        "phoneNumber": phoneNumber,
-        "phoneNumberCode": phoneNumberCode,
-        "countryId": countryId,
-        "country": country?.toJson(),
-        "mainCategoryId": mainCategoryId,
-        "currentBusinessCategoryId": currentBusinessCategoryId,
-        "folderName": folderName,
-        "totalEmployee": totalEmployee,
-        "websiteUrl": websiteUrl,
-        "legalOwner": legalOwner,
-        "officeSize": officeSize,
-        "advantages": advantages,
-        "subdomain": subdomain,
-        "email": email,
-        "qtyProductLandingPage": qtyProductLandingPage,
-        "socialMedias": List<dynamic>.from(socialMedias.map((x) => x)),
-        "banks": List<dynamic>.from(banks.map((x) => x.toJson())),
-        "whatsappNumber": whatsappNumber,
-        "hasProfileImg": hasProfileImg,
-    };
-    
     @override
     
     List<Object?> get props => [
@@ -201,13 +175,13 @@ class Company extends Equatable {
         email,
         qtyProductLandingPage,
         socialMedias,
-        banks,
+        // banks,
         whatsappNumber,
         hasProfileImg,
     ];
 }
 
-class Bank extends Equatable {
+class CompanyBank extends Equatable {
     final String id;
     final String companyId;
     final String bankId;
@@ -221,7 +195,7 @@ class Bank extends Equatable {
     final String bankCountryId;
     final String intermediaryBankCountryId;
 
-    const Bank({
+    const CompanyBank({
         required this.id,
         required this.companyId,
         required this.bankId,
@@ -236,7 +210,7 @@ class Bank extends Equatable {
         required this.intermediaryBankCountryId,
     });
 
-    Bank copyWith({
+    CompanyBank copyWith({
         String? id,
         String? companyId,
         String? bankId,
@@ -250,7 +224,7 @@ class Bank extends Equatable {
         String? bankCountryId,
         String? intermediaryBankCountryId,
     }) => 
-        Bank(
+        CompanyBank(
             id: id ?? this.id,
             companyId: companyId ?? this.companyId,
             bankId: bankId ?? this.bankId,
@@ -265,7 +239,7 @@ class Bank extends Equatable {
             intermediaryBankCountryId: intermediaryBankCountryId ?? this.intermediaryBankCountryId,
         );
 
-    factory Bank.fromJson(Map<String, dynamic> json) => Bank(
+    factory CompanyBank.fromJson(Map<String, dynamic> json) => CompanyBank(
         id: json["id"],
         companyId: json["companyId"],
         bankId: json["bankId"],
@@ -279,21 +253,6 @@ class Bank extends Equatable {
         bankCountryId: json["bankCountryId"],
         intermediaryBankCountryId: json["intermediaryBankCountryId"],
     );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "companyId": companyId,
-        "bankId": bankId,
-        "accountType": accountType,
-        "accountNumber": accountNumber,
-        "swiftCode": swiftCode,
-        "address": address,
-        "phoneNumber": phoneNumber,
-        "intermediaryBankId": intermediaryBankId,
-        // "showOrder": showOrder,
-        "bankCountryId": bankCountryId,
-        "intermediaryBankCountryId": intermediaryBankCountryId,
-    };
 
     @override
     
@@ -310,6 +269,65 @@ class Bank extends Equatable {
         // showOrder,
         bankCountryId,
         intermediaryBankCountryId,
+    ];
+}
+class Bank extends Equatable {
+    final String companyId;
+    final String bankId;
+    final String? accountType;
+    final String? accountNumber;
+    final String? swiftCode;
+    final String? address;
+    final String? phoneNumber;
+    final String? bankAdress;
+    final String? intermediaryBankId;
+    final String? accountHolder;
+    final String? accoutnHolderId;
+    // final String bankCountryId;
+    // final String intermediaryBankCountryId;
+
+    const Bank({
+        required this.companyId,
+        required this.bankId,
+        this.accountType,
+        this.accountNumber,
+        this.swiftCode,
+        this.address,
+        this.phoneNumber,
+        this.bankAdress,
+        this.intermediaryBankId,
+        this.accountHolder,
+        this.accoutnHolderId,
+        // required this.showOrder,
+        // required this.bankCountryId,
+        // required this.intermediaryBankCountryId,
+    });
+
+    Map<String, dynamic> toJson() => {
+        "companyId": companyId,
+        "bankId": bankId,
+        "accountType": accountType,
+        "accountNumber": accountNumber,
+        "swiftCode": swiftCode,
+        "address": address,
+        "phoneNumber": phoneNumber,
+        "bankAdress": bankAdress,
+        "intermediaryBankId": intermediaryBankId,
+        "accountHolder": accountHolder,
+        "accoutnHolderId": accoutnHolderId,
+    };
+
+    @override
+    
+    List<Object?> get props => [
+        companyId,
+        bankId,
+        accountType,
+        accountNumber,
+        swiftCode,
+        address,
+        phoneNumber,
+        intermediaryBankId,
     ];
 }
 

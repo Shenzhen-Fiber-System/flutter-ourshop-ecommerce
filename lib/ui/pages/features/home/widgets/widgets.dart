@@ -8,14 +8,19 @@ class SubCategoryChip extends StatelessWidget {
     required this.theme,
   });
 
-  final void Function(Category? p1)? onTap;
+  final void Function(Category)? onTap;
   final Category c;
   final ThemeData theme;
 
   @override
   Widget build(BuildContext context) {
+    
     return GestureDetector(
-      onTap: () => onTap != null ? onTap!(c) : null,
+      onTap: () {
+        if(onTap != null){
+          onTap!(c);
+        }
+      } ,
       child: Chip(
         avatar: 
         c.iconSvg != null && c.iconSvg!.isNotEmpty ? SvgPicture.string(

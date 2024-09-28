@@ -24,7 +24,7 @@ class _AdminProductsState extends State<AdminProducts> {
 
   void fetchAdminProducts() {
     context.read<ProductsBloc>().add(AddAdminProductsEvent(
-        uuid: context.read<UsersBloc>().state.loggedUser.companyId, 
+        companyId: context.read<UsersBloc>().state.loggedUser.companyId, 
         page: 1
       )
     );
@@ -33,7 +33,7 @@ class _AdminProductsState extends State<AdminProducts> {
   void _scrollListener() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent && context.read<ProductsBloc>().state.productsStates != ProductsStates.loadingMore) {
         context.read<ProductsBloc>().add(AddAdminProductsEvent(
-            uuid: context.read<UsersBloc>().state.loggedUser.companyId, 
+            companyId: context.read<UsersBloc>().state.loggedUser.companyId, 
             page: context.read<ProductsBloc>().state.currentPage + 1
           )
         );
@@ -99,10 +99,10 @@ class _AdminProductsState extends State<AdminProducts> {
                             children: [
                               Expanded(child: Text(Helpers.truncateText(product.name, 20), style: style.copyWith(fontSize: 12))),
                               const SizedBox(width: 5.0,),
-                              Expanded(child: Text(Helpers.truncateText(product.brandName, 12), style: style.copyWith(fontSize: 12))),
+                              Expanded(child: Text(Helpers.truncateText(product.brandName ?? '', 12), style: style.copyWith(fontSize: 12))),
                             ],
                           ),
-                          subtitle: Text(product.modelNumber, style: style.copyWith(fontSize: 12)),
+                          subtitle: Text(product.modelNumber ?? '', style: style.copyWith(fontSize: 12)),
                           trailing: IconButton(
                             onPressed: () {
                               DeleteProductDialog(
@@ -113,6 +113,7 @@ class _AdminProductsState extends State<AdminProducts> {
                                 theme
                               ).then((value) {
                                 if (value == true) {
+                                  // ignore: use_build_context_synchronously
                                   context.read<ProductsBloc>().add(DeleteAdminProductEvent(productId: product.id));
                                 }
                               });

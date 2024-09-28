@@ -129,9 +129,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> with TickerProviderSt
                                   if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator.adaptive());
                                   if (snapshot.hasError) return const Center(child: Text('Error'));
                                   return ListView.builder(
-                                    itemCount: snapshot.data!.orderItems.length,
+                                    itemCount: snapshot.data!.orderItems?.length,
                                     itemBuilder: (context, index) {
-                                      final OrderItem item = snapshot.data!.orderItems[index];
+                                      final OrderItem item = snapshot.data!.orderItems![index];
                                       return _Article(
                                         size: size, 
                                         item: item, 
@@ -180,9 +180,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> with TickerProviderSt
                                         if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator.adaptive());
                                         if (snapshot.hasError) return  Center(child: Text('Error', style: style,));
                                         return ListView.builder(
-                                          itemCount: snapshot.data!.orderItems.length,
+                                          itemCount: snapshot.data!.orderItems?.length,
                                           itemBuilder: (context, index) {
-                                            final OrderItem item = snapshot.data!.orderItems[index];
+                                            final OrderItem item = snapshot.data!.orderItems![index];
                                             return _Article(
                                               size: size, 
                                               item: item, 
@@ -214,8 +214,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> with TickerProviderSt
               spacer,
               Text(translations.status(widget.order.orderStatus), style: style),
               spacer,
-              Text(translations.date(widget.order.createdAt), style: style),
-              spacer,
+              // Text(translations.date(widget.order.createdAt), style: style),
+              // spacer,
               Text(translations.total_order('\$${widget.order.total}'), style: style.copyWith(fontWeight: FontWeight.w600)),
             ],
           ),
@@ -227,7 +227,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> with TickerProviderSt
 
 class _Article extends StatelessWidget {
   const _Article({
-    super.key,
     required this.size,
     required this.item,
     required this.style,
@@ -261,11 +260,24 @@ class _Article extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.only(topLeft: Radius.circular(5.0), bottomLeft: Radius.circular(5.0)),
-            child: CachedNetworkImage(
+            child: 
+            item.productMainPhotoUrl != null ?
+            CachedNetworkImage(
               imageUrl: '${dotenv.env['PRODUCT_URL']}${item.productMainPhotoUrl}',
               height: 100,
               width: 100,
               fit: BoxFit.cover,
+            ) : 
+            SizedBox(
+              width: size.width * 0.25,
+              child: Column(
+                children: [
+                  const Icon(Icons.image_not_supported, size: 50, color: Colors.grey,),
+                  FittedBox(
+                    child: Text(translations.no_image, style: style.copyWith(color: Colors.grey),),
+                  )
+                ],
+              ),
             ),
           ),
           Expanded(
@@ -276,11 +288,11 @@ class _Article extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(Helpers.truncateText(item.productName, 25), style: style, overflow: TextOverflow.ellipsis,),
-                  Text(translations.unit_price(item.price), style: style),
-                  Text(translations.discount(item.discount), style: style),
-                  Text(translations.qty(item.qty), style: style),
-                  Text(translations.sub_total(item.subTotal), style: style),
+                  Text(Helpers.truncateText(item.productName!, 25), style: style, overflow: TextOverflow.ellipsis,),
+                  Text(translations.unit_price(item.price!), style: style),
+                  Text(translations.discount(item.discount!), style: style),
+                  Text(translations.qty(item.qty!), style: style),
+                  Text(translations.sub_total(item.subTotal!), style: style),
                 ],
               ),
             ),

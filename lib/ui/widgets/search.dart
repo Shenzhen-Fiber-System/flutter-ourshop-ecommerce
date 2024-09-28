@@ -66,7 +66,6 @@ class _SearchSuggestionsState extends State<SearchSuggestions> {
 
   @override
   void deactivate() {
-    log('deactivate search suggestions');
     context.read<ProductsBloc>().add(const ResetStatesEvent());
     super.deactivate();
   }
@@ -212,6 +211,10 @@ class _SearchResultsState extends State<SearchResults> {
           }
           if (state.productsStates == ProductsStates.error) {
             return Center(child: Text(translations.error, style: style,));
+          }
+
+          if (state.filteredBuildResults.isEmpty) {
+            return Center(child: Text(translations.no_results_found, style: style,));
           }
 
           return GridView.builder(

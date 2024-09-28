@@ -38,6 +38,9 @@ import 'my_company/my_company.dart';
       ),
       AdminOption(
         title: locator<AppLocalizations>().comunication,
+        subCategories: [
+          locator<AppLocalizations>().comunication,
+        ]
       ),
     ];
   }
@@ -131,6 +134,8 @@ class AdminPage extends StatelessWidget {
                               context.push('/admin/option/products/shipping-rates');
                             } else if (subCategory == locator<AppLocalizations>().offers) {
                               context.push('/admin/option/products/offers');
+                            } else if (subCategory == locator<AppLocalizations>().comunication) {
+                              context.push('/admin/option/communication', extra: AdminOptions.COMMUNICATION);
                             }
                           },
                         );
@@ -210,8 +215,8 @@ class AdminOptionPage extends StatelessWidget {
               return const AdminOrders();
             case AdminOptions.PRODUCTS:
               return const AdminProducts();
-            // case AdminOptions.COMMUNICATION:
-            //   return const _Communication();
+            case AdminOptions.COMMUNICATION:
+              return const AdminCommunicationPage();
             default:
               return SizedBox(
                 child: Center(

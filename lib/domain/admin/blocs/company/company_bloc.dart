@@ -42,21 +42,24 @@ class CompanyBloc extends Bloc<CompanyEvent, CompanyState> {
 
       try {
         emit(state.copyWith(status: CompanyStateStatus.loading, banks: []));
+        log('comaany id: ${event.companyId}');
+        // filteredParamenters['uuids'].add({"fieldName":"company.id", "value":event.companyId});
         filteredParamenters['uuids'].add({"fieldName":"country.id", "value":event.countryId});
         // to fetch 100 banks per request
         filteredParamenters['page'] = 1;
         filteredParamenters['pageSize'] = 100;
         final dynamic company = await _companyService.getCompanyById(event.companyId);
         final dynamic socialMedias = await _socialMediaService.getSocialMedias();
-        final dynamic banks = await _companyService.getBanksByCompany(filteredParamenters);
+        final dynamic banks = await _companyService.getBanksByCountry(filteredParamenters);
         if (company is Company) {
           add(AddUserCompanyEvent(company));
         }
         if (socialMedias is List<SocialMedia>) {
           emit(state.copyWith(socialMedias: socialMedias));
         }
-        if (banks is FilteredData){
-          emit(state.copyWith(banks: banks.content as List<FilteredBanks>));
+        if (banks is FilteredData<FilteredBanks>){
+          log('company banks: ${banks.content}');
+          emit(state.copyWith(banks: banks.content));
         }
         emit(state.copyWith(status: CompanyStateStatus.loaded));
       } catch (e) {

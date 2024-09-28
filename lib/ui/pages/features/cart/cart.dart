@@ -17,8 +17,7 @@ class Cart extends StatelessWidget {
       appBar: AppBar(
         leading: canBack ?  IconButton(
           icon: const Icon(Icons.arrow_back),
-          // onPressed: () => context.go('/sub-category/${context.read<ProductsBloc>().state.selectedSubCategory.parentCategoryId}'),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go('/sub-category/${context.read<ProductsBloc>().state.selectedSubCategory.parentCategoryId}'),
         ) : TextButton(
           onPressed: () => context.read<ProductsBloc>().selectedCartProductsCount == 0 ? context.read<ProductsBloc>().selectAllCartProducts() : context.read<ProductsBloc>().deselectAllCartProducts(),
           child: Text('${context.watch<ProductsBloc>().selectedCartProductsCount == 0 ? translations.select_all : translations.deselect_all} ${context.watch<ProductsBloc>().selectedCartProductsCount}', style: theme.textTheme.labelSmall?.copyWith(color: AppTheme.palette[1000]!),)
@@ -69,7 +68,7 @@ class Cart extends StatelessWidget {
                           return DeleteProductDialog(productName: state.cartProducts[index].name).showAlertDialog(context, translations, theme)
                           .then((value){
                               if (value != null && value) {
-                                // context.read<ProductsBloc>().removeCartProduct(state.cartProducts[index]);
+                                context.read<ProductsBloc>().add(RemoveCartProductEvent(product:state.cartProducts[index]));
                                 return Future.value(value);
                               }
                               return Future.value(false);
@@ -77,7 +76,7 @@ class Cart extends StatelessWidget {
                           );
                         },
                         onDismissed: (direction) {
-                          // context.read<ProductsBloc>().removeCartProduct(state.cartProducts[index]);
+                          context.read<ProductsBloc>().add(RemoveCartProductEvent(product:state.cartProducts[index]));
                         },
                         child: CartCard(
                           showCheckBox: true,

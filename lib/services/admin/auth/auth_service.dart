@@ -16,7 +16,7 @@ class AuthService{
       final LoggedUser loggedUser = LoggedUser.fromJson(auth.data.getTokenPayload);
       return loggedUser;
     } on DioException catch (e) {
-      // log('AuthService -> : ${e.response?.data}');
+      log('AuthService -> : ${e.response?.data}');
       ErrorHandler(e);
     }
   }
@@ -32,28 +32,21 @@ class AuthService{
   }
 
 
-  Future<Map<String, String>?> refreshToken(String refreshToken) async {
+  Future<void> refreshToken(String refreshToken) async {
     try {
-      final response = await dio.post(
-        '/auth/refresh-token', 
-        options: Options(headers: {'Authorization': 'Bearer $refreshToken'})
+      log('dio: ${dio.options.baseUrl}/auth/refresh-token');
+      log('refer: ${dio.options.headers['Referer']}');
+      final response = await dio.post('/auth/refresh-token', options: Options(
+        headers: {'Authorization': 'Bearer $refreshToken'})
       );
-
-      log('refreshToken response: ${response.data}');
+      log('response :${response.data}');
       
-      final newToken = response.data['accessToken'];
-      final newRefreshToken = response.data['refreshToken'];
-
-      // Log para ver el nuevo token
-      log('Nuevo token: $newToken');
-
-      return {
-        'accessToken': newToken,
-        'refreshToken': newRefreshToken,
-      };
+      // return {
+      //   'accessToken': newToken,
+      //   'refreshToken': newRefreshToken,
+      // };
     } on DioException catch (e) {
       log('refreshToken exception: ${e.response?.data}');
-      return null; // Asegúrate de devolver null si falla
     }
   }
 
