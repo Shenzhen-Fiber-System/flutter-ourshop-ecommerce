@@ -68,7 +68,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         );
         final subCategoryName = await _categoryService.getCategoryById(event.selectedSubCategoryId);
         if (subCategoryName is Category){
-          log('subCategoryName: ${subCategoryName}');
+          log('subCategoryName: $subCategoryName');
           emit(state.copyWith(selectedSubCategory: subCategoryName));
         } 
         final subcateogries = await _categoryService.getSubCategoriesByCategory(event.selectedSubCategoryId);

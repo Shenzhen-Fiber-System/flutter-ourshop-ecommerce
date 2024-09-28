@@ -25,7 +25,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_rating_bar: 4.0.1
-  flutter_stripe: ^11.1.0
+  flutter_stripe: 11.1.0
   flutter_svg: 2.0.10+1
   form_builder_validators: 11.0.0
   get_it: 7.7.0

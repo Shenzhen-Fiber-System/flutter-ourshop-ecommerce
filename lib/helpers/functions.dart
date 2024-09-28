@@ -35,12 +35,12 @@ class Helpers{
   }
 
   static Color getRandomeColor() {
-    final Random _random = Random();
+    final Random random = Random();
     return Color.fromARGB(
       255,
-      _random.nextInt(256),
-      _random.nextInt(256),
-      _random.nextInt(256),
+      random.nextInt(256),
+      random.nextInt(256),
+      random.nextInt(256),
     );
   }
 }

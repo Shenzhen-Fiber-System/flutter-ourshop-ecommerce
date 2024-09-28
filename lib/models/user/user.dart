@@ -1,4 +1,3 @@
-import 'package:ourshop_ecommerce/enums/enums.dart';
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 class UserResponse extends Equatable {

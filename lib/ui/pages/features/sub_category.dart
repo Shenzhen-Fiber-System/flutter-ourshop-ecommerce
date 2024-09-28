@@ -136,7 +136,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                              padding: const EdgeInsets.symmetric(horizontal: 3.0),
                              child: SubCategoryChip(
                                onTap: (selectedSubCategory) {
-                                log('here--- ${selectedSubCategory}');
+                                log('here--- $selectedSubCategory');
                                 context.read<ProductsBloc>().add(AddSelectedSubCategoryEvent(selectedSubCategoryId: selectedSubCategory.id));
                                 //  context.go('/sub-category/${selectedSubCategory.id}');
                                },
