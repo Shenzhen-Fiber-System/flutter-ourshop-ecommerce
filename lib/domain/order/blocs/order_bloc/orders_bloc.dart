@@ -22,6 +22,30 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
         emit(state.copyWith(filteredAdminOrders: state.adminOrders, isFiltering: false));
       }
     });
+
+    on<AddOrdersByUserEvent>((event,emit) async {
+      try {
+        emit(state.copyWith(ordersStatus: OrdersStatus.loading));
+        // 
+        emit(state.copyWith(
+           
+            ordersStatus: OrdersStatus.loaded
+          )
+        );
+      } catch (e) {
+        log('e: $e');
+      }
+    });
+
+    on<NewOrderEvent>((event,emit) async {
+      try { 
+        emit(state.copyWith(ordersStatus: OrdersStatus.submittingOrder));
+        final dynamic response = await _orderService.addNewOrder(event.data);
+        emit(state.copyWith(ordersStatus: OrdersStatus.orderSubmitted));
+      } catch (e) {
+        log('e: $e');
+      }
+    });
   }
 
 

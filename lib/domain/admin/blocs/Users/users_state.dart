@@ -10,16 +10,21 @@ enum UserStatus {
   success,
   error,
   initial,
+  paying,
+  paid,
+  getting_client_sercret,
+  got_client_secret,
 }
 
 class UsersState extends Equatable {
 
   final LoggedUser loggedUser;
-  final List<PaymentMethod> cards;
-  final PaymentMethod selectedCard;
+  final List<PaymentMethodCustom> cards;
+  final PaymentMethodCustom selectedCard;
   final ShippingAddress selectedShippingAddress;
   final List<ShippingAddress> shippingAddresses;
   final UserStatus status;
+  final StripeClient stripeClient;
 
   const UsersState({
       this.loggedUser = const LoggedUser(
@@ -43,51 +48,8 @@ class UsersState extends Equatable {
         iat: 0,
         email: "",
       ),
-      this.cards = const [
-        PaymentMethod(
-          id: "1",
-          type: CardType.VISA,
-          cardNumber: "4234567812345678",
-          expirationDate: "12/23",
-          cvv: "123"
-        ),
-        // PaymentMethod(
-        //   id: "2",
-        //   type: CardType.MASTERCARD,
-        //   cardNumber: "5134 5678 1234 5678",
-        //   expirationDate: "12/23",
-        //   cvv: "123"
-        // ),
-        // PaymentMethod(
-        //   id: "3",
-        //   type: CardType.VISA,
-        //   cardNumber: "4234 5678 1234 5678",
-        //   expirationDate: "12/23",
-        //   cvv: "123"
-        // ),
-        // PaymentMethod(
-        //   id: "4",
-        //   type: CardType.MASTERCARD,
-        //   cardNumber: "5134 5678 1234 5678",
-        //   expirationDate: "12/23",
-        //   cvv: "123"
-        // ),
-        // PaymentMethod(
-        //   id: "5",
-        //   type: CardType.VISA,
-        //   cardNumber: "4234 5678 1234 5678",
-        //   expirationDate: "12/23",
-        //   cvv: "123"
-        // ),
-        // PaymentMethod(
-        //   id: "6",
-        //   type: CardType.MASTERCARD,
-        //   cardNumber: "5134 5678 1234 5678",
-        //   expirationDate: "12/23",
-        //   cvv: "123"
-        // ),
-      ],
-      this.selectedCard = const PaymentMethod(
+      this.cards = const [],
+      this.selectedCard = const PaymentMethodCustom(
         id: "",
         cardNumber: "",
         type: CardType.UNKNOWN,
@@ -105,49 +67,18 @@ class UsersState extends Equatable {
         state: "California",
         municipality: "Los Angeles", 
       ),
-      this.shippingAddresses = const [
-        ShippingAddress(
-          id: '1',
-          country: "United States",
-          fullName: "John Doe",
-          phoneNumber: "+1 1234567890",
-          address: "123 Main St",
-          addtionalInstructions: "Apartment 4B",
-          postalCode: 12345,
-          state: "California",
-          municipality: "Los Angeles", 
-        ),
-        ShippingAddress(
-          id: '2',
-          country: "Canada",
-          fullName: "Jane Smith",
-          phoneNumber: "+1 9876543210",
-          address: "456 Maple Ave",
-          postalCode: 67890,
-          state: "Ontario",
-          municipality: "Toronto",
-        ),
-        ShippingAddress(
-          id: '3',
-          country: "Mexico",
-          fullName: "Benito Juarez",
-          phoneNumber: "+52 9998885555",
-          address: "La luna",
-          addtionalInstructions: "Apartment 4B",
-          postalCode: 12345,
-          state: "BCS",
-          municipality: "SJDC",
-        ),
-      ],
+      this.shippingAddresses = const [],
       this.status = UserStatus.initial,
+      this.stripeClient = const StripeClient(clientSecret: "",),
     });
 
   UsersState copyWith({
     LoggedUser? loggedUser,
-    List<PaymentMethod>? cards,
-    PaymentMethod? selectedCard,
+    List<PaymentMethodCustom>? cards,
+    PaymentMethodCustom? selectedCard,
     ShippingAddress? selectedShippingAddress,
     UserStatus? status,
+    StripeClient? stripeClient,
   }) {
     return UsersState(
       loggedUser: loggedUser ?? this.loggedUser,
@@ -155,6 +86,7 @@ class UsersState extends Equatable {
       selectedCard: selectedCard ?? this.selectedCard,
       selectedShippingAddress: selectedShippingAddress ?? this.selectedShippingAddress,
       status: status ?? this.status,
+      stripeClient: stripeClient ?? this.stripeClient,
     );
   }
   
@@ -165,5 +97,6 @@ class UsersState extends Equatable {
     selectedCard,
     selectedShippingAddress,
     status,
+    stripeClient,
   ];
 }

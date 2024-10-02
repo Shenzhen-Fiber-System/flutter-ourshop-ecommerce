@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 GetIt locator = GetIt.instance;
@@ -9,6 +9,7 @@ Future<void> initializeServiceLocator() async {
   locator.registerLazySingleton<AppLocalizations>(() => AppLocalizations.of(AppRoutes.globalContext!)!);
   locator.registerLazySingleton(() => Preferences());
   locator.registerLazySingleton(() => ImagePicker());
+  Stripe.publishableKey = dotenv.env['STRIPE_SECRET_KEY']!;
   // get preferences
   await locator<Preferences>().getpreferences();
 
@@ -44,9 +45,8 @@ Future<void> admin(Dio instance) async {
 
   final CountryService countryService = locator.registerSingleton(CountryService(dio: instance));
   locator.registerSingleton(CountryBloc(countryService));
-  
-  locator.registerSingleton(UsersBloc(authService, locator<SettingsBloc>(), locator<GeneralBloc>()));
-  log('preferences: ${locator<Preferences>().preferences['last_visited_page']}');
+  locator.registerLazySingleton(() => StripeService(dio: instance));
+  locator.registerSingleton(UsersBloc(authService, locator<SettingsBloc>(), locator<GeneralBloc>(), locator<StripeService>()));
     // get roles...
     // await rolesBloc.getRoles();
 

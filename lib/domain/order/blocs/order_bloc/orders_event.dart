@@ -65,3 +65,23 @@ class AddOrderProductsEvent extends OrdersEvent {
   @override
   List<Object> get props => [];
 }
+
+class AddOrdersByUserEvent extends OrdersEvent {
+  final int page;
+  const AddOrdersByUserEvent({
+    required this.page,
+  });
+
+  @override
+  List<Object> get props => [page];
+}
+
+class NewOrderEvent extends OrdersEvent {
+  final Map<String, dynamic> data;
+  const NewOrderEvent({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}

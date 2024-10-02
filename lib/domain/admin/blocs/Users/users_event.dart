@@ -25,28 +25,28 @@ class RegisterNewUser extends UsersEvent {
 
 
 class AddPaymentMethodsEvent extends UsersEvent {
-  final List<PaymentMethod> cards;
+  final List<PaymentMethodCustom> cards;
   const AddPaymentMethodsEvent(this.cards);
   @override
   List<Object> get props => [cards];
 }
 
 class AddPaymentMethodEvent extends UsersEvent {
-  final PaymentMethod card;
+  final PaymentMethodCustom card;
   const AddPaymentMethodEvent(this.card);
   @override
   List<Object> get props => [card];
 }
 
 class RemovePaymentMethodEvent extends UsersEvent {
-  final PaymentMethod card;
+  final PaymentMethodCustom card;
   const RemovePaymentMethodEvent(this.card);
   @override
   List<Object> get props => [card];
 }
 
 class AddSelectedCardEvent extends UsersEvent {
-  final PaymentMethod card;
+  final PaymentMethodCustom card;
   const AddSelectedCardEvent(this.card);
   @override
   List<Object> get props => [card];
@@ -57,4 +57,13 @@ class AddSelectedShippingAddressEvent extends UsersEvent {
   const AddSelectedShippingAddressEvent(this.shippingAddress);
   @override
   List<Object> get props => [shippingAddress];
+}
+
+class MakeStripePaymentEvent extends UsersEvent{
+  final StripePayment stripePayment;
+  const MakeStripePaymentEvent({
+    required this.stripePayment,
+  });
+  @override
+  List<Object> get props => [stripePayment,];
 }

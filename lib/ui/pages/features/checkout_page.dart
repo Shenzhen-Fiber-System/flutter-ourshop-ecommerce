@@ -1,6 +1,7 @@
 
 import 'dart:developer';
 
+import 'package:flutter_stripe/flutter_stripe.dart';
 import '../pages.dart';
 
 enum CheckOutMode{
@@ -353,7 +354,7 @@ class DefaultShippingAdress extends StatelessWidget {
                                     value: address.id, 
                                     groupValue: context.watch<UsersBloc>().state.selectedShippingAddress.id, 
                                     onChanged: (value) {
-                                      context.read<UsersBloc>().addSelectedShippingAddress(context.read<UsersBloc>().state.shippingAddresses.firstWhere((element) => element.id == value));
+                                      // context.read<UsersBloc>().addSelectedShippingAddress(context.read<UsersBloc>().state.shippingAddresses.firstWhere((element) => element.id == value));
                                     } 
                                   );
                                 },
@@ -479,12 +480,20 @@ class OrderDetails extends StatelessWidget {
                   const Spacer(),
                   SizedBox(
                     width: size.width,
-                    child: ElevatedButton(
-                      onPressed: () {
-                      
-                        
-                      }, 
-                      child: Text(translations.submit_order, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),),
+                    child: BlocBuilder<OrdersBloc, OrdersState>(
+                      builder: (context, state) {
+                        return ElevatedButton(
+                          onPressed: state.ordersStatus == OrdersStatus.submittingOrder ? null : () {
+                            context.read<UsersBloc>().add(MakeStripePaymentEvent(
+                              stripePayment: StripePayment(
+                                amount: (context.read<ProductsBloc>().subtotal * 100.00).toInt(),
+                                currency: 'usd'
+                              ))
+                            );
+                          }, 
+                          child: state.ordersStatus == OrdersStatus.submittingOrder ? const Center(child: CircularProgressIndicator.adaptive(),) : Text(translations.submit_order, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),),
+                        );
+                      },
                     ),
                   )
                 ],

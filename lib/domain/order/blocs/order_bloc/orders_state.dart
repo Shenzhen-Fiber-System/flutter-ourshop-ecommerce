@@ -11,6 +11,7 @@ class OrdersState extends Equatable {
   final List<FilteredOrders> filteredAdminOrders;
   final bool isFiltering;
   final List<FilteredProduct> orderProducts;
+  final List<FilteredOrders> ordersByUse;
 
   const OrdersState({
     this.adminOrders = const [],
@@ -21,6 +22,7 @@ class OrdersState extends Equatable {
     this.filteredAdminOrders = const [],
     this.isFiltering = false,
     this.orderProducts = const [],
+    this.ordersByUse = const [],
   });
 
   OrdersState copyWith({
@@ -32,6 +34,7 @@ class OrdersState extends Equatable {
     List<FilteredOrders>? filteredAdminOrders,
     bool? isFiltering,
     List<FilteredProduct>? orderProducts,
+    List<FilteredOrders>? ordersByUse,
   }) {
     return OrdersState(
       adminOrders: adminOrders ?? this.adminOrders,
@@ -42,6 +45,7 @@ class OrdersState extends Equatable {
       filteredAdminOrders: filteredAdminOrders ?? this.filteredAdminOrders,
       isFiltering: isFiltering ?? this.isFiltering,
       orderProducts: orderProducts ?? this.orderProducts,
+      ordersByUse: ordersByUse ?? this.ordersByUse,
     );
   }
 
@@ -55,5 +59,6 @@ class OrdersState extends Equatable {
     filteredAdminOrders,
     isFiltering,
     orderProducts,
+    ordersByUse,
   ];
 }

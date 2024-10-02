@@ -595,7 +595,9 @@ class _AccountSecction extends StatelessWidget {
               RadioListTile(
                 value: card.id, 
                 groupValue: context.read<UsersBloc>().state.selectedCard.id, 
-                onChanged: (value) => context.read<UsersBloc>().addSelectedCard(context.read<UsersBloc>().state.cards.firstWhere((element) => element.id == value)),
+                onChanged: (value) {
+                  // context.read<UsersBloc>().addSelectedCard(context.read<UsersBloc>().state.cards.firstWhere((element) => element.id == value));
+                },
                 title: Align(
                   alignment: Alignment.centerRight,
                     child: Text( card.cardNumber, style: const TextStyle(color: Colors.black, fontSize: 12.0)

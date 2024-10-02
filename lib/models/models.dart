@@ -10,3 +10,4 @@ export 'package:ourshop_ecommerce/models/roles/roles.dart';
 export 'package:ourshop_ecommerce/models/countries/countries.dart';
 export 'package:ourshop_ecommerce/models/products/products.dart';
 export 'package:ourshop_ecommerce/models/available_languages.dart';
+export 'package:ourshop_ecommerce/models/stripe.dart';
