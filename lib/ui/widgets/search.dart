@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:ourshop_ecommerce/models/models.dart';
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
@@ -17,20 +19,235 @@ class Search extends SearchDelegate{
   @override
   Widget? buildLeading(BuildContext context) {
     return IconButton(
-      onPressed: () => close(context, null),
+      onPressed: () => context.pop(),
       icon: const Icon(Icons.arrow_back),
     );
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return  Center(child: Text('Results', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black),));
+    query = query.trim();
+    return SearchResults(query: query,);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    return  const SearchSuggestions();
+  }
+}
+
+//Suggestions
+class SearchSuggestions extends StatefulWidget {
+  const SearchSuggestions({super.key,});
+
+
+  @override
+  State<SearchSuggestions> createState() => _SearchSuggestionsState();
+}
+
+class _SearchSuggestionsState extends State<SearchSuggestions> {
+
+
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()..addListener(listener);
+    fetchFilteredProducts();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(listener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    context.read<ProductsBloc>().add(const ResetStatesEvent());
+    super.deactivate();
+  }
+
+
+
+  void listener() {
+    final double threshold = _scrollController.position.maxScrollExtent * 0.1;
+    if (_scrollController.position.pixels >= threshold && 
+        context.read<ProductsBloc>().state.hasMore && 
+        context.read<ProductsBloc>().state.productsStates != ProductsStates.loadingMore) {
+      fetchFilteredProducts();
+    }
+  }
+
+  void fetchFilteredProducts() {
+    context.read<ProductsBloc>().add(AddFilteredProductsSuggestionsEvent(
+        page: context.read<ProductsBloc>().state.suggestionsCurrentPage + 1,
+      )
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    return Center(child: Text('Suggestions', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black),));
+    final Size size = MediaQuery.of(context).size;
+    final AppLocalizations translations = AppLocalizations.of(context)!;
+    final TextStyle? style = theme.textTheme.bodyMedium?.copyWith(color: Colors.black);
+
+    return SizedBox(
+      height: size.height,
+      width: size.width,
+      child: BlocBuilder<ProductsBloc, ProductsState>(
+        buildWhen: (previous, current) => previous.filteredBuildResults != current.filteredBuildResults || previous.productsStates != current.productsStates,
+        builder: (context, state) {
+          if (state.productsStates == ProductsStates.loading) {
+            return const Center(child: CircularProgressIndicator.adaptive());
+          }
+          if (state.productsStates == ProductsStates.error) {
+            return Center(child: Text(translations.error, style: style,));
+          }
+
+          return GridView.builder(
+            controller: _scrollController,
+              itemCount:state.hasMore
+                      ? state.filteredProductsSuggestions.length + 1
+                      : state.filteredProductsSuggestions.length,
+              itemBuilder: (context, index) {
+                if (index == state.filteredProductsSuggestions.length) {
+                  return const Center(child: CircularProgressIndicator.adaptive());
+                }
+                if (state.filteredProductsSuggestions.isEmpty) {
+                  return Center(child: Text(translations.no_results_found, style: style,));
+                }
+                final FilteredProduct product = state.filteredProductsSuggestions[index];
+                return ProductCard(
+                  height: size.height, 
+                  width: size.width, 
+                  product: product, 
+                  theme: theme, 
+                  translations: translations
+                );
+              }, gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.6
+              ),
+            );
+        },
+      )
+    );
+  }
+}
+
+class SearchResults extends StatefulWidget {
+  const SearchResults({super.key, required this.query});
+
+  final String query;
+
+  @override
+  State<SearchResults> createState() => _SearchResultsState();
+}
+
+class _SearchResultsState extends State<SearchResults> {
+
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchFilteredProducts();
+    _scrollController = ScrollController()..addListener(listener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(listener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+
+  void listener() {
+    final double threshold = _scrollController.position.maxScrollExtent * 0.1;
+    if (_scrollController.position.pixels >= threshold && 
+        context.read<ProductsBloc>().state.hasMore && 
+        context.read<ProductsBloc>().state.productsStates != ProductsStates.loadingMore) {
+      fetchFilteredProducts();
+    }
+  }
+
+  void fetchFilteredProducts() {
+    context.read<ProductsBloc>().add(AddFilteredBuildResultsEvent(
+        query: widget.query,
+        page: context.read<ProductsBloc>().state.resultsCurrentPage + 1,
+      )
+    );
+  }
+
+  @override
+  void deactivate() {
+    log('deactivate search results');
+    context.read<ProductsBloc>().add(const ResetStatesEvent());
+    super.deactivate();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final Size size = MediaQuery.of(context).size;
+    final AppLocalizations translations = AppLocalizations.of(context)!;
+    final TextStyle? style = theme.textTheme.bodyMedium?.copyWith(color: Colors.black);
+
+    return SizedBox(
+      height: size.height,
+      width: size.width,
+      child: BlocBuilder<ProductsBloc, ProductsState>(
+        buildWhen: (previous, current) => previous.filteredBuildResults != current.filteredBuildResults || previous.productsStates != current.productsStates,
+        builder: (context, state) {
+          if (state.productsStates == ProductsStates.loading) {
+            return const Center(child: CircularProgressIndicator.adaptive());
+          }
+          if (state.productsStates == ProductsStates.error) {
+            return Center(child: Text(translations.error, style: style,));
+          }
+
+          if (state.filteredBuildResults.isEmpty) {
+            return Center(child: Text(translations.no_results_found, style: style,));
+          }
+
+          return GridView.builder(
+              controller: _scrollController,
+              itemCount:state.hasMore
+                      ? state.filteredBuildResults.length + 1
+                      : state.filteredBuildResults.length,
+              itemBuilder: (context, index) {
+                if (index == state.filteredBuildResults.length) {
+                  return const Center(child: CircularProgressIndicator.adaptive());
+                }
+
+                if (state.filteredBuildResults.isEmpty) {
+                  return Center(child: Text(translations.no_results_found, style: style,));
+                }
+
+                final FilteredProduct product = state.filteredBuildResults[index];
+                return ProductCard(
+                  height: size.height, 
+                  width: size.width, 
+                  product: product, 
+                  theme: theme, 
+                  translations: translations
+                );
+              }, gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.6
+              ),
+            );
+        },
+      )
+    );
   }
 }

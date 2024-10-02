@@ -1,12 +1,15 @@
 
 
 
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:ourshop_ecommerce/enums/enums.dart';
 
 class Helpers{
 
   static String maskCardNumber(String cardNumber) {
-    return cardNumber.replaceAll(RegExp(r'\d(?=\d{4})'), '*');
+    return cardNumber.replaceAllMapped(RegExp(r'\d(?=\d{4})'), (match) => '*');
   }
 
   static String truncateText(String text, int maxLength) {
@@ -29,5 +32,15 @@ class Helpers{
     } else {
       return CardType.UNKNOWN;
     }
+  }
+
+  static Color getRandomeColor() {
+    final Random random = Random();
+    return Color.fromARGB(
+      255,
+      random.nextInt(256),
+      random.nextInt(256),
+      random.nextInt(256),
+    );
   }
 }

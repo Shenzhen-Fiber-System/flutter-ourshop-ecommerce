@@ -15,11 +15,11 @@ class DioInstance{
           baseUrl: '${dotenv.env[api]}',
           headers: {
             'Referer': dotenv.env[api],
-            'Authorization': '${locator<Preferences>().preferences['token']}',
           },
           
         )
       );
+      _dio.interceptors.addAll([RefreshTokenInterceptor()]);
     }
   }
 

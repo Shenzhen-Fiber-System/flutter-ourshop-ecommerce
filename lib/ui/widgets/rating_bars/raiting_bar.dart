@@ -7,14 +7,14 @@ class RaitingBarWidget extends StatelessWidget {
     this.size,
   });
 
-  final Product product;
+  final FilteredProduct product;
   final double? size;
 
   @override
   Widget build(BuildContext context) {
     final Size s = MediaQuery.of(context).size;
     return RatingBar(
-      initialRating: product.productReviewInfo?.ratingAvg ?? 0,
+      initialRating: product.productReviewInfo!.ratingAvg,
       direction: Axis.horizontal,
       allowHalfRating: true,
       ignoreGestures: true,

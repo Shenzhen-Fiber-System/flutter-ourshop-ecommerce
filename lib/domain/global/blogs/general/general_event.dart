@@ -30,3 +30,11 @@ class InternetConnectionChangedEvent extends GeneralEvent {
   @override
   List<Object> get props => [interNetConnectionActive];
 }
+
+class KeyboardVisibilityChangedEvent extends GeneralEvent {
+  final bool keyboardVisible;
+  const KeyboardVisibilityChangedEvent({required this.keyboardVisible});
+
+  @override
+  List<Object> get props => [keyboardVisible];
+}

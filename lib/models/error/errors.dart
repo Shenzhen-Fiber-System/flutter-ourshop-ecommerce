@@ -1,4 +1,3 @@
-
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 class ErrorHandler extends DioException{
@@ -27,6 +26,18 @@ class ErrorHandler extends DioException{
           foregroundColor: Colors.white,
           backgroundColor: Colors.red.shade500,
           icon: const Icon(Icons.error, color: Colors.white,),
+        ).showToast(context);
+        break;
+      case 401:
+        final error = RequestError.fromJson(response?.data);
+        ErrorToast(
+          title: error.debugMessage ?? error.message,
+          style: ToastificationStyle.flatColored,
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.red.shade500,
+          icon: const Icon(Icons.error, color: Colors.white,),
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          onAutoCompleted: (_) => context.go('/'),
         ).showToast(context);
         break;
       case 500:

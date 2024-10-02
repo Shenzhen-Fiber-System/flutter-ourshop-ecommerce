@@ -1,4 +1,3 @@
-import 'package:ourshop_ecommerce/enums/enums.dart';
 import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 
 class UserResponse extends Equatable {
@@ -189,9 +188,9 @@ class NewUser extends Equatable {
   ];
 }
 
-class PaymentMethod extends Equatable{
+class PaymentMethodCustom extends Equatable{
 
-  const PaymentMethod({
+  const PaymentMethodCustom({
     required this.id,
     required this.type,
     required this.cardNumber,
@@ -207,16 +206,16 @@ class PaymentMethod extends Equatable{
   final String cvv;
   final bool? isDefault;
 
-  factory PaymentMethod.fromJson(Map<String, dynamic> json) => PaymentMethod(
+  factory PaymentMethodCustom.fromJson(Map<String, dynamic> json) => PaymentMethodCustom(
     id: json["id"],
     type: json["type"],
-    cardNumber: json["cardNumber"],
+    cardNumber: Helpers.maskCardNumber(json["cardNumber"]),
     expirationDate: json["expirationDate"],
     cvv: json["cvv"],
     isDefault: json["isDefault"],
   );
 
-  PaymentMethod copyWith({
+  PaymentMethodCustom copyWith({
     String? id,
     CardType? type,
     String? cardNumber,
@@ -224,7 +223,7 @@ class PaymentMethod extends Equatable{
     String? cvv,
     bool? isDefault,
   }) {
-    return PaymentMethod(
+    return PaymentMethodCustom(
       id: id ?? this.id,
       type: type ?? this.type,
       cardNumber: cardNumber ?? this.cardNumber,

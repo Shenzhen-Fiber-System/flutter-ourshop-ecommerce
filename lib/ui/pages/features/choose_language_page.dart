@@ -62,19 +62,19 @@ class _ChooseLanguagePageState extends State<ChooseLanguagePage> {
                             title: Text(availbaleLanguage.name),
                             selected: state.selectedLanguage == availbaleLanguage.id,
                             selectedColor: theme.primaryColor,
-                            selectedTileColor: AppTheme.palette[50],
+                            selectedTileColor: AppTheme.palette[900]!.withOpacity(0.1),
                             leading: Image.network(availbaleLanguage.flag, width: 30, height: 30,),
-                            trailing: state.selectedLanguage == availbaleLanguage.id ?  Icon(Icons.check_circle, color: AppTheme.palette[500],) : null,
+                            trailing: state.selectedLanguage == availbaleLanguage.id ?  Icon(Icons.check_circle, color: AppTheme.palette[950],) : null,
                             shape: state.selectedLanguage == availbaleLanguage.id ?  RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                               side: BorderSide(
-                                color: AppTheme.palette[600]!,
+                                color: AppTheme.palette[1000]!,
                                 width: 1
                               )
                             ) :  null,
                             onTap: () {
-                              context.read<SettingsBloc>().add(ChangeSelectedLanguage(availbaleLanguage.id));
-                              // locator<Preferences>().saveData('language', language);
+                              context.read<SettingsBloc>().add(ChangeSelectedLanguage(selectedLanguage:availbaleLanguage.id));
+                              locator<Preferences>().saveData('language', availbaleLanguage.id.toString());
                             },
                           );
                         },

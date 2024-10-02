@@ -26,7 +26,7 @@ class ChangeTheme extends SettingsEvent {
 
 class ChangeSelectedLanguage extends SettingsEvent {
   final int selectedLanguage;
-  const ChangeSelectedLanguage(this.selectedLanguage);
+  const ChangeSelectedLanguage({required this.selectedLanguage});
 
   @override
   List<Object> get props => [selectedLanguage];

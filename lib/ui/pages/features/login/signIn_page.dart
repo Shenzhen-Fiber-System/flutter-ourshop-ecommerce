@@ -1,5 +1,3 @@
-
-
 import '../../pages.dart';
 
 class SignInPage extends StatefulWidget {
@@ -30,6 +28,8 @@ class _SignInPageState extends State<SignInPage> {
   @override
   void initState() {
     super.initState();
+    context.read<RolesBloc>().add(const AddRolesEvent());
+    context.read<CountryBloc>().add(const AddCountriesEvent());
     locator<Preferences>().saveLastVisitedPage('sign_in_page');
     _userController = TextEditingController(text: locator<Preferences>().preferences['username'] ?? '');
     _passwordController = TextEditingController(text: locator<Preferences>().preferences['password'] ?? '');
@@ -74,7 +74,7 @@ class _SignInPageState extends State<SignInPage> {
                   children: [
                     TextSpan(
                       text: translations.ourshop, 
-                      style: theme.textTheme.titleMedium?.copyWith(color: Colors.blue)
+                      style: theme.textTheme.titleMedium?.copyWith(color: AppTheme.palette[800])
                     ),
                     TextSpan(
                       text: translations.e_commerce, 
@@ -82,7 +82,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     TextSpan(
                       text: translations.app, 
-                      style: theme.textTheme.titleMedium?.copyWith(color: Colors.blue)
+                      style: theme.textTheme.titleMedium?.copyWith(color: AppTheme.palette[800])
                     ),
                   ]
                 )
@@ -112,12 +112,12 @@ class _SignInPageState extends State<SignInPage> {
               SizedBox(height: _space,),
               FormBuilder(
                 key: _formKey,
-                child: BlocBuilder<UsersBloc, UsersState>(
+                child: BlocConsumer<UsersBloc, UsersState>(
                   builder: (context, state) {
                     return Column(
                       children: [
                         FormBuilderTextField(
-                          readOnly: state.isLoading,
+                          readOnly: state.status == UserStatus.loading,
                           autofocus: rememberMe  ? false : true,
                           focusNode: _userFocusNode,
                           controller: _userController,
@@ -141,20 +141,20 @@ class _SignInPageState extends State<SignInPage> {
                           valueListenable: showPassword,
                           builder: (BuildContext context, value, _) {
                             return FormBuilderTextField(
-                              readOnly: state.isLoading,
+                              readOnly: state.status == UserStatus.loading,
                               focusNode: _passwordFocusNode,
                               style: inputValueStyle,
                               controller: _passwordController,
                               textInputAction: TextInputAction.send,
                               onEditingComplete: () => _formKey.currentState!.save(),
-                              onSubmitted: (_) async => await _doLogin(),
+                              onSubmitted: (_) => _doLogin(),
                               name: "password",
                               cursorColor: _cursorColor,
                               decoration: InputDecoration(
                                 labelText: translations.password,
                                 hintText: translations.placeholder(translations.password.toLowerCase()),
                                 suffixIcon: IconButton(
-                                  onPressed: state.isLoading ? null : () => showPassword.value = !showPassword.value,
+                                  onPressed: state.status == UserStatus.loading ? null : () => showPassword.value = !showPassword.value,
                                   icon: Icon(showPassword.value ? Icons.visibility : Icons.visibility_off),
                                 )
                               ),
@@ -174,7 +174,7 @@ class _SignInPageState extends State<SignInPage> {
                             SizedBox(
                               width: size.width * 0.4,
                               child: IgnorePointer(
-                                ignoring: state.isLoading,
+                                ignoring: state.status == UserStatus.loading,
                                 child: FormBuilderCheckbox(
                                   shape: const RoundedRectangleBorder(
                                     side: BorderSide.none
@@ -200,78 +200,82 @@ class _SignInPageState extends State<SignInPage> {
                                 ),
                               ),
                             ),
-                            TextButton(
-                              onPressed: state.isLoading ? null : (){},
-                              child: Text(translations.forgot_password, style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.palette[700]),),
-                            )
+                            // TextButton(
+                            //   onPressed: state.status == UserStatus.loading ? null : (){},
+                            //   child: Text(translations.forgot_password, style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.palette[700]),),
+                            // )
                           ],
                         ),
                         const SizedBox(height: 10,),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: state.isLoading ? null : () async  => await _doLogin(),
-                            child: state.isLoading ? const CircularProgressIndicator.adaptive() : Text(translations.sign_in_with(translations.email.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
+                            onPressed: state.status == UserStatus.loading ? null : ()  => _doLogin(),
+                            child: state.status == UserStatus.loading ? const CircularProgressIndicator.adaptive() : Text(translations.sign_in_with(translations.email.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),),
                           ),
                         ),
-                        const SizedBox(height: 5,),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: Theme.of(context).elevatedButtonTheme.style!.copyWith(
-                              backgroundColor: const WidgetStatePropertyAll(Colors.white)
-                            ),
-                            onPressed: state.isLoading ? null : (){},
-                            child: Stack(
-                              children: [
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Image.asset('assets/icons/google.png', height: 20, width: 20,)
-                                ),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: Text(translations.sign_in_with(translations.google.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black),)
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 5,),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: Theme.of(context).elevatedButtonTheme.style!.copyWith(
-                              backgroundColor: const WidgetStatePropertyAll(Colors.black)
-                            ),
-                            onPressed: state.isLoading ? null : (){},
-                            child: Stack(
-                              children: [
-                                  const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Icon(Icons.apple, color: Colors.white, size: 25,)
-                                ),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: Text(translations.sign_in_with(translations.apple.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),)
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        // const SizedBox(height: 5,),
+                        // SizedBox(
+                        //   width: double.infinity,
+                        //   child: ElevatedButton(
+                        //     style: Theme.of(context).elevatedButtonTheme.style!.copyWith(
+                        //       backgroundColor: const WidgetStatePropertyAll(Colors.white)
+                        //     ),
+                        //     onPressed: state.status == UserStatus.loading ? null : (){},
+                        //     child: Stack(
+                        //       children: [
+                        //         Align(
+                        //           alignment: Alignment.centerLeft,
+                        //           child: Image.asset('assets/icons/google.png', height: 20, width: 20,)
+                        //         ),
+                        //         Align(
+                        //           alignment: Alignment.center,
+                        //           child: Text(translations.sign_in_with(translations.google.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black),)
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 5,),
+                        // SizedBox(
+                        //   width: double.infinity,
+                        //   child: ElevatedButton(
+                        //     style: Theme.of(context).elevatedButtonTheme.style!.copyWith(
+                        //       backgroundColor: const WidgetStatePropertyAll(Colors.black)
+                        //     ),
+                        //     onPressed: state.status == UserStatus.loading ? null : (){},
+                        //     child: Stack(
+                        //       children: [
+                        //           const Align(
+                        //           alignment: Alignment.centerLeft,
+                        //           child: Icon(Icons.apple, color: Colors.white, size: 25,)
+                        //         ),
+                        //         Align(
+                        //           alignment: Alignment.center,
+                        //           child: Text(translations.sign_in_with(translations.apple.toLowerCase()), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),)
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(translations.dont_have_account, style: theme.textTheme.bodySmall,),
                             TextButton(
-                              onPressed: state.isLoading ? null : () => context.push('/sign-up'),
+                              onPressed: state.status == UserStatus.loading ? null : () => context.push('/sign-up'),
                               child: Text(translations.sign_up, 
-                                style: theme.textTheme.bodySmall?.copyWith(color: Colors.blue, fontWeight: FontWeight.w600),
+                                style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.palette[800], fontWeight: FontWeight.w600),
                               ),
                             )
                           ],
                         )   
                       ],
                     );
+                  }, listener: (BuildContext context, UsersState state) {
+                    if(state.status == UserStatus.logged && state.loggedUser.userId.isNotEmpty) {
+                      context.go('/home');
+                    }
                   },
                 )
               )
@@ -282,17 +286,14 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  Future<void> _doLogin() async {
+  void _doLogin() {
     if (_formKey.currentState!.saveAndValidate()) {
       if (_formKey.currentState!.value['remember_me']) {
         locator<Preferences>().saveData('username', _formKey.currentState!.value['username']);
         locator<Preferences>().saveData('password', _formKey.currentState!.value['password']);
       }
       FocusScope.of(context).unfocus();
-      await context.read<UsersBloc>().loginUser(_formKey.currentState!.value)
-        .then((value) async {
-          if (value is LoggedUser) context.go('/home');
-        });
+      context.read<UsersBloc>().add(Login(data : _formKey.currentState!.value));
     }
   }
 }

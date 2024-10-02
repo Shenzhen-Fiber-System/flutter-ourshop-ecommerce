@@ -3,7 +3,7 @@ import 'package:ourshop_ecommerce/ui/pages/pages.dart';
 class ProductResponse extends Equatable {
     final bool success;
     final String message;
-    final List<Product> data;
+    final List<FilteredProduct> data;
 
     const ProductResponse({
         required this.success,
@@ -14,15 +14,9 @@ class ProductResponse extends Equatable {
     factory ProductResponse.fromJson(Map<String, dynamic> json) => ProductResponse(
         success: json["success"],
         message: json["message"],
-        data: List<Product>.from(json["data"].map((x) => Product.fromJson(x))),
+        data: List<FilteredProduct>.from(json["data"].map((x) => FilteredProduct.fromJson(x))),
     );
 
-    Map<String, dynamic> toJson() => {
-        "success": success,
-        "message": message,
-        "data": List<dynamic>.from(data.map((x) => x.toJson())),
-    };
-    
     @override
     List<Object?> get props => [
       success, 
@@ -128,8 +122,8 @@ class Product extends Equatable {
         details: List<Certification>.from(json["details"].map((x) => Certification.fromJson(x))),
         certifications: List<Certification>.from(json["certifications"].map((x) => Certification.fromJson(x))),
         productStatus: json["productStatus"],
-        photos: List<Photo>.from(json["photos"].map((x) => Photo.fromJson(x))),
-        videos: List<Photo>.from(json["videos"].map((x) => Photo.fromJson(x))),
+        photos: json['photos'] != null ? List<Photo>.from(json["photos"].map((x) => Photo.fromJson(x))) : [],
+        videos: json['photos'] != null ? List<Photo>.from(json["videos"].map((x) => Photo.fromJson(x))) : [],
         mainPhotoUrl: json["mainPhotoUrl"],
         mainVideoUrl: json["mainVideoUrl"],
         productReviewInfo: ProductReviewInfo.fromJson(json["productReviewInfo"]),        
@@ -206,41 +200,38 @@ class Product extends Equatable {
       reviews: reviews ?? this.reviews,
     );
 
-
-    
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "keyValue": keyValue,
-        "productGroupId": productGroupId,
-        "companyId": companyId,
-        "subCategoryId": subCategoryId,
-        "categoryId": categoryId,
-        "categoryName": categoryName,
-        "modelNumber": modelNumber,
-        "productTypeId": productTypeId,
-        "brandName": brandName,
-        "unitMeasurementId": unitMeasurementId,
-        "fboPriceStart": fboPriceStart,
-        "fboPriceEnd": fboPriceEnd,
-        "moqUnit": moqUnit,
-        "stock": stock,
-        "packageLength": packageLength,
-        "packageWidth": packageWidth,
-        "packageHeight": packageHeight,
-        "packageWeight": packageWeight,
-        "unitPrice": unitPrice,
-        "specifications": List<dynamic>.from(specifications.map((x) => x.toJson())),
-        "details": List<dynamic>.from(details.map((x) => x.toJson())),
-        "certifications": List<dynamic>.from(certifications.map((x) => x.toJson())),
-        "productStatus": productStatus,
-        "productPhotos": List<dynamic>.from(photos.map((x) => x.toJson())),
-        "productVideos": List<dynamic>.from(videos.map((x) => x.toJson())),
-        "mainPhotoUrl": mainPhotoUrl,
-        "mainVideoUrl": mainVideoUrl,
-        "productReviewInfo": productReviewInfo?.toJson(),
-    };
+    // Map<String, dynamic> toJson() => {
+    //     "id": id,
+    //     "name": name,
+    //     "keyValue": keyValue,
+    //     "productGroupId": productGroupId,
+    //     "companyId": companyId,
+    //     "subCategoryId": subCategoryId,
+    //     "categoryId": categoryId,
+    //     "categoryName": categoryName,
+    //     "modelNumber": modelNumber,
+    //     "productTypeId": productTypeId,
+    //     "brandName": brandName,
+    //     "unitMeasurementId": unitMeasurementId,
+    //     "fboPriceStart": fboPriceStart,
+    //     "fboPriceEnd": fboPriceEnd,
+    //     "moqUnit": moqUnit,
+    //     "stock": stock,
+    //     "packageLength": packageLength,
+    //     "packageWidth": packageWidth,
+    //     "packageHeight": packageHeight,
+    //     "packageWeight": packageWeight,
+    //     "unitPrice": unitPrice,
+    //     "specifications": List<dynamic>.from(specifications.map((x) => x.toJson())),
+    //     "details": List<dynamic>.from(details.map((x) => x.toJson())),
+    //     "certifications": List<dynamic>.from(certifications.map((x) => x.toJson())),
+    //     "productStatus": productStatus,
+    //     "productPhotos": List<dynamic>.from(photos.map((x) => x.toJson())),
+    //     "productVideos": List<dynamic>.from(videos.map((x) => x.toJson())),
+    //     "mainPhotoUrl": mainPhotoUrl,
+    //     "mainVideoUrl": mainVideoUrl,
+    //     "productReviewInfo": productReviewInfo?.toJson(),
+    // };
     
     @override
     List<Object?> get props => [
@@ -283,14 +274,14 @@ class Certification extends Equatable {
     final String id;
     final String name;
     final String? certificationNumber;
-    final String productId;
+    final String? productId;
     final String? description;
 
     const Certification({
         required this.id,
         required this.name,
         this.certificationNumber,
-        required this.productId,
+        this.productId,
         this.description,
     });
 
@@ -338,12 +329,13 @@ class Photo {
         String? name,
         String? url,
         int? importanceOrder,
+        dynamic companyName,
     }) => 
         Photo(
-            id: id ?? this.id,
-            name: name ?? this.name,
-            url: url ?? this.url,
-            importanceOrder: importanceOrder ?? this.importanceOrder,
+          id: id ?? this.id,
+          name: name ?? this.name,
+          url: url ?? this.url,
+          importanceOrder: importanceOrder ?? this.importanceOrder,
         );
 
     factory Photo.fromJson(Map<String, dynamic> json) => Photo(
@@ -351,6 +343,7 @@ class Photo {
         name: json["name"],
         url: json["url"],
         importanceOrder: json["importanceOrder"],
+
     );
 
     Map<String, dynamic> toJson() => {
@@ -358,388 +351,19 @@ class Photo {
         "name": name,
         "url": url,
         "importanceOrder": importanceOrder,
+
     };
-}
-
-
-
-class FilterResponse extends Equatable {
-    final bool success;
-    final String message;
-    final Data data;
-
-    const FilterResponse({
-        required this.success,
-        required this.message,
-        required this.data,
-    });
-
-    FilterResponse copyWith({
-        bool? success,
-        String? message,
-        Data? data,
-    }) => 
-        FilterResponse(
-            success: success ?? this.success,
-            message: message ?? this.message,
-            data: data ?? this.data,
-        );
-
-    factory FilterResponse.fromJson(Map<String, dynamic> json) => FilterResponse(
-        success: json["success"],
-        message: json["message"],
-        data: Data.fromJson(json["data"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "success": success,
-        "message": message,
-        "data": data.toJson(),
-    };
-    
-    @override
-    List<Object?> get props => [
-      success, 
-      message, 
-      data,
-    ];
-}
-
-class Data extends Equatable {
-    final List<Content> content;
-    final int totalElements;
-    final int page;
-    final int pageSize;
-    final int totalPages;
-
-    const Data({
-        required this.content,
-        required this.totalElements,
-        required this.page,
-        required this.pageSize,
-        required this.totalPages,
-    });
-
-    Data copyWith({
-        List<Content>? content,
-        int? totalElements,
-        int? page,
-        int? pageSize,
-        int? totalPages,
-    }) => 
-        Data(
-            content: content ?? this.content,
-            totalElements: totalElements ?? this.totalElements,
-            page: page ?? this.page,
-            pageSize: pageSize ?? this.pageSize,
-            totalPages: totalPages ?? this.totalPages,
-        );
-
-    factory Data.fromJson(Map<String, dynamic> json) => Data(
-        content: List<Content>.from(json["content"].map((x) => Content.fromJson(x))),
-        totalElements: json["totalElements"],
-        page: json["page"],
-        pageSize: json["pageSize"],
-        totalPages: json["totalPages"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "content": List<dynamic>.from(content.map((x) => x.toJson())),
-        "totalElements": totalElements,
-        "page": page,
-        "pageSize": pageSize,
-        "totalPages": totalPages,
-    };
-    
-    @override
-    List<Object?> get props => [
-      content, 
-      totalElements, 
-      page, 
-      pageSize, 
-      totalPages,
-    ];
-}
-
-class Content extends Equatable {
-    final String id;
-    final String name;
-    final KeyValue? keyValue;
-    final String? productGroupId;
-    // final ProductGroupName productGroupName;
-    final String? companyId;
-    final String? companyName;
-    final String? categoryId;
-    final CategoryName? categoryName;
-    final String? modelNumber;
-    final String? productTypeId;
-    final ProductTypeName? productTypeName;
-    final BrandName? brandName;
-    final String? unitMeasurementId;
-    final UnitMeasurementName? unitMeasurementName;
-    final double? fboPriceStart;
-    final double? fboPriceEnd;
-    final double? moqUnit;
-    final double? unitPrice;
-    final double? stock;
-    final double? packageLength;
-    final double? packageWidth;
-    final double? packageHeight;
-    final double? packageWeight;
-    final dynamic productStatus;
-    final String? mainPhotoUrl;
-    final String? mainVideoUrl;
-
-    const Content({
-        required this.id,
-        required this.name,
-        this.keyValue,
-        this.productGroupId,
-        // required this.productGroupName,
-        this.companyId,
-        this.companyName,
-        this.categoryId,
-        this.categoryName,
-        this.modelNumber,
-        this.productTypeId,
-        this.productTypeName,
-        this.brandName,
-        this.unitMeasurementId,
-        this.unitMeasurementName,
-        this.fboPriceStart,
-        this.fboPriceEnd,
-        this.moqUnit,
-        this.unitPrice,
-        this.stock,
-        this.packageLength,
-        this.packageWidth,
-        this.packageHeight,
-        this.packageWeight,
-        this.productStatus,
-        this.mainPhotoUrl,
-        this.mainVideoUrl,
-    });
-
-    Content copyWith({
-        String? id,
-        String? name,
-        KeyValue? keyValue,
-        String? productGroupId,
-        // ProductGroupName? productGroupName,
-        String? companyId,
-        String? companyName,
-        String? categoryId,
-        CategoryName? categoryName,
-        String? modelNumber,
-        String? productTypeId,
-        ProductTypeName? productTypeName,
-        BrandName? brandName,
-        String? unitMeasurementId,
-        UnitMeasurementName? unitMeasurementName,
-        double? fboPriceStart,
-        double? fboPriceEnd,
-        double? moqUnit,
-        double? unitPrice,
-        double ? stock,
-        double ? packageLength,
-        double ? packageWidth,
-        double ? packageHeight,
-        double ? packageWeight,
-        dynamic productStatus,
-        String? mainPhotoUrl,
-        String? mainVideoUrl,
-    }) => 
-        Content(
-            id: id ?? this.id,
-            name: name ?? this.name,
-            keyValue: keyValue ?? this.keyValue,
-            productGroupId: productGroupId ?? this.productGroupId,
-            // productGroupName: productGroupName ?? this.productGroupName,
-            companyId: companyId ?? this.companyId,
-            companyName: companyName ?? this.companyName,
-            categoryId: categoryId ?? this.categoryId,
-            categoryName: categoryName ?? this.categoryName,
-            modelNumber: modelNumber ?? this.modelNumber,
-            productTypeId: productTypeId ?? this.productTypeId,
-            productTypeName: productTypeName ?? this.productTypeName,
-            brandName: brandName ?? this.brandName,
-            unitMeasurementId: unitMeasurementId ?? this.unitMeasurementId,
-            unitMeasurementName: unitMeasurementName ?? this.unitMeasurementName,
-            fboPriceStart: fboPriceStart ?? this.fboPriceStart,
-            fboPriceEnd: fboPriceEnd ?? this.fboPriceEnd,
-            moqUnit: moqUnit ?? this.moqUnit,
-            unitPrice: unitPrice ?? this.unitPrice,
-            stock: stock ?? this.stock,
-            packageLength: packageLength ?? this.packageLength,
-            packageWidth: packageWidth ?? this.packageWidth,
-            packageHeight: packageHeight ?? this.packageHeight,
-            packageWeight: packageWeight ?? this.packageWeight,
-            productStatus: productStatus ?? this.productStatus,
-            mainPhotoUrl: mainPhotoUrl ?? this.mainPhotoUrl,
-            mainVideoUrl: mainVideoUrl ?? this.mainVideoUrl,
-        );
-
-    factory Content.fromJson(Map<String, dynamic> json) => Content(
-        id: json["id"],
-        name: json["name"],
-        keyValue: keyValueValues.map[json["keyValue"]],
-        productGroupId: json["productGroupId"],
-        // productGroupName: productGroupNameValues.map[json["productGroupName"]],
-        companyId: json["companyId"],
-        companyName: json["companyName"],
-        categoryId: json["categoryId"],
-        categoryName: categoryNameValues.map[json["categoryName"]],
-        modelNumber: json["modelNumber"],
-        productTypeId: json["productTypeId"],
-        productTypeName: productTypeNameValues.map[json["productTypeName"]],
-        brandName: brandNameValues.map[json["brandName"]],
-        unitMeasurementId: json["unitMeasurementId"],
-        unitMeasurementName: unitMeasurementNameValues.map[json["unitMeasurementName"]],
-        fboPriceStart: json["fboPriceStart"],
-        fboPriceEnd: json["fboPriceEnd"],
-        moqUnit: json["moqUnit"],
-        unitPrice: json["unitPrice"]?.toDouble(),
-        stock: json["stock"],
-        packageLength: json["packageLength"],
-        packageWidth: json["packageWidth"],
-        packageHeight: json["packageHeight"],
-        packageWeight: json["packageWeight"],
-        productStatus: json["productStatus"],
-        mainPhotoUrl: json["mainPhotoUrl"],
-        mainVideoUrl: json["mainVideoUrl"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "keyValue": keyValueValues.reverse[keyValue],
-        "productGroupId": productGroupId,
-        // "productGroupName": productGroupNameValues.reverse[productGroupName],
-        "companyId": companyId,
-        "companyName": companyName,
-        "categoryId": categoryId,
-        "categoryName": categoryNameValues.reverse[categoryName],
-        "modelNumber": modelNumber,
-        "productTypeId": productTypeId,
-        "productTypeName": productTypeNameValues.reverse[productTypeName],
-        "brandName": brandNameValues.reverse[brandName],
-        "unitMeasurementId": unitMeasurementId,
-        "unitMeasurementName": unitMeasurementNameValues.reverse[unitMeasurementName],
-        "fboPriceStart": fboPriceStart,
-        "fboPriceEnd": fboPriceEnd,
-        "moqUnit": moqUnit,
-        "unitPrice": unitPrice,
-        "stock": stock,
-        "packageLength": packageLength,
-        "packageWidth": packageWidth,
-        "packageHeight": packageHeight,
-        "packageWeight": packageWeight,
-        "productStatus": productStatus,
-        "mainPhotoUrl": mainPhotoUrl,
-        "mainVideoUrl": mainVideoUrl,
-    };
-    
-      @override
-      List<Object?> get props => [
-        id, 
-        name, 
-        keyValue, 
-        productGroupId, 
-        // productGroupName, 
-        companyId, 
-        companyName, 
-        categoryId, 
-        categoryName, 
-        modelNumber, 
-        productTypeId, 
-        productTypeName, 
-        brandName, 
-        unitMeasurementId, 
-        unitMeasurementName, 
-        fboPriceStart, 
-        fboPriceEnd, 
-        moqUnit, 
-        unitPrice, 
-        stock, 
-        packageLength, 
-        packageWidth, 
-        packageHeight, 
-        packageWeight, 
-        productStatus, 
-        mainPhotoUrl, 
-        mainVideoUrl,
-      ];
-}
-
-enum BrandName {
-    MARCA_XYZ
-}
-
-final brandNameValues = EnumValues({
-    "MARCA XYZ": BrandName.MARCA_XYZ
-});
-
-enum CategoryName {
-    METALLURGY_CHEMICALS_RUBBER_AND_PLASTICS
-}
-
-final categoryNameValues = EnumValues({
-    "Metallurgy, Chemicals, Rubber and Plastics": CategoryName.METALLURGY_CHEMICALS_RUBBER_AND_PLASTICS
-});
-
-enum KeyValue {
-    SAMPLE
-}
-
-final keyValueValues = EnumValues({
-    "SAMPLE": KeyValue.SAMPLE
-});
-
-enum ProductGroupName {
-    BOOKS
-}
-
-final productGroupNameValues = EnumValues({
-    "Books": ProductGroupName.BOOKS
-});
-
-enum ProductTypeName {
-    FITNESS_EQUIPMENT
-}
-
-final productTypeNameValues = EnumValues({
-    "Fitness Equipment": ProductTypeName.FITNESS_EQUIPMENT
-});
-
-enum UnitMeasurementName {
-    KILOGRAM
-}
-
-final unitMeasurementNameValues = EnumValues({
-    "Kilogram": UnitMeasurementName.KILOGRAM
-});
-
-class EnumValues<T> {
-    Map<String, T> map;
-    late Map<T, String> reverseMap;
-
-    EnumValues(this.map);
-
-    Map<T, String> get reverse {
-            reverseMap = map.map((k, v) => MapEntry(v, k));
-            return reverseMap;
-    }
 }
 
 class ProductReviewInfo {
     final double ratingAvg;
-    final int reviewCount;
-    final List<Summary> summary;
+    final int? reviewCount;
+    final List<Summary>? summary;
 
     ProductReviewInfo({
         required this.ratingAvg,
-        required this.reviewCount,
-        required this.summary,
+        this.reviewCount,
+        this.summary,
     });
 
     ProductReviewInfo copyWith({
@@ -748,35 +372,29 @@ class ProductReviewInfo {
         List<Summary>? summary,
     }) => 
         ProductReviewInfo(
-            ratingAvg: ratingAvg ?? this.ratingAvg,
-            reviewCount: reviewCount ?? this.reviewCount,
-            summary: summary ?? this.summary,
+          ratingAvg: ratingAvg ?? this.ratingAvg,
+          reviewCount: reviewCount ?? this.reviewCount,
+          summary: summary ?? this.summary,
         );
 
     factory ProductReviewInfo.fromJson(Map<String, dynamic> json) => ProductReviewInfo(
         ratingAvg: json["ratingAvg"]?.toDouble(),
         reviewCount: json["reviewCount"],
-        summary: List<Summary>.from(json["summary"].map((x) => Summary.fromJson(x))),
+        summary:json["summary"] != null ? List<Summary>.from(json["summary"].map((x) => Summary.fromJson(x))) : [],
     );
-
-    Map<String, dynamic> toJson() => {
-        "ratingAvg": ratingAvg,
-        "reviewCount": reviewCount,
-        "summary": List<dynamic>.from(summary.map((x) => x.toJson())),
-    };
 }
 
 class Summary {
-    final int rating;
-    final int reviewCount;
-    final int totalReviews;
-    final double percentage;
+    final int? rating;
+    final int? reviewCount;
+    final int? totalReviews;
+    final double? percentage;
 
     Summary({
-        required this.rating,
-        required this.reviewCount,
-        required this.totalReviews,
-        required this.percentage,
+        this.rating,
+        this.reviewCount,
+        this.totalReviews,
+        this.percentage,
     });
 
     Summary copyWith({
@@ -904,4 +522,305 @@ class Review extends Equatable {
         fullName,
       ];
 }
+
+class ProductGroupsResponse {
+    final bool success;
+    final String message;
+    final List<ProductGroup> data;
+
+    ProductGroupsResponse({
+        required this.success,
+        required this.message,
+        required this.data,
+    });
+
+    ProductGroupsResponse copyWith({
+        bool? success,
+        String? message,
+        List<ProductGroup>? data,
+    }) => 
+        ProductGroupsResponse(
+            success: success ?? this.success,
+            message: message ?? this.message,
+            data: data ?? this.data,
+        );
+
+    factory ProductGroupsResponse.fromJson(Map<String, dynamic> json) => ProductGroupsResponse(
+        success: json["success"],
+        message: json["message"],
+        data: List<ProductGroup>.from(json["data"].map((x) => ProductGroup.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "success": success,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
+}
+
+class ProductGroup {
+    final String id;
+    final String name;
+    final dynamic description;
+    final String companyId;
+
+    ProductGroup({
+        required this.id,
+        required this.name,
+        required this.description,
+        required this.companyId,
+    });
+
+    ProductGroup copyWith({
+        String? id,
+        String? name,
+        dynamic description,
+        String? companyId,
+    }) => 
+        ProductGroup(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            description: description ?? this.description,
+            companyId: companyId ?? this.companyId,
+        );
+
+    factory ProductGroup.fromJson(Map<String, dynamic> json) => ProductGroup(
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+        companyId: json["companyId"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "description": description,
+        "companyId": companyId,
+    };
+}
+
+class ProductTypeResponse {
+    final bool success;
+    final String message;
+    final List<ProductType> data;
+
+    ProductTypeResponse({
+        required this.success,
+        required this.message,
+        required this.data,
+    });
+
+    ProductTypeResponse copyWith({
+        bool? success,
+        String? message,
+        List<ProductType>? data,
+    }) => 
+        ProductTypeResponse(
+            success: success ?? this.success,
+            message: message ?? this.message,
+            data: data ?? this.data,
+        );
+
+    factory ProductTypeResponse.fromJson(Map<String, dynamic> json) => ProductTypeResponse(
+        success: json["success"],
+        message: json["message"],
+        data: List<ProductType>.from(json["data"].map((x) => ProductType.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "success": success,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
+}
+
+class ProductType {
+    final String id;
+    final String name;
+    final dynamic description;
+    final String companyId;
+
+    ProductType({
+        required this.id,
+        required this.name,
+        required this.description,
+        required this.companyId,
+    });
+
+    ProductType copyWith({
+        String? id,
+        String? name,
+        dynamic description,
+        String? companyId,
+    }) => 
+        ProductType(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            description: description ?? this.description,
+            companyId: companyId ?? this.companyId,
+        );
+
+    factory ProductType.fromJson(Map<String, dynamic> json) => ProductType(
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+        companyId: json["companyId"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "description": description,
+        "companyId": companyId,
+    };
+}
+
+
+class UnitMeasurementResponse {
+    final bool success;
+    final String message;
+    final List<UnitMeasurement> data;
+
+    UnitMeasurementResponse({
+        required this.success,
+        required this.message,
+        required this.data,
+    });
+
+    UnitMeasurementResponse copyWith({
+        bool? success,
+        String? message,
+        List<UnitMeasurement>? data,
+    }) => 
+        UnitMeasurementResponse(
+            success: success ?? this.success,
+            message: message ?? this.message,
+            data: data ?? this.data,
+        );
+
+    factory UnitMeasurementResponse.fromJson(Map<String, dynamic> json) => UnitMeasurementResponse(
+        success: json["success"],
+        message: json["message"],
+        data: List<UnitMeasurement>.from(json["data"].map((x) => UnitMeasurement.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "success": success,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
+}
+
+class UnitMeasurement {
+    final String id;
+    final String name;
+    final String description;
+
+    UnitMeasurement({
+        required this.id,
+        required this.name,
+        required this.description,
+    });
+
+    UnitMeasurement copyWith({
+        String? id,
+        String? name,
+        String? description,
+    }) => 
+        UnitMeasurement(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            description: description ?? this.description,
+        );
+
+    factory UnitMeasurement.fromJson(Map<String, dynamic> json) => UnitMeasurement(
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "description": description,
+    };
+}
+
+class CountryGroupResponse {
+    final bool success;
+    final String message;
+    final List<CountryGroup> data;
+
+    CountryGroupResponse({
+        required this.success,
+        required this.message,
+        required this.data,
+    });
+
+    CountryGroupResponse copyWith({
+        bool? success,
+        String? message,
+        List<CountryGroup>? data,
+    }) => 
+        CountryGroupResponse(
+            success: success ?? this.success,
+            message: message ?? this.message,
+            data: data ?? this.data,
+        );
+
+    factory CountryGroupResponse.fromJson(Map<String, dynamic> json) => CountryGroupResponse(
+        success: json["success"],
+        message: json["message"],
+        data: List<CountryGroup>.from(json["data"].map((x) => CountryGroup.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "success": success,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
+}
+
+class CountryGroup {
+    final String id;
+    final String name;
+    final List<String> countriesIds;
+    final List<Country> countries;
+
+    CountryGroup({
+        required this.id,
+        required this.name,
+        this.countriesIds = const [],
+        required this.countries,
+    });
+
+    CountryGroup copyWith({
+        String? id,
+        String? name,
+        // dynamic countriesIds,
+        List<Country>? countries,
+    }) => 
+        CountryGroup(
+            id: id ?? this.id,
+            name: name ?? this.name,
+            // countriesIds: countriesIds ?? this.countriesIds,
+            countries: countries ?? this.countries,
+        );
+
+    factory CountryGroup.fromJson(Map<String, dynamic> json) => CountryGroup(
+        id: json["id"],
+        name: json["name"],
+        // countriesIds: json["countriesIds"],
+        countries: List<Country>.from(json["countries"].map((x) => Country.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "countriesIds": countriesIds,
+        "countries": List<dynamic>.from(countries.map((x) => x.toJson())),
+    };
+}
+
+
 

@@ -415,7 +415,7 @@ class _FormView extends StatelessWidget {
                       name: "companyName",
                       decoration: InputDecoration(
                         labelText: translations.company,
-                        hintText: translations.choose_language
+                        hintText: translations.company
                       ),
                       validator: FormBuilderValidators.compose([
                         FormBuilderValidators.required(),
@@ -426,29 +426,34 @@ class _FormView extends StatelessWidget {
                 SizedBox(height: _space,),
                 SizedBox(
                   width: double.infinity,
-                  child: BlocBuilder<UsersBloc, UsersState>(
+                  child: BlocConsumer<UsersBloc, UsersState>(
                     builder: (context, state) {
                       return ElevatedButton(
                         onPressed: context.read<UsersBloc>().generalBloc.state.isLoading ? null : () {
                           if (_formKey.currentState!.saveAndValidate()) {
-                            context.watch<UsersBloc>().registerUser(_formKey.currentState!.value)
-                            .then((value) {
-                              if (value is User) {
-                                SuccessToast(
-                                  title: AppLocalizations.of(context)!.suceess,
-                                  description: AppLocalizations.of(context)!.user_registered,
-                                  style: ToastificationStyle.flatColored,
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: Colors.green.shade500,
-                                  icon: const Icon(Icons.check, color: Colors.white,),
-                                ).showToast(context);
-                                showActiveView.value = true;
-                              }
-                            });
+                            context.read<UsersBloc>().add(RegisterNewUser(data: _formKey.currentState!.value));
                           }
                         },
-                        child: context.watch<UsersBloc>().generalBloc.state.isLoading ? const CircularProgressIndicator.adaptive() : Text(translations.sign_up, style: textS.labelMedium,),
+                        child: state.status == UserStatus.registering ?  CircularProgressIndicator.adaptive(backgroundColor: AppTheme.palette[550],) : Text(translations.sign_up, style: textS.labelMedium,),
                       );
+
+                    }, 
+                    listenWhen: (previous, current) => previous.status != current.status,
+                    listener: (BuildContext context, UsersState state) {
+                      switch (state.status) {
+                        case UserStatus.registered:
+                          SuccessToast(
+                            title: AppLocalizations.of(context)!.suceess,
+                            description: AppLocalizations.of(context)!.user_registered,
+                            style: ToastificationStyle.flatColored,
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.green.shade500,
+                            icon: const Icon(Icons.check, color: Colors.white,),
+                          ).showToast(context);
+                          showActiveView.value = true;
+                          break;
+                        default:
+                      }
                     },
                   ),
                 )

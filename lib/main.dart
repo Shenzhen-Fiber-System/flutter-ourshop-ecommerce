@@ -5,7 +5,7 @@ void main() async  {
   WidgetsFlutterBinding.ensureInitialized();
   WakelockPlus.enable();
   const bool isProduction = bool.fromEnvironment('dart.vm.product');
-  await dotenv.load(fileName: isProduction ? ".env.prod" : ".env.prod");
+  await dotenv.load(fileName: isProduction ? ".env.prod" : ".env.dev");
   Bloc.observer = Observable();
   await initializeServiceLocator();
   runApp(
@@ -18,6 +18,8 @@ void main() async  {
         BlocProvider(create: (_) => locator<UsersBloc>()),
         BlocProvider(create: (_) => locator<GeneralBloc>()),
         BlocProvider(create: (_) => locator<ProductsBloc>()),
+        BlocProvider(create: (_) => locator<OrdersBloc>()),
+        BlocProvider(create: (_) => locator<CommunicationBloc>()),
       ],
       child: const MyApp()
     )
@@ -46,7 +48,7 @@ class MyApp extends StatelessWidget {
         ],
         themeMode: ThemeMode.system,
         theme: context.watch<SettingsBloc>().state.currentTheme == ThemeMode.light ? AppTheme.light : AppTheme.dark,
-        locale: Locale(context.watch<SettingsBloc>().state.currentLanguege.value),
+        locale: Locale(context.watch<SettingsBloc>().state.currentLanguage.value),
         debugShowCheckedModeBanner: true,
         builder: (context, child) {
           return ConnectivityListener(

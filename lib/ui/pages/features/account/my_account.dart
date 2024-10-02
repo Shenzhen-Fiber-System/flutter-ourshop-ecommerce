@@ -1,6 +1,3 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers
-
-import 'dart:developer';
 import '../../pages.dart';
 
 class MyAccount extends StatefulWidget {
@@ -35,7 +32,6 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
         _componentAnimationController.forward();
         
       } else if (_translateAnimation.value == 0.0) {
-        log('jshdfs${_avatarButtonTranslation.value}');
         _componentAnimationController.reverse();
       }
     });
@@ -69,8 +65,8 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
     super.dispose();
     _scrollController.dispose();
     _scrollController.removeListener(listener);
-    _animationController.removeListener(animationControllerListener);
     _animationController.dispose();
+    _animationController.removeListener(animationControllerListener);
   }
 
   @override
@@ -80,108 +76,179 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
     final Size size = MediaQuery.of(context).size;
     final loggedUser = context.watch<UsersBloc>().state.loggedUser;
 
-    final _personalInformationTextTheme = theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500);
+    final personalInformationTextTheme = theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade500);
 
 
-    void showBottomSheet(BuildContext context) {
+    void showBottomSheet(BuildContext context, SettingsOptionsMode mode) {
       showModalBottomSheet(
         context: context,
+        backgroundColor: Colors.white,
+        
         builder: (BuildContext context) {
-          return Container(
-            height: size.height * 0.50,
-            color: Colors.white,
-            child: const Center(
-              child: Text('This is a Bottom Sheet'),
-            ),
-          );
+          switch (mode) {
+            case SettingsOptionsMode.Language:
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
+                child: Column(
+                  children: [
+                    Text(translations.change_your_language, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),),
+                    SizedBox(
+                      height: size.height * 0.05,
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: AvailableLanguages.availableLanguages.length,
+                        itemBuilder: (context, index) {
+                          final AvailableLanguages availbaleLanguage = AvailableLanguages.availableLanguages[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 5.0),
+                            child: BlocBuilder<SettingsBloc, SettingsState>(
+                              builder: (context, state) {
+                                return ListTile(
+                                  splashColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  title: Text(availbaleLanguage.name),
+                                  selected: state.selectedLanguage == availbaleLanguage.id,
+                                  selectedColor: theme.primaryColor,
+                                  selectedTileColor: AppTheme.palette[900]!.withOpacity(0.1),
+                                  leading: Image.network(availbaleLanguage.flag, width: 30, height: 30,),
+                                  trailing: state.selectedLanguage == availbaleLanguage.id ?  Icon(Icons.check_circle, color: AppTheme.palette[950],) : null,
+                                  shape: state.selectedLanguage == availbaleLanguage.id ?  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    side: BorderSide(
+                                      color: AppTheme.palette[1000]!,
+                                      width: 1
+                                    )
+                                  ) :  null,
+                                  onTap: () {
+                                    context.read<SettingsBloc>().add(ChangeSelectedLanguage(selectedLanguage:availbaleLanguage.id));
+                                    locator<Preferences>().saveData('language', availbaleLanguage.id.toString());
+                                  },
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            default:
+              return Container(
+                height: size.height * 0.50,
+                color: Colors.white,
+                child: const Center(
+                  child: Text('This is a Bottom Sheet'),
+                ),
+              );
+          }
         },
       );
     }
 
     final List<SettignsOptions> personalInformation = [
       SettignsOptions(
-        title: 'Name', 
+        title: translations.name, 
         mode: SettingsOptionsMode.Name,
-        onClick: () => showBottomSheet(context),
-        data: Text(loggedUser.name.toUpperCase(), style: _personalInformationTextTheme)
+        // onClick: () => showBottomSheet(context),
+        onClick: () => null,
+        data: Text(loggedUser.name.toUpperCase(), style: personalInformationTextTheme)
       ),
       SettignsOptions(
-        title: 'Last Name', 
+        title: translations.last_name, 
         mode: SettingsOptionsMode.LastName,
-        onClick: () => showBottomSheet(context),
-        data: Text(loggedUser.lastName.toUpperCase(), style: _personalInformationTextTheme)
+        // onClick: () => showBottomSheet(context),
+        onClick: () => null,
+        data: Text(loggedUser.lastName.toUpperCase(), style: personalInformationTextTheme)
       ),
       SettignsOptions(
-        title: 'Email', 
+        title: translations.email, 
         mode: SettingsOptionsMode.Email,
-        onClick: () => showBottomSheet(context),
-        data: Text(loggedUser.email, style: _personalInformationTextTheme)
+        // onClick: () => showBottomSheet(context),
+        onClick: () => null,
+        data: Text(loggedUser.email, style: personalInformationTextTheme)
       ),
       SettignsOptions(
-        title: 'Phone', 
+        title: translations.phone, 
         mode: SettingsOptionsMode.Phone,
-        onClick: () => showBottomSheet(context),
-        data: Text('${loggedUser.userPhoneNumberCode} ${loggedUser.userPhoneNumber}', style: _personalInformationTextTheme)
+        // onClick: () => showBottomSheet(context),
+        onClick: () => null,
+        data: Text('${loggedUser.userPhoneNumberCode} ${loggedUser.userPhoneNumber}', style: personalInformationTextTheme)
       ),
       SettignsOptions(
-        title: 'Country', 
+        title: translations.country, 
         mode: SettingsOptionsMode.Phone,
-        onClick: () => showBottomSheet(context),
-        data: Text(loggedUser.userCountryName, style: _personalInformationTextTheme)
+        // onClick: () => showBottomSheet(context),
+        onClick: () => null,
+        data: Text(loggedUser.userCountryName, style: personalInformationTextTheme)
       ),
     ];
 
     final List<SettignsOptions> orderHistory = [
       SettignsOptions(
-        title: 'All orders', 
+        title: translations.all_orders, 
         mode: SettingsOptionsMode.AllOrders,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
       SettignsOptions(
-        title: 'Processing', 
+        title: translations.processing, 
         mode: SettingsOptionsMode.Processing,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
       SettignsOptions(
-        title: 'Shipped', 
+        title: translations.shipped, 
         mode: SettingsOptionsMode.Shipped,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
       SettignsOptions(
-        title: 'Delivered', 
+        title: translations.delivered, 
         mode: SettingsOptionsMode.Delivered,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
       SettignsOptions(
-        title: 'Cancelled', 
+        title: translations.cancelled, 
         mode: SettingsOptionsMode.Cancelled,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: () => null,
       ),
       SettignsOptions(
-        title: 'Returned', 
+        title: translations.returned, 
         mode: SettingsOptionsMode.Returned,
-        onClick: () => showBottomSheet(context)
+        // onClick: () => showBottomSheet(context)
+        onClick: (){},
       ),
     ];
 
     final List<SettignsOptions> settings = [
-      SettignsOptions(
-        title: translations.deliver_to, 
-        mode: SettingsOptionsMode.Deliver,
-        onClick: () => showBottomSheet(context)
-      ),
-      SettignsOptions(
-        title: translations.currency, 
-        mode: SettingsOptionsMode.Currency,
-        onClick: () => showBottomSheet(context)
-      ),
+      // SettignsOptions(
+      //   title: translations.deliver_to, 
+      //   mode: SettingsOptionsMode.Deliver,
+      //   onClick: () => null,
+      // ),
+      // SettignsOptions(
+      //   title: translations.currency, 
+      //   mode: SettingsOptionsMode.Currency,
+      //   onClick: () => null,
+      // ),
       SettignsOptions(
         title: translations.language, 
         mode: SettingsOptionsMode.Language,
-        onClick: () => showBottomSheet(context)
+        onClick: () => showBottomSheet(context, SettingsOptionsMode.Language)
+        // onClick: () => null,
       ),
+      if (loggedUser.roles.toLowerCase().split(', ').contains('seller')) 
+        SettignsOptions(
+          title: translations.admin, 
+          mode: SettingsOptionsMode.Language,
+          onClick: () => context.push('/admin')
+        ),
       SettignsOptions(
-        title: 'logout', 
+        title: translations.logout, 
         mode: SettingsOptionsMode.Logout,
         onClick: (){}
       ),
@@ -189,7 +256,7 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
 
     List<AccountOptions> sections = [
       AccountOptions(
-        label: 'Personal Information', 
+        label: translations.personal_information, 
         mode: AccountOptionsMode.PersonalInformation,
         sectionOptions: personalInformation,
         labelIcon: IconButton(
@@ -217,59 +284,60 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
           
         )
       ),
-      AccountOptions(
-        label: 'Shipping Address', 
-        mode: AccountOptionsMode.ShippingAddress,
-        sectionOptions: const [],
-        labelIcon: IconButton(
-          style: ButtonStyle(
-            splashFactory: NoSplash.splashFactory,
-            visualDensity: VisualDensity.compact,
-            iconSize: const WidgetStatePropertyAll(15.0),
-            backgroundColor: WidgetStatePropertyAll(Colors.grey.shade300)
-          ),
-          onPressed: () async {
-            await ShippingAddressDialog(
-              type: ShippingAddressDialogType.ADD
-            ).showAlertDialog(context, translations, theme);
-          }, 
-          icon: const Icon(Icons.add, color: Colors.grey)
-        )
-      ),
-      AccountOptions(
-        label: 'Payment Methods', 
-        mode: AccountOptionsMode.PaymentMethods,
-        sectionOptions: const [],
-        labelIcon: IconButton(
-          style: ButtonStyle(
-            splashFactory: NoSplash.splashFactory,
-            visualDensity: VisualDensity.compact,
-            iconSize: const WidgetStatePropertyAll(15.0),
-            backgroundColor: WidgetStatePropertyAll(Colors.grey.shade300)
-          ),
-          onPressed: () {
+      // AccountOptions(
+      //   label: translations.shipping_address, 
+      //   mode: AccountOptionsMode.ShippingAddress,
+      //   sectionOptions: const [],
+      //   labelIcon: IconButton(
+      //     style: ButtonStyle(
+      //       splashFactory: NoSplash.splashFactory,
+      //       visualDensity: VisualDensity.compact,
+      //       iconSize: const WidgetStatePropertyAll(15.0),
+      //       backgroundColor: WidgetStatePropertyAll(Colors.grey.shade300)
+      //     ),
+      //     onPressed: () async {
+      //       await ShippingAddressDialog(
+      //         type: ShippingAddressDialogType.ADD
+      //       ).showAlertDialog(context, translations, theme);
+      //     }, 
+      //     icon: const Icon(Icons.add, color: Colors.grey)
+      //   )
+      // ),
+      
+      // AccountOptions(
+      //   label: translations.payment_methods, 
+      //   mode: AccountOptionsMode.PaymentMethods,
+      //   sectionOptions: const [],
+      //   labelIcon: IconButton(
+      //     style: ButtonStyle(
+      //       splashFactory: NoSplash.splashFactory,
+      //       visualDensity: VisualDensity.compact,
+      //       iconSize: const WidgetStatePropertyAll(15.0),
+      //       backgroundColor: WidgetStatePropertyAll(Colors.grey.shade300)
+      //     ),
+      //     onPressed: () {
             
-          }, 
-          icon: const Icon(Icons.add, color: Colors.grey)
-        )
-      ),
+      //     }, 
+      //     icon: const Icon(Icons.add, color: Colors.grey)
+      //   )
+      // ),
+      // AccountOptions(
+      //   label: translations.order_history,
+      //   mode: AccountOptionsMode.OrderHistory,
+      //   sectionOptions: orderHistory,
+      //   labelIcon: IconButton(
+      //     style: ButtonStyle(
+      //       splashFactory: NoSplash.splashFactory,
+      //       visualDensity: VisualDensity.compact,
+      //       iconSize: const WidgetStatePropertyAll(15.0),
+      //       backgroundColor: WidgetStatePropertyAll(Colors.grey.shade100)
+      //     ),
+      //     onPressed: null,
+      //     icon: Icon(Icons.add, color:Colors.grey.shade100)
+      //   )
+      // ),
       AccountOptions(
-        label: 'Order History',
-        mode: AccountOptionsMode.OrderHistory,
-        sectionOptions: orderHistory,
-        labelIcon: IconButton(
-          style: ButtonStyle(
-            splashFactory: NoSplash.splashFactory,
-            visualDensity: VisualDensity.compact,
-            iconSize: const WidgetStatePropertyAll(15.0),
-            backgroundColor: WidgetStatePropertyAll(Colors.grey.shade100)
-          ),
-          onPressed: null,
-          icon: Icon(Icons.add, color:Colors.grey.shade100)
-        )
-      ),
-      AccountOptions(
-        label: 'Settings',
+        label: translations.settings,
         mode: AccountOptionsMode.Settings,
         sectionOptions: settings,
         labelIcon: IconButton(
@@ -323,15 +391,30 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
                 width: size.width * 0.5,
                 child: Autocomplete(
                   initialValue: TextEditingValue.empty,
+                  displayStringForOption: (country) => country.name,
                   fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
-                    return TextField(
-                      controller: textEditingController,
-                      focusNode: focusNode,
-                      onTapOutside: (event) => focusNode.unfocus(),
-                      style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),
-                      decoration: const InputDecoration(
-                        hintText: 'Search',
-                        border: InputBorder.none,
+                    return ColoredBox(
+                      color: Colors.white,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: TextField(
+                          controller: textEditingController,
+                          focusNode: focusNode,
+                          onTapOutside: (event) => focusNode.unfocus(),
+                          style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[1000]),
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.search, color: Colors.grey.shade700,),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+                            hintText: translations.search,
+                            hintStyle: theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade600),
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                        
+                          ),
+                        ),
                       ),
                     );
                   },
@@ -372,8 +455,11 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
                   onSelected: (value){},
                 ),
               ),
-              ),
+             ),
             ),
+            actions: [
+              Text('Role: ${loggedUser.roles}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
+            ],
           ),
           SliverToBoxAdapter(
             child: Container(
@@ -503,16 +589,18 @@ class _AccountSecction extends StatelessWidget {
             )
           ];
         } 
-        return context.read<UsersBloc>().state.cards.map((card){
+        return context.watch<UsersBloc>().state.cards.map((card){
           return Column(
             children: [
               RadioListTile(
                 value: card.id, 
                 groupValue: context.read<UsersBloc>().state.selectedCard.id, 
-                onChanged: (value) => context.read<UsersBloc>().addSelectedCard(context.read<UsersBloc>().state.cards.firstWhere((element) => element.id == value)),
+                onChanged: (value) {
+                  // context.read<UsersBloc>().addSelectedCard(context.read<UsersBloc>().state.cards.firstWhere((element) => element.id == value));
+                },
                 title: Align(
                   alignment: Alignment.centerRight,
-                    child: Text( Helpers.maskCardNumber(card.cardNumber), style: const TextStyle(color: Colors.black, fontSize: 12.0)
+                    child: Text( card.cardNumber, style: const TextStyle(color: Colors.black, fontSize: 12.0)
                   )
                 ),
                 subtitle: Align(
@@ -533,7 +621,7 @@ class _AccountSecction extends StatelessWidget {
               width: size.width,
               child: ElevatedButton(
                 onPressed: () => context.go('/'),
-                child: Text(translations.logout, style: theme.textTheme.bodyMedium,)
+                child: Text(translations.logout, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),)
               ),
             );
 
@@ -646,6 +734,7 @@ enum SettingsOptionsMode{
   Email,
   Phone,
   Country,
+  Admin,
   Logout
 }
 
