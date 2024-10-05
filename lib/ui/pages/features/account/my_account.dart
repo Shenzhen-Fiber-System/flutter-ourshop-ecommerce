@@ -385,82 +385,83 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
                   )
                 );
               },
-              child: 
-              Align(
-                alignment: Alignment.centerLeft,
-                child: SizedBox(
-                width: size.width * 0.5,
-                child: Autocomplete(
-                  initialValue: TextEditingValue.empty,
-                  displayStringForOption: (country) => country.name,
-                  fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
-                    return ColoredBox(
-                      color: Colors.white,
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: TextField(
-                          controller: textEditingController,
-                          focusNode: focusNode,
-                          onTapOutside: (event) => focusNode.unfocus(),
-                          style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[1000]),
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.search, color: Colors.grey.shade700,),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
-                            hintText: translations.search,
-                            hintStyle: theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade600),
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
+
+              child: Text('${translations.role}: ${loggedUser.roles}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
+            //   child: Align(
+            //     alignment: Alignment.centerLeft,
+            //     child: SizedBox(
+            //     width: size.width * 0.5,
+            //     child: Autocomplete(
+            //       initialValue: TextEditingValue.empty,
+            //       displayStringForOption: (country) => country.name,
+            //       fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
+            //         return ColoredBox(
+            //           color: Colors.white,
+            //           child: Align(
+            //             alignment: Alignment.center,
+            //             child: TextField(
+            //               controller: textEditingController,
+            //               focusNode: focusNode,
+            //               onTapOutside: (event) => focusNode.unfocus(),
+            //               style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.palette[1000]),
+            //               decoration: InputDecoration(
+            //                 prefixIcon: Icon(Icons.search, color: Colors.grey.shade700,),
+            //                 contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+            //                 hintText: translations.search,
+            //                 hintStyle: theme.textTheme.labelMedium?.copyWith(color: Colors.grey.shade600),
+            //                 border: InputBorder.none,
+            //                 enabledBorder: InputBorder.none,
+            //                 focusedBorder: InputBorder.none,
+            //                 errorBorder: InputBorder.none,
+            //                 disabledBorder: InputBorder.none,
                         
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  optionsViewBuilder: (context, onSelected, options) {
-                    return Material(
-                      elevation: 4.0,
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        itemCount: options.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final Country option = options.toList()[index];
-                          return ListTile(
-                            selected: false,
-                            tileColor: Colors.white,
-                            shape: theme.listTileTheme.copyWith(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0))
-                            ).shape,
-                            title: Text(option.name, style: theme.textTheme.titleMedium,),
-                            trailing: Text(option.iso3, style: theme.textTheme.labelLarge,),
-                            leading: CircleAvatar(
-                              backgroundImage: NetworkImage('${dotenv.env['FLAG_URL']}${option.flagUrl}'),
-                            ),
-                            onTap: () => onSelected(option),
-                          );
-                        }, separatorBuilder: (BuildContext context, int index)  => Divider(
-                            height: 0.0,
-                            indent: 15.0,
-                            endIndent: 15.0,
-                            color: Colors.grey.shade300,
-                          )
-                      ),
-                    );
-                  },
-                  optionsBuilder: (textEditingValue) {
-                    final List<Country> currencies = List.from(context.read<CountryBloc>().state.countries);
-                    return currencies.where((element) => (element.name.trim().toLowerCase().startsWith(textEditingValue.text) || element.iso3.trim().toLowerCase().startsWith(textEditingValue.text))).toList();
-                  }, 
-                  onSelected: (value){},
-                ),
-              ),
-             ),
+            //               ),
+            //             ),
+            //           ),
+            //         );
+            //       },
+            //       optionsViewBuilder: (context, onSelected, options) {
+            //         return Material(
+            //           elevation: 4.0,
+            //           child: ListView.separated(
+            //             shrinkWrap: true,
+            //             itemCount: options.length,
+            //             itemBuilder: (BuildContext context, int index) {
+            //               final Country option = options.toList()[index];
+            //               return ListTile(
+            //                 selected: false,
+            //                 tileColor: Colors.white,
+            //                 shape: theme.listTileTheme.copyWith(
+            //                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0))
+            //                 ).shape,
+            //                 title: Text(option.name, style: theme.textTheme.titleMedium,),
+            //                 trailing: Text(option.iso3, style: theme.textTheme.labelLarge,),
+            //                 leading: CircleAvatar(
+            //                   backgroundImage: NetworkImage('${dotenv.env['FLAG_URL']}${option.flagUrl}'),
+            //                 ),
+            //                 onTap: () => onSelected(option),
+            //               );
+            //             }, separatorBuilder: (BuildContext context, int index)  => Divider(
+            //                 height: 0.0,
+            //                 indent: 15.0,
+            //                 endIndent: 15.0,
+            //                 color: Colors.grey.shade300,
+            //               )
+            //           ),
+            //         );
+            //       },
+            //       optionsBuilder: (textEditingValue) {
+            //         final List<Country> currencies = List.from(context.read<CountryBloc>().state.countries);
+            //         return currencies.where((element) => (element.name.trim().toLowerCase().startsWith(textEditingValue.text) || element.iso3.trim().toLowerCase().startsWith(textEditingValue.text))).toList();
+            //       }, 
+            //       onSelected: (value){},
+            //     ),
+            //   ),
+            //  ),
             ),
-            actions: [
-              Text('Role: ${loggedUser.roles}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
-            ],
+            //actions: [
+              // Text('Role: ${loggedUser.roles}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.black),),
+            //],
           ),
           SliverToBoxAdapter(
             child: Container(
