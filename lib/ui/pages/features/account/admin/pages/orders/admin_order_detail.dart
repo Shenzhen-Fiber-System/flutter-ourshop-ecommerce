@@ -291,7 +291,6 @@ class _Article extends StatelessWidget {
                   Text(Helpers.truncateText(item.productName!, 25), style: style, overflow: TextOverflow.ellipsis,),
                   Text(translations.unit_price(item.price!), style: style),
                   Text(translations.discount(item.discount!), style: style),
-                  Text(translations.qty(item.qty!), style: style),
                   Text(translations.sub_total(item.subTotal!), style: style),
                 ],
               ),

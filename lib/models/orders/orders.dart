@@ -1,14 +1,14 @@
 import '../../ui/pages/pages.dart';
 
-class OrderResponse {
+class OrderResponse extends Equatable {
     final bool success;
     final String message;
-    final Order data;
+    final Order? data;
 
-    OrderResponse({
+    const OrderResponse({
         required this.success,
         required this.message,
-        required this.data,
+        this.data,
     });
 
     OrderResponse copyWith({
@@ -25,8 +25,15 @@ class OrderResponse {
     factory OrderResponse.fromJson(Map<String, dynamic> json) => OrderResponse(
         success: json["success"],
         message: json["message"],
-        data: Order.fromJson(json["data"]),
+        data: json['data'] != null ? Order.fromJson(json["data"]) : null,
     );
+    
+    @override
+    List<Object?> get props => [
+        success,
+        message,
+        data,
+    ];
 }
 
 
@@ -34,7 +41,6 @@ class Order {
     final String? id;
     final String? orderNumber;
     final String? customerId;
-    final String? companyId;
     final String? customerName;
     final String? orderStatus;
     final List<OrderItem>? orderItems;
@@ -43,7 +49,6 @@ class Order {
     final double? discount;
     final double? total;
     final DateTime? createdAt;
-    final List<ShippingRangeCalculation>? shippingRangeCalculation;
     final dynamic addressLine1;
     final dynamic addressLine2;
     final dynamic addressLine3;
@@ -57,7 +62,6 @@ class Order {
         this.id,
         this.orderNumber,
         this.customerId,
-        this.companyId,
         this.customerName,
         this.orderStatus,
         this.orderItems,
@@ -66,7 +70,6 @@ class Order {
         this.discount,
         this.total,
         this.createdAt,
-        this.shippingRangeCalculation,
         this.addressLine1,
         this.addressLine2,
         this.addressLine3,
@@ -81,7 +84,6 @@ class Order {
         String? id,
         String? orderNumber,
         String? customerId,
-        String? companyId,
         String? customerName,
         String? orderStatus,
         List<OrderItem>? orderItems,
@@ -90,7 +92,6 @@ class Order {
         double? discount,
         double? total,
         DateTime? createdAt,
-        List<ShippingRangeCalculation>? shippingRangeCalculation,
         dynamic addressLine1,
         dynamic addressLine2,
         dynamic addressLine3,
@@ -104,7 +105,6 @@ class Order {
             id: id ?? this.id,
             orderNumber: orderNumber ?? this.orderNumber,
             customerId: customerId ?? this.customerId,
-            companyId: companyId ?? this.companyId,
             customerName: customerName ?? this.customerName,
             orderStatus: orderStatus ?? this.orderStatus,
             orderItems: orderItems ?? this.orderItems,
@@ -113,7 +113,6 @@ class Order {
             discount: discount ?? this.discount,
             total: total ?? this.total,
             createdAt: createdAt ?? this.createdAt,
-            shippingRangeCalculation: shippingRangeCalculation ?? this.shippingRangeCalculation,
             addressLine1: addressLine1 ?? this.addressLine1,
             addressLine2: addressLine2 ?? this.addressLine2,
             addressLine3: addressLine3 ?? this.addressLine3,
@@ -128,16 +127,14 @@ class Order {
         id: json["id"],
         orderNumber: json["orderNumber"],
         customerId: json["customerId"],
-        companyId: json["companyId"],
         customerName: json["customerName"],
         orderStatus: json["orderStatus"],
         orderItems: json["orderItems"] == null ? [] : List<OrderItem>.from(json["orderItems"]!.map((x) => OrderItem.fromJson(x))),
         orderStatuses: json["orderStatuses"],
-        subTotal: json["subTotal"],
-        discount: json["discount"],
-        total: json["total"],
+        subTotal: json["subTotal"]?.toDouble(),
+        discount: json["discount"]?.toDouble(),
+        total: json["total"]?.toDouble(),
         createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        shippingRangeCalculation: json["shippingRangeCalculation"] == null ? [] : List<ShippingRangeCalculation>.from(json["shippingRangeCalculation"]!.map((x) => ShippingRangeCalculation.fromJson(x))),
         addressLine1: json["addressLine1"],
         addressLine2: json["addressLine2"],
         addressLine3: json["addressLine3"],
@@ -147,9 +144,31 @@ class Order {
         country: json["country"],
         zipCode: json["zipCode"],
     );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "orderNumber": orderNumber,
+        "customerId": customerId,
+        "customerName": customerName,
+        "orderStatus": orderStatus,
+        "orderItems": orderItems == null ? [] : List<dynamic>.from(orderItems!.map((x) => x.toJson())),
+        "orderStatuses": orderStatuses,
+        "subTotal": subTotal,
+        "discount": discount,
+        "total": total,
+        "createdAt": createdAt?.toIso8601String(),
+        "addressLine1": addressLine1,
+        "addressLine2": addressLine2,
+        "addressLine3": addressLine3,
+        "phoneNumber": phoneNumber,
+        "city": city,
+        "state": state,
+        "country": country,
+        "zipCode": zipCode,
+    };
 }
 
-class OrderItem  extends Equatable {
+class OrderItem {
     final String? id;
     final String? orderId;
     final String? productId;
@@ -158,14 +177,16 @@ class OrderItem  extends Equatable {
     final String? productUnitMeasurementName;
     final String? productMainPhotoUrl;
     final String? productCompanyId;
-    final double? qty;
+    final dynamic description;
+    final dynamic shippingRangeCalculationId;
+    final int? qty;
     final double? price;
     final double? discount;
     final double? total;
     final double? subTotal;
     final String? companyName;
 
-    const OrderItem({
+    OrderItem({
         this.id,
         this.orderId,
         this.productId,
@@ -174,6 +195,8 @@ class OrderItem  extends Equatable {
         this.productUnitMeasurementName,
         this.productMainPhotoUrl,
         this.productCompanyId,
+        this.description,
+        this.shippingRangeCalculationId,
         this.qty,
         this.price,
         this.discount,
@@ -191,7 +214,9 @@ class OrderItem  extends Equatable {
         String? productUnitMeasurementName,
         String? productMainPhotoUrl,
         String? productCompanyId,
-        double? qty,
+        dynamic description,
+        dynamic shippingRangeCalculationId,
+        int? qty,
         double? price,
         double? discount,
         double? total,
@@ -207,6 +232,8 @@ class OrderItem  extends Equatable {
             productUnitMeasurementName: productUnitMeasurementName ?? this.productUnitMeasurementName,
             productMainPhotoUrl: productMainPhotoUrl ?? this.productMainPhotoUrl,
             productCompanyId: productCompanyId ?? this.productCompanyId,
+            description: description ?? this.description,
+            shippingRangeCalculationId: shippingRangeCalculationId ?? this.shippingRangeCalculationId,
             qty: qty ?? this.qty,
             price: price ?? this.price,
             discount: discount ?? this.discount,
@@ -224,32 +251,36 @@ class OrderItem  extends Equatable {
         productUnitMeasurementName: json["productUnitMeasurementName"],
         productMainPhotoUrl: json["productMainPhotoUrl"],
         productCompanyId: json["productCompanyId"],
+        description: json["description"],
+        shippingRangeCalculationId: json["shippingRangeCalculationId"],
         qty: json["qty"],
-        price: json["price"],
-        discount: json["discount"],
-        total: json["total"],
-        subTotal: json["subTotal"],
+        price: json["price"]?.toDouble(),
+        discount: json["discount"]?.toDouble(),
+        total: json["total"]?.toDouble(),
+        subTotal: json["subTotal"]?.toDouble(),
         companyName: json["companyName"],
     );
-    
-    @override
-    List<Object?> get props => [
-      id,
-      orderId,
-      productId,
-      productName,
-      productCategoryName,
-      productUnitMeasurementName,
-      productMainPhotoUrl,
-      productCompanyId,
-      qty,
-      price,
-      discount,
-      total,
-      subTotal,
-      companyName,
-    ];
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "orderId": orderId,
+        "productId": productId,
+        "productName": productName,
+        "productCategoryName": productCategoryName,
+        "productUnitMeasurementName": productUnitMeasurementName,
+        "productMainPhotoUrl": productMainPhotoUrl,
+        "productCompanyId": productCompanyId,
+        "description": description,
+        "shippingRangeCalculationId": shippingRangeCalculationId,
+        "qty": qty,
+        "price": price,
+        "discount": discount,
+        "total": total,
+        "subTotal": subTotal,
+        "companyName": companyName,
+    };
 }
+
 
 class ShippingRangeCalculation {
     final int? quantity;

@@ -230,14 +230,14 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
           productsStates: event.page == 1 ? ProductsStates.loading : ProductsStates.loadingMore,
         ));
         filteredParamenters['uuids'] = [];
-        if (event.mode != FilteredResponseMode.all) {
-          filteredParamenters['uuids'].add({"fieldName":"category.id", "value":event.mode == FilteredResponseMode.subCategoryProducts ? state.selectedSubCategory.id : state.selectedParentCategory});
-        } else {
-          filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
-        }
+        // if (event.mode != FilteredResponseMode.all) {
+        //   filteredParamenters['uuids'].add({"fieldName":"category.id", "value":event.mode == FilteredResponseMode.subCategoryProducts ? state.selectedSubCategory.id : state.selectedParentCategory});
+        // } else {
+        //   filteredParamenters['uuids'].add({"fieldName":"products", "value":""});
+        // }
         filteredParamenters['page'] = event.page == 0 ? 1 : event.page;
         filteredParamenters['pageSize'] = 10;
-        final dynamic response =  await _productService.filteredProducts(filteredParamenters);
+        final dynamic response =  await _productService.filteredProducts(filteredParamenters, event.mode == FilteredResponseMode.subCategoryProducts ? state.selectedSubCategory.id : state.selectedParentCategory );
 
         if (response is FilteredData) {
           
@@ -460,9 +460,15 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     });
     on<CalculateShippingRateEvent>((event, emit) async {
       try {
-        emit(state.copyWith(productsStates: ProductsStates.loading));
-        await _productService.calculateshippingRate(event.body);
-        emit(state.copyWith(productsStates: ProductsStates.loaded));
+        emit(state.copyWith(productsStates: ProductsStates.calculating));
+        final response = await _productService.calculateshippingRate(event.body);
+        if (response is CalculateShippingRangeresponse) {
+          emit(state.copyWith(
+            calculateShippingRangeresponse: response,
+            productsStates: ProductsStates.calculated
+          ));
+        }
+        emit(state.copyWith(productsStates: ProductsStates.initial));
       } catch (e) {
         log('error -> CalculateShippingRateEvent: ${e.toString()}');
       }
@@ -703,6 +709,19 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       total += (product.unitPrice! * product.quantity);
     }
     return total;
+  }
+
+  double get calculatedShipingRate {
+    double totalShippingCalculation = 0.00;
+    if ( state.calculateShippingRangeresponse.data != null && state.calculateShippingRangeresponse.data!.isNotEmpty) {
+      for (var sh in state.calculateShippingRangeresponse.data!) {
+        if (sh.price != null) {
+          totalShippingCalculation += sh.price!;
+        }
+      }
+    }
+    return totalShippingCalculation;
+    
   }
 
 

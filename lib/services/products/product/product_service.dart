@@ -77,12 +77,11 @@ class ProductService {
     }
   }
 
-  Future<dynamic> filteredProducts(Map<String, dynamic> filteredParamenters) async {
+  Future<dynamic> filteredProducts(Map<String, dynamic> filteredParamenters, [String? categoryId = '']) async {
     try {
-      // log('filteredParamenters: $filteredParamenters');
-      final response = await dio.post('/products/filtered-page', data: filteredParamenters);
+      log('categroryId: $categoryId');
+      final response = await dio.post(categoryId != null && categoryId.isNotEmpty && categoryId != 'all' ? '/products/filtered-page/$categoryId' : '/products/filtered-page', data: filteredParamenters);
       final filteredProducts = FilteredResponse<FilteredProduct>.fromJson(response.data, (json) => FilteredProduct.fromJson(json));
-      // log('filteredProducts: ${filteredProducts.data.content.length}');
       return filteredProducts.data;
     } on DioException catch (e) {
       log('error filteredProducts: ${e.response?.data}');
@@ -244,11 +243,16 @@ class ProductService {
 
   Future<dynamic> calculateshippingRate(Map<String,dynamic> data) async {
     try {
-      log('dio: ${dio.options.headers}');
-      log('data: $data');
       final response = await dio.post('/shipping-rates/calculate', data: data );
-      log('response: ${response.data}');
-
+      final calculate = CalculateShippingRangeresponse.fromJson(response.data);
+      if (calculate.success == false){
+        ErrorToast(
+          title: calculate.message!,
+          style: ToastificationStyle.flatColored,
+          backgroundColor: Colors.red,
+        ).showToast(AppRoutes.globalContext!);
+      }
+      return calculate;
     } on DioException catch (e) {
       log('error calculateshipping: ${e.response?.data}');
       ErrorHandler(e);

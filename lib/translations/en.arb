@@ -233,7 +233,8 @@
     "product_sub_total_price": "Subtotal : {product_sub_total_price}",
     "order_cost": "Order cost",
     "order_shipping_cost": "Shipping cost: {shipping_cost}",
-    "shipping_rate_added": "Shipping rate added successfully"
+    "shipping_rate_added": "Shipping rate added successfully",
+    "order_created": "Order created successfully"
 
 
 }

@@ -1,7 +1,5 @@
 
 import 'dart:developer';
-
-import 'package:flutter_stripe/flutter_stripe.dart';
 import '../pages.dart';
 
 enum CheckOutMode{
@@ -9,15 +7,28 @@ enum CheckOutMode{
   checkout
 }
 
-class CheckoutPage extends StatelessWidget {
-  CheckoutPage({super.key});
+class CheckoutPage extends StatefulWidget {
+  const CheckoutPage({super.key});
 
+  @override
+  State<CheckoutPage> createState() => _CheckoutPageState();
+}
 
+class _CheckoutPageState extends State<CheckoutPage> {
   final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
 
   final ValueNotifier<String> _selectedCountry = ValueNotifier<String>('');
+
   final ValueNotifier<String> _selectedCountryId = ValueNotifier<String>('');
+
   final ValueNotifier<bool> emitOrder = ValueNotifier<bool>(false);
+
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<CountryBloc>().add(const AddCountriesEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -226,31 +237,32 @@ class CheckoutPage extends StatelessWidget {
               )
             ]
           ),
-          child: ElevatedButton(
-            onPressed: context.watch<ProductsBloc>().state.cartProducts.isEmpty ? null : () {
-              if (_formKey.currentState!.saveAndValidate()) {
-                final Map<String, dynamic> values = _formKey.currentState!.value;
-
-                //TODO don´t delete
-                // final data = {
-                //     "countryId": "",
-                //     "products": [
-            
-                //     ]
-                // };
-                // data['countryId'] = _selectedCountryId.value;
-                // data['products'] = context.read<ProductsBloc>().state.cartProducts.map((e) => {
-                //   'productId': e.id,
-                //   'quantity': e.quantity
-                // }).toList();
-                // log('data: $data');
-                // context.read<ProductsBloc>().add(CalculateShippingRateEvent(body: data));
-
+          child: BlocConsumer<ProductsBloc, ProductsState>(
+            listenWhen: (previous, current) => current.productsStates == ProductsStates.calculated && current.calculateShippingRangeresponse.success == true,
+            listener: (context, state) {
+              if(state.productsStates == ProductsStates.calculated && state.calculateShippingRangeresponse.success == true){
                 emitOrder.value = true;
-      
               }
-            }, 
-            child: Text(translations.submit_order, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),),
+            },
+            builder: (context, state) {
+              return ElevatedButton(
+                onPressed: state.cartProducts.isEmpty || state.productsStates == ProductsStates.calculating ? null : () {
+                  if (_formKey.currentState!.saveAndValidate()) {
+                    final data = {
+                        "countryId": "",
+                        "products": []
+                    };
+                    data['countryId'] = _selectedCountryId.value;
+                    data['products'] = context.read<ProductsBloc>().state.cartProducts.map((e) => {
+                      'productId': e.id,
+                      'quantity': e.quantity
+                    }).toList();
+                    context.read<ProductsBloc>().add(CalculateShippingRateEvent(body: data));      
+                  }
+                }, 
+                child:state.productsStates == ProductsStates.calculating ? const CircularProgressIndicator.adaptive() : Text(translations.submit_order, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),),
+              );
+            },
           )
         ),
       ),
@@ -468,22 +480,37 @@ class OrderDetails extends StatelessWidget {
                   spacer,
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Text(translations.order_shipping_cost(': \$${0.00}'), style: theme.textTheme.titleMedium,)
+                    child: Text(translations.order_shipping_cost(': \$${context.read<ProductsBloc>().calculatedShipingRate}'), style: theme.textTheme.titleMedium,)
                   ),
                   spacer,
                   const Divider(),
                   spacer,
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Text(translations.total_order(': \$${context.watch<ProductsBloc>().subtotal}'), style: theme.textTheme.titleLarge,)
+                    child: Text(translations.total_order(': \$${context.watch<ProductsBloc>().subtotal + context.read<ProductsBloc>().calculatedShipingRate}'), style: theme.textTheme.titleLarge,)
                   ),
                   const Spacer(),
                   SizedBox(
                     width: size.width,
-                    child: BlocBuilder<OrdersBloc, OrdersState>(
+                    child: BlocConsumer<OrdersBloc, OrdersState>(
+                      listenWhen: (previous, current) => current.ordersStatus == OrdersStatus.orderSubmitted,
+                      listener: (BuildContext context, OrdersState state) {
+                        if (state.ordersStatus == OrdersStatus.orderSubmitted) {
+                          context.read<ProductsBloc>().add(const ClearCart());
+                          SuccessToast(
+                            title: translations.order_created,
+                            titleStyle: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
+                            backgroundColor: Colors.green,
+                            autoCloseDuration: const Duration(seconds: 2),
+                            onAutoCompleted: (_) {
+                              context.go('/home');
+                            },
+                          ).showToast(context);
+                        }
+                      },
                       builder: (context, state) {
                         return ElevatedButton(
-                          onPressed: state.ordersStatus == OrdersStatus.submittingOrder ? null : () {
+                          onPressed: state.ordersStatus == OrdersStatus.submittingOrder || context.watch<UsersBloc>().state.status == UserStatus.paying ? null : () {
                             context.read<UsersBloc>().add(MakeStripePaymentEvent(
                               stripePayment: StripePayment(
                                 amount: (context.read<ProductsBloc>().subtotal * 100.00).toInt(),
@@ -491,7 +518,7 @@ class OrderDetails extends StatelessWidget {
                               ))
                             );
                           }, 
-                          child: state.ordersStatus == OrdersStatus.submittingOrder ? const Center(child: CircularProgressIndicator.adaptive(),) : Text(translations.submit_order, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),),
+                          child: state.ordersStatus == OrdersStatus.submittingOrder || context.watch<UsersBloc>().state.status == UserStatus.paying ? const Center(child: CircularProgressIndicator.adaptive(),) : Text(translations.submit_order, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),),
                         );
                       },
                     ),

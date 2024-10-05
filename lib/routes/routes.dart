@@ -86,7 +86,7 @@ class AppRoutes {
       ),
       GoRoute(
         path: '/checkout',
-        builder: (context, state) => CheckoutPage(),
+        builder: (context, state) => const CheckoutPage(),
       ),
       GoRoute(
         path: '/admin',

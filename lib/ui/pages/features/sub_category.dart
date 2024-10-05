@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../pages.dart';
 
 class SubCategoryPage extends StatefulWidget {
@@ -17,9 +15,6 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
   @override
   void initState() {
     super.initState();
-    // context.read<ProductsBloc>().add(AddSelectedSubCategoryEvent(selectedSubCategoryId: widget.categoryId));
-    // context.read<ProductsBloc>().add(AddSubCategoriesEvent(categoryId: widget.categoryId));
-    // fetchData();
     _scrollController = ScrollController()..addListener(listener);
 
   }
@@ -30,8 +25,8 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
     if (_scrollController.position.pixels >= threshold && 
         context.read<ProductsBloc>().state.hasMore && 
         context.read<ProductsBloc>().state.productsStates != ProductsStates.loadingMore) {
-        fetchData();
-    }
+          fetchData();
+        }
   }
 
   void fetchData(){
@@ -48,11 +43,6 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
     super.dispose();
   }
 
-  // @override
-  // void deactivate() {
-  //   context.read<ProductsBloc>().add(const ResetStatesEvent());
-  //   super.deactivate();
-  // }
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -60,16 +50,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
     final AppLocalizations translations = AppLocalizations.of(context)!;
 
     return BlocBuilder<ProductsBloc,ProductsState>(
-      // listener: (context, state) {
-      //   if (state.selectedSubCategory.id.isNotEmpty) {
-      //     context.go('/sub-category/${state.selectedSubCategory.id}',);
-      //   }
-      // },
-      // listenWhen: (previous, current) {
-      //   if (previous.selectedSubCategory != current.selectedSubCategory ) return true;
-      //   if (current.selectedParentCategory == current.selectedSubCategory.parentCategoryId) return true;
-      //   return false;
-      // },
+
       builder: (BuildContext context, state) {
 
         if (state.productsStates == ProductsStates.loading) {
@@ -115,7 +96,6 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                               context.go('/home');
                               return;
                             }
-                          // context.go('/sub-category/${state.selectedSubCategory.parentCategoryId}');
                           context.read<ProductsBloc>().add(AddSelectedSubCategoryEvent(selectedSubCategoryId: state.selectedSubCategory.parentCategoryId));
                         },
                       ),
@@ -124,7 +104,6 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                     ),
                     if (state.subCategories.isNotEmpty) 
                      SizedBox(
-                      //  height: size.height * 0.20,
                        height: size.height * 0.10,
                        width: size.width,
                        child: ListView.builder(
@@ -136,9 +115,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                              padding: const EdgeInsets.symmetric(horizontal: 3.0),
                              child: SubCategoryChip(
                                onTap: (selectedSubCategory) {
-                                log('here--- $selectedSubCategory');
                                 context.read<ProductsBloc>().add(AddSelectedSubCategoryEvent(selectedSubCategoryId: selectedSubCategory.id));
-                                //  context.go('/sub-category/${selectedSubCategory.id}');
                                },
                                c: subCategory, 
                                theme: theme

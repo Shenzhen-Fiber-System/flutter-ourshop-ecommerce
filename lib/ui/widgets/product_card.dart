@@ -317,7 +317,7 @@ class CartCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(Helpers.truncateText(product.name, 20), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),),
+                          Text(Helpers.truncateText(product.name, 18), style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),),
                         ],
                       ),
                       Row(
@@ -326,13 +326,13 @@ class CartCard extends StatelessWidget {
                         ],
                       ), 
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          GestureDetector(
-                            // onTap: () => context.read<ProductsBloc>().addFavoriteProduct(product),
-                            onTap: () {},
-                            child: Icon(state.favoriteProducts.contains(product) ? Icons.favorite : Icons.favorite_border_outlined, color: state.favoriteProducts.contains(product) ? Colors.red : Colors.grey ,)
-                          ),
-                          const Spacer(),
+                          // GestureDetector(
+                          //   onTap: () {},
+                          //   child: Icon(state.favoriteProducts.contains(product) ? Icons.favorite : Icons.favorite_border_outlined, color: state.favoriteProducts.contains(product) ? Colors.red : Colors.grey ,)
+                          // ),
+                          // const Spacer(),
                           //TODO add increase decrease
                           IncreaseDecrease(theme: theme, product: product),
                           

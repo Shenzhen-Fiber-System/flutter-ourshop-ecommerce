@@ -24,9 +24,4 @@ class CountryBloc extends Bloc<CountryEvent, CountryState> {
       }
     });
   }
-
-  // Future<void> fetchCountries() async {
-  //   final countries = await _countryService.getCountries();
-  //   if (countries is List<Country>) add(AddCountriesEvent(countries));
-  // }
 }

@@ -385,7 +385,8 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
                   )
                 );
               },
-              child: Align(
+              child: 
+              Align(
                 alignment: Alignment.centerLeft,
                 child: SizedBox(
                 width: size.width * 0.5,

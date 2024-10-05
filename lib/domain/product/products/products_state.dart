@@ -13,6 +13,8 @@ enum ProductsStates{
   added,
   updating,
   updated,
+  calculating,
+  calculated,
 }
 
 enum FilteredResponseMode{
@@ -59,6 +61,7 @@ class ProductsState extends Equatable {
   final List<FilteredProduct> searchProductShippingRates;
   final List<FilteredOfferProduct> offerProducts;
   final int offerProductsCurrentPage;
+  final CalculateShippingRangeresponse calculateShippingRangeresponse;
 
   const ProductsState({
     this.productsStates = ProductsStates.initial,
@@ -96,7 +99,8 @@ class ProductsState extends Equatable {
     this.searchProductOffer = const [],
     this.searchProductShippingRates = const [],
     this.offerProducts = const [],
-    this.offerProductsCurrentPage = 0
+    this.offerProductsCurrentPage = 0,
+    this.calculateShippingRangeresponse =  const CalculateShippingRangeresponse()
   });
 
   ProductsState copyWith({
@@ -133,7 +137,8 @@ class ProductsState extends Equatable {
     List<FilteredProduct>? searchProductOffer,
     List<FilteredProduct>? searchProductShippingRates,
     List<FilteredOfferProduct>? offerProducts,
-    int? offerProductsCurrentPage
+    int? offerProductsCurrentPage,
+    CalculateShippingRangeresponse? calculateShippingRangeresponse
   }) {
     return ProductsState(
       productsStates: productsStates ?? this.productsStates,
@@ -169,7 +174,8 @@ class ProductsState extends Equatable {
       searchProductOffer: searchProductOffer ?? this.searchProductOffer,
       searchProductShippingRates: searchProductShippingRates ?? this.searchProductShippingRates,
       offerProducts: offerProducts ?? this.offerProducts,
-      offerProductsCurrentPage: offerProductsCurrentPage ?? this.offerProductsCurrentPage
+      offerProductsCurrentPage: offerProductsCurrentPage ?? this.offerProductsCurrentPage,
+      calculateShippingRangeresponse: calculateShippingRangeresponse ?? this.calculateShippingRangeresponse,
     );
   }
   
@@ -207,6 +213,7 @@ class ProductsState extends Equatable {
     searchProductOffer,
     searchProductShippingRates,
     offerProducts,
-    offerProductsCurrentPage
+    offerProductsCurrentPage,
+    calculateShippingRangeresponse
   ];
 }
