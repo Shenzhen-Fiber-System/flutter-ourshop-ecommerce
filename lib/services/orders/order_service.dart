@@ -33,9 +33,9 @@ class OrderService {
 
   Future<dynamic> addNewOrder(Map<String, dynamic> body) async {
     try {
-      log('order body: $body');
       final response = await dio.post('/orders', data: body);
-      log('response: ${response.data}');
+      final order = OrderResponse.fromJson(response.data);
+      return order;
     } on DioException catch (e) {
       log('error adding new order: $e');
       ErrorHandler(e);

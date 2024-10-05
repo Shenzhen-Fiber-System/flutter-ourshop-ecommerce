@@ -41,7 +41,12 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       try { 
         emit(state.copyWith(ordersStatus: OrdersStatus.submittingOrder));
         final dynamic response = await _orderService.addNewOrder(event.data);
-        emit(state.copyWith(ordersStatus: OrdersStatus.orderSubmitted));
+        if (response is OrderResponse) {
+          emit(state.copyWith(
+            ordersStatus: OrdersStatus.orderSubmitted
+          ));
+        }
+        emit(state.copyWith(ordersStatus: OrdersStatus.initial));
       } catch (e) {
         log('e: $e');
       }

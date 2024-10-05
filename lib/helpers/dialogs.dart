@@ -431,7 +431,7 @@ class ContactSellerDialog extends AlertDialogs{
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.saveAndValidate()) {
-                      _openWhatsApp('555566765764', _formKey.currentState!.value['message']);
+                      _openWhatsApp('+526241197742', _formKey.currentState!.value['message']);
                     }
                   },
                   child: Text(translations.whatsapp, style: theme.textTheme.labelMedium,),
@@ -471,7 +471,7 @@ class ContactSellerDialog extends AlertDialogs{
   }
 
   Future<void> _openWhatsApp(String phoneNumber, String message) async {
-    final url = 'https://api.whatsapp.com/send/?phone=$phoneNumber&text=${Uri.encodeComponent(message)}';
+    final url = 'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}';
     try {  
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url));
